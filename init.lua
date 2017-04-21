@@ -2,9 +2,6 @@ hs.window.animationDuration = 0
 
 local hyper = {'cmd', 'alt', 'ctrl'}
 
-hs.hotkey.bind(hyper, 'r', hs.reload)
-hs.hotkey.bind(hyper, 'e', hs.hints.windowHints)
-
 local function reloadConfig(files)
     local doReload = false
     for _, file in pairs(files) do
@@ -57,6 +54,15 @@ end)
 
 hs.hotkey.bind(hyper, 'down', function ()
   move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
+end)
+
+hs.hotkey.bind(hyper, 'r', hs.reload)
+hs.hotkey.bind(hyper, 'e', hs.hints.windowHints)
+hs.hotkey.bind(hyper, 'l', function ()
+  os.execute('/usr/local/bin/lockscreen')
+end)
+hs.hotkey.bind(hyper, 't', function ()
+    os.execute('open -a Terminal ~')
 end)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

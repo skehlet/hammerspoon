@@ -11,6 +11,6 @@ I'm using [Karabiner](https://pqrs.org/osx/karabiner/) and [Seil](https://pqrs.o
 To build `lockscreen` ([source](https://www.isi.edu/~calvin/mac-lockscreen.htm)):
 
 ```
-clang -framework Foundation main.m -o lockscreen
+clang -framework Foundation lockscreen.m -o lockscreen
 mv lockscreen /usr/local/bin
 ```

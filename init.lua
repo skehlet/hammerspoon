@@ -1,7 +1,6 @@
 hs.window.animationDuration = 0
 
-local hyper = {'cmd', 'alt', 'ctrl'}
-
+-- reload hammerspoon config automatically on save
 local function reloadConfig(files)
     local doReload = false
     for _, file in pairs(files) do
@@ -28,11 +27,13 @@ local function move(cb)
   end
 end
 
-hs.hotkey.bind(hyper, 'f', function ()
+local hyper = hs.hotkey.modal.new()
+
+hyper:bind({}, 'f', function ()
   move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
 end)
 
-hs.hotkey.bind(hyper, 'c', function ()
+hyper:bind({}, 'c', nil, function ()
   move(function (f, sf)
     local x = sf.x + ((sf.w - f.w) / 2)
     local y = sf.y + ((sf.h - f.h) / 2)
@@ -40,29 +41,35 @@ hs.hotkey.bind(hyper, 'c', function ()
   end)
 end)
 
-hs.hotkey.bind(hyper, 'left', function ()
+hyper:bind(hyper, 'left', function ()
   move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
 
-hs.hotkey.bind(hyper, 'right', function ()
+hyper:bind(hyper, 'right', function ()
   move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
 
-hs.hotkey.bind(hyper, 'up', function ()
+hyper:bind(hyper, 'up', function ()
   move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
 end)
 
-hs.hotkey.bind(hyper, 'down', function ()
+hyper:bind(hyper, 'down', function ()
   move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end)
 
-hs.hotkey.bind(hyper, 'r', hs.reload)
-hs.hotkey.bind(hyper, 'e', hs.hints.windowHints)
-hs.hotkey.bind(hyper, 'l', function ()
+hyper:bind(hyper, 'r', hs.reload)
+hyper:bind(hyper, 'e', hs.hints.windowHints)
+hyper:bind(hyper, 'c', function ()
+    os.execute('/usr/bin/open -a "/Applications/Google Chrome.app" "http://google.com/"')
+end)
+hyper:bind(hyper, 't', function ()
+    os.execute('/usr/bin/open -a Terminal ~')
+end)
+hyper:bind(hyper, 'l', function ()
   os.execute('/usr/local/bin/lockscreen')
 end)
-hs.hotkey.bind(hyper, 't', function ()
-    os.execute('open -a Terminal ~')
-end)
+
+-- Use Karabiner-Elements to map caps_lock to f18.
+local f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

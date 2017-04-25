@@ -1,16 +1,26 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-Basic stuff:
-* Full screen
-* Centered on screen
-* Left/Right Half
-* Top/Bottom Half
-* Lock screen
-* Launch a Terminal
+Window management hotkeys:
+* Hyper+f: Full screen
+* Hyper+c: Centered on screen
+* Hyper+left: Left Half
+* Hyper+right: Right Half
+* Hyper+up: Top Half
+* Hyper+down: Bottom Half
+* Hyper+t: Launch a Terminal
+* Hyper+l: Lock screen
 
-I'm using [Karabiner](https://pqrs.org/osx/karabiner/) and [Seil](https://pqrs.org/osx/karabiner/seil.html.en) to map my Caps Lock key to Command+Alt+Ctrl. When I upgrade to macOS Sierra I'll use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements/) and [the config file here](https://github.com/lodestone/hyper-hacks).
+## Hyper key
 
-To build `lockscreen` ([source](https://www.isi.edu/~calvin/mac-lockscreen.htm)):
+Inspired by [this post](http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#hyper) and others, I've remapped my Caps Lock key to a private modal key (using [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements)) and used it for the above hotkeys.
+
+Configuring Karabiner-Elements is simple:
+
+![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
+
+## Lockscreen executable
+
+To build `lockscreen` ([credit](https://www.isi.edu/~calvin/mac-lockscreen.htm)):
 
 ```
 clang -framework Foundation lockscreen.m -o lockscreen

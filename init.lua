@@ -12,7 +12,8 @@ local function reloadConfig(files)
         hs.reload()
     end
 end
--- note myWatcher is deliberately global so it's never garbage collected
+
+-- note myWatcher and other variables are deliberately global so it's never garbage collected
 myWatcher = hs.pathwatcher.new(os.getenv('HOME')..'/.hammerspoon/', reloadConfig):start()
 
 local function move(cb)
@@ -27,13 +28,13 @@ local function move(cb)
   end
 end
 
-local hyper = hs.hotkey.modal.new()
+hyper = hs.hotkey.modal.new()
 
 hyper:bind({}, 'f', function ()
   move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
 end)
 
-hyper:bind({}, 'c', nil, function ()
+hyper:bind({}, 'c', function ()
   move(function (f, sf)
     local x = sf.x + ((sf.w - f.w) / 2)
     local y = sf.y + ((sf.h - f.h) / 2)
@@ -41,35 +42,32 @@ hyper:bind({}, 'c', nil, function ()
   end)
 end)
 
-hyper:bind(hyper, 'left', function ()
+hyper:bind({}, 'left', function ()
   move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
 
-hyper:bind(hyper, 'right', function ()
+hyper:bind({}, 'right', function ()
   move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
 
-hyper:bind(hyper, 'up', function ()
+hyper:bind({}, 'up', function ()
   move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
 end)
 
-hyper:bind(hyper, 'down', function ()
+hyper:bind({}, 'down', function ()
   move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end)
 
-hyper:bind(hyper, 'r', hs.reload)
-hyper:bind(hyper, 'e', hs.hints.windowHints)
-hyper:bind(hyper, 'c', function ()
-    os.execute('/usr/bin/open -a "/Applications/Google Chrome.app" "http://google.com/"')
-end)
-hyper:bind(hyper, 't', function ()
+hyper:bind({}, 'r', hs.reload)
+hyper:bind({}, 'e', hs.hints.windowHints)
+hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
-hyper:bind(hyper, 'l', function ()
+hyper:bind({}, 'l', function ()
   os.execute('/usr/local/bin/lockscreen')
 end)
 
 -- Use Karabiner-Elements to map caps_lock to f18.
-local f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
+f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

@@ -12,7 +12,7 @@ Window management hotkeys:
 
 ## Hyper key
 
-Inspired by [this post](http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#hyper) and others, I've remapped my Caps Lock key to a private modal key (using [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements)) and used it for the above hotkeys.
+Inspired by [this post](http://stevelosh.com/blog/2012/10/a-modern-space-cadet/#hyper) and others, I've remapped my Caps Lock key to a private modal key (F18, something never normally used, using [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements)) and used it for the above hotkeys.
 
 Configuring Karabiner-Elements is simple:
 

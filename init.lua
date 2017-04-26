@@ -1,3 +1,6 @@
+local logger = hs.logger.new('init.lua', 'debug')
+local util = require('util')
+
 hs.window.animationDuration = 0
 
 -- reload hammerspoon config automatically on save
@@ -22,13 +25,14 @@ local function move(cb)
         local frame = win:frame()
         local screenFrame = win:screen():frame()
         frame.x, frame.y, frame.w, frame.h = cb(frame, screenFrame)
-        local log = hs.logger.new('move', 'debug')
-        log.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+        logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
         win:setFrame(frame)
   end
 end
 
 hyper = hs.hotkey.modal.new()
+-- Use Karabiner-Elements to map caps_lock to f18.
+f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
 
 hyper:bind({}, 'f', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
@@ -67,7 +71,20 @@ hyper:bind({}, 'l', function ()
     os.execute('/usr/local/bin/lockscreen')
 end)
 
--- Use Karabiner-Elements to map caps_lock to f18.
-f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
+hyper:bind({}, 'g', function ()
+    local ok, result = hs.osascript.applescript('tell application "Google Chrome" to make new window')
+    if not ok then
+        hs.alert.show('Error launching new Chrome window: '..result)
+        return
+    end
+    local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
+        currentSpace = true,
+        visible = true,
+        allowTitles = 'New Tab'
+    }):getWindows()[1]
+    if firstNewWindow then
+        firstNewWindow:focus()
+    end
+end)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

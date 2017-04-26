@@ -9,6 +9,7 @@ Window management hotkeys:
 * Hyper+down: Bottom Half
 
 A few other misc features:
+* Hyper+g: Open a new Google Chrome window
 * Hyper+t: Launch a Terminal
 * Hyper+l: Lock screen
 * Hyper+e: Enable hints, a way to switch apps

@@ -58,10 +58,12 @@ end)
 hyper:bind({}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
+-- hyper:bind({}, 'left', function () hs.grid.set(hs.window.focusedWindow(), {0, 0, 2, 6}) end)
 
 hyper:bind({}, 'right', function ()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
+-- hyper:bind({}, 'right', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 6}) end)
 
 hyper:bind({}, 'up', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
@@ -95,5 +97,17 @@ hyper:bind({}, 'g', function ()
         firstNewWindow:focus()
     end
 end)
+
+-- Grid
+hs.grid.setGrid('4x6')
+hs.grid.setMargins({0, 0})
+hyper:bind({}, 'tab', function () hs.grid.show() end)
+hyper:bind({}, 'pad7', function () hs.grid.set(hs.window.focusedWindow(), {0, 0, 2, 2}) end)
+hyper:bind({}, 'pad4', function () hs.grid.set(hs.window.focusedWindow(), {0, 2, 2, 2}) end)
+hyper:bind({}, 'pad1', function () hs.grid.set(hs.window.focusedWindow(), {0, 4, 2, 2}) end)
+hyper:bind({}, 'pad9', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 2}) end)
+hyper:bind({}, 'pad6', function () hs.grid.set(hs.window.focusedWindow(), {2, 2, 2, 2}) end)
+hyper:bind({}, 'pad3', function () hs.grid.set(hs.window.focusedWindow(), {2, 4, 2, 2}) end)
+
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

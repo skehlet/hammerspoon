@@ -81,9 +81,6 @@ end)
 hyper:bind({}, 'l', function ()
     os.execute('/usr/local/bin/lockscreen')
 end)
-hs.hotkey.bind({}, 'f19', function ()
-    os.execute('/usr/local/bin/lockscreen')
-end)
 
 hyper:bind({}, 'g', function ()
     local ok, result = hs.osascript.applescript('tell application "Google Chrome" to make new window')
@@ -99,6 +96,19 @@ hyper:bind({}, 'g', function ()
     if firstNewWindow then
         firstNewWindow:focus()
     end
+end)
+
+-- this doesn't work... Sublime blocks if you don't background it, and then it opens a tmpfile instead of just an empty 
+-- hyper:bind({}, 's', function ()
+--     os.execute('/Applications/Sublime\\ Text.app/Contents/SharedSupport/bin/subl --new-window &')
+--     -- os.execute(os.getenv('HOME')..'/subl.sh')
+-- end)
+
+hs.hotkey.bind({}, 'f19', function ()
+    -- built-in screensaver:
+    -- hs.caffeinate.startScreensaver()
+    -- this one just blanks the screen, no photos/etc
+    os.execute('/usr/local/bin/lockscreen')
 end)
 
 -- Grid

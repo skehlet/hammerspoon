@@ -39,8 +39,9 @@ local function move(cb)
   end
 end
 
-hyper = hs.hotkey.modal.new()
 -- Use Karabiner-Elements to map caps_lock to f18.
+-- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
+hyper = hs.hotkey.modal.new()
 f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
 
 hyper:bind({}, 'f', function ()
@@ -110,6 +111,33 @@ hs.hotkey.bind({}, 'f19', function ()
     -- this one just blanks the screen, no photos/etc
     os.execute('/usr/local/bin/lockscreen')
 end)
+
+-- Intercept Mission Control (F3) keypresses and launch missionControlFullDesktopBar instead:
+local MISSION_CONTROL_KEYCODE = 160
+local log = hs.logger.new('eventtap', 'debug')
+function handleMissionControl(e)
+    local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+    if code == MISSION_CONTROL_KEYCODE then
+        local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+        if isAutoRepeat == 1 then
+            return true -- discard
+        end
+        local type = e:getType()
+        -- log.i('code: '..code..', type: '..type..', isAutoRepeat: '..isAutoRepeat)
+        if type == hs.eventtap.event.types.keyDown then
+            -- log.i('intercepted Mission Control DOWN')
+            -- /path/to/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar -d -i
+            -- return true
+        elseif type == hs.eventtap.event.types.keyUp then
+            -- log.i('intercepted Mission Control UP')
+            -- /path/to/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar -d -i
+            -- return true
+        end
+    end
+    return false -- propogate
+end
+trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
+trapMissionControl:start()
 
 -- Grid
 hs.grid.setGrid('4x6')

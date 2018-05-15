@@ -112,32 +112,36 @@ hs.hotkey.bind({}, 'f19', function ()
     os.execute('/usr/local/bin/lockscreen')
 end)
 
--- Intercept Mission Control (F3) keypresses and launch missionControlFullDesktopBar instead:
-local MISSION_CONTROL_KEYCODE = 160
-local log = hs.logger.new('eventtap', 'debug')
-function handleMissionControl(e)
-    local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
-    if code == MISSION_CONTROL_KEYCODE then
-        local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
-        if isAutoRepeat == 1 then
-            return true -- discard
+-- Intercept Mission Control (F3) keypresses and launch missionControlFullDesktopBar (if installed) instead:
+local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
+local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
+if mcfdbSize then
+    local log = hs.logger.new('eventtap', 'debug')
+    log.i('mcfdbSize: '..mcfdbSize)
+    local MISSION_CONTROL_KEYCODE = 160
+    function handleMissionControl(e)
+        local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+        if code == MISSION_CONTROL_KEYCODE then
+            local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+            if isAutoRepeat == 1 then
+                return true -- discard
+            end
+            local type = e:getType()
+            if type == hs.eventtap.event.types.keyDown then
+                log.i('intercepted Mission Control DOWN')
+                os.execute(MCFDB_PATH..' -d -i')
+                return true -- discard
+            elseif type == hs.eventtap.event.types.keyUp then
+                log.i('intercepted Mission Control UP')
+                os.execute(MCFDB_PATH..' -d -r')
+                return true -- discard
+            end
         end
-        local type = e:getType()
-        -- log.i('code: '..code..', type: '..type..', isAutoRepeat: '..isAutoRepeat)
-        if type == hs.eventtap.event.types.keyDown then
-            -- log.i('intercepted Mission Control DOWN')
-            -- /path/to/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar -d -i
-            -- return true
-        elseif type == hs.eventtap.event.types.keyUp then
-            -- log.i('intercepted Mission Control UP')
-            -- /path/to/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar -d -i
-            -- return true
-        end
+        return false -- propogate
     end
-    return false -- propogate
+    trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
+    trapMissionControl:start()
 end
-trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
-trapMissionControl:start()
 
 -- Grid
 hs.grid.setGrid('4x6')

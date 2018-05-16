@@ -22,11 +22,12 @@ Configuring Karabiner-Elements is simple:
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
-## Lockscreen executable
+## Lockscreen
+After updating to High Sierra, [the way I was using](https://apple.stackexchange.com/a/123738) no longer works, due to a change in the Keychain Access app.
 
-To build `lockscreen` ([credit](https://www.isi.edu/~calvin/mac-lockscreen.htm)):
+There's [another way here](https://stackoverflow.com/a/26492632), but it shows the login screen for a few seconds, I'd prefer just a blank screen.
 
-```
-clang -framework Foundation lockscreen.m -o lockscreen
-mv lockscreen /usr/local/bin
-```
+I've settled on `pmset displaysleepnow` ([credit](https://apple.stackexchange.com/a/111493)). It just puts the display to sleep, and relies on you having
+set _Require password immediately after sleep or screen saver begins_, which I had set anyway.
+
+![Require password immediately after sleep or screen saver begins](L851F.png?raw=true "Require password immediately after sleep or screen saver begins")

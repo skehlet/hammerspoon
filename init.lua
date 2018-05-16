@@ -109,7 +109,10 @@ hs.hotkey.bind({}, 'f19', function ()
     -- built-in screensaver:
     -- hs.caffeinate.startScreensaver()
     -- this one just blanks the screen, no photos/etc
-    os.execute('/usr/local/bin/lockscreen')
+    --os.execute('/usr/local/bin/lockscreen')
+    -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
+    -- set under System Preferences, Security & Privacy, General.
+    os.execute('pmset displaysleepnow')
 end)
 
 -- Intercept Mission Control (F3) keypresses and launch missionControlFullDesktopBar (if installed) instead:

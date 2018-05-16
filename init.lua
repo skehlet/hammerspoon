@@ -39,6 +39,16 @@ local function move(cb)
   end
 end
 
+local function lockScreen()
+    -- built-in screensaver:
+    -- hs.caffeinate.startScreensaver()
+    -- this one just blanks the screen, no photos/etc
+    --os.execute('/usr/local/bin/lockscreen')
+    -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
+    -- set under System Preferences, Security & Privacy, General.
+    os.execute('pmset displaysleepnow')
+end
+
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hyper = hs.hotkey.modal.new()
@@ -79,9 +89,7 @@ hyper:bind({}, 'e', hs.hints.windowHints)
 hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
-hyper:bind({}, 'l', function ()
-    os.execute('/usr/local/bin/lockscreen')
-end)
+hyper:bind({}, 'l', lockScreen)
 
 hyper:bind({}, 'g', function ()
     local ok, result = hs.osascript.applescript('tell application "Google Chrome" to make new window')
@@ -99,21 +107,7 @@ hyper:bind({}, 'g', function ()
     end
 end)
 
--- this doesn't work... Sublime blocks if you don't background it, and then it opens a tmpfile instead of just an empty 
--- hyper:bind({}, 's', function ()
---     os.execute('/Applications/Sublime\\ Text.app/Contents/SharedSupport/bin/subl --new-window &')
---     -- os.execute(os.getenv('HOME')..'/subl.sh')
--- end)
-
-hs.hotkey.bind({}, 'f19', function ()
-    -- built-in screensaver:
-    -- hs.caffeinate.startScreensaver()
-    -- this one just blanks the screen, no photos/etc
-    --os.execute('/usr/local/bin/lockscreen')
-    -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
-    -- set under System Preferences, Security & Privacy, General.
-    os.execute('pmset displaysleepnow')
-end)
+hs.hotkey.bind({}, 'f19', lockScreen)
 
 -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
 -- See https://github.com/briankendall/missionControlFullDesktopBar

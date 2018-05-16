@@ -22,7 +22,7 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 `caps lock` is my hotkey.
 
-In [my Hammerspoon config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L45) I turn F18 into a modifier key (like
+In [my Hammerspoon config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L55) I turn F18 into a modifier key (like
 Command, Shift, Control, etc). F18 isn't used for anything as far as I know:
 
 ![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
@@ -39,7 +39,7 @@ At some point macOS stopped expanding the Desktop thumbnails by default whenever
 
 > I recommend making it so that the above command is executed when the button is pressed, and the following command is executed when it's released
 
-and this is possible by intercepting F3 keypresses, see [my config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L118), and [my video of it working](https://youtu.be/K0PgxgLWZM4).
+and this is possible by intercepting F3 keypresses, see [my config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L112), and [my video of it working](https://youtu.be/K0PgxgLWZM4).
 
 ## Lockscreen
 

@@ -2,6 +2,8 @@
 
 ## Window Management
 
+See [a video here](https://youtu.be/OjS6LqKEPcA):
+
 * Hotkey+f: Full screen
 * Hotkey+c: Centered on screen
 * Hotkey+left: Left Half

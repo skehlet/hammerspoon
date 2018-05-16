@@ -47,6 +47,6 @@ After updating to High Sierra, [the way I was using](https://apple.stackexchange
 
 There's [another way here](https://stackoverflow.com/a/26492632), but it shows the login screen for a few seconds, I'd prefer just a blank screen.
 
-I've settled on `pmset displaysleepnow` ([credit](https://apple.stackexchange.com/a/111493)), which just puts the display to sleep. You'll need to set _Require password immediately after sleep or screen saver begins_ (a good idea anyway) for it to actually lock the screen.
+I've settled on `pmset displaysleepnow` ([credit](https://apple.stackexchange.com/a/111493)), which just puts the display to sleep. You'll need to set _Require password immediately after sleep or screen saver begins_ under System Preferences, Security & Privacy, General (a good idea anyway) for it to actually lock the screen.
 
 ![Require password immediately after sleep or screen saver begins](L851F.png?raw=true "Require password immediately after sleep or screen saver begins")

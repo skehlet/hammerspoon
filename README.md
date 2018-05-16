@@ -18,12 +18,11 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 * Hotkey+l: Lock screen
 * Hotkey+e: Enable hints, a way to switch apps
 
-## What's this "Hotkey"?
+## What is this "Hotkey"?
 
 `caps lock` is my hotkey.
 
-In [my Hammerspoon config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L55) I turn F18 into a modifier key (like
-Command, Shift, Control, etc). F18 isn't used for anything as far as I know:
+In my Hammerspoon config I turn F18 into a modifier key (like Command, Shift, Control, etc). F18 isn't used for anything as far as I know:
 
 ![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
 
@@ -31,7 +30,7 @@ Then I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
-This allows holding Caps Lock while hitting `f`, `c`, `left`, `right`, etc. There might be other ways to do this but this, for example you'll find examples out there of people binding Caps Lock to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this is really straightforward and won't conflict with other apps that might have overlapping modifier key combinations.
+This allows holding Caps Lock while hitting `f`, `c`, `left`, `right`, etc. There might be other ways to do this but this, for example you'll find examples out there of people binding Caps Lock to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
 
 ## Mission Control: Expanding Desktop thumbnails by default
 
@@ -39,9 +38,11 @@ At some point macOS stopped expanding the Desktop thumbnails by default whenever
 
 > I recommend making it so that the above command is executed when the button is pressed, and the following command is executed when it's released
 
-and this is possible by intercepting F3 keypresses, see [my config](https://github.com/skehlet/hammerspoon/blob/master/init.lua#L112), and [my video of it working](https://youtu.be/K0PgxgLWZM4).
+and this is possible by intercepting F3 keypresses, see my config, and [a video of it working](https://youtu.be/K0PgxgLWZM4).
 
-## Lockscreen
+## Screen Lock
+
+Activate with `Hotkey`+`l` or `f19`.
 
 After updating to High Sierra, [the way I was using](https://apple.stackexchange.com/a/123738) no longer works, due to a change in the Keychain Access app.
 

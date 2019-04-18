@@ -48,4 +48,8 @@ I've settled on `pmset displaysleepnow` ([credit](https://apple.stackexchange.co
 
 Using the Logitech G Hub software, I remapped the extra ring finger button to `F17`, and then remap `F17`'s down and up keypresses to the Mission Control key.
 
-![logitech-g600-ring-finger-button.png](logitech-g600-ring-finger-button.png?raw=true "Logitech G600 ring finger button remap in Logitech G Hub")
+![Logitech G600 ring finger button remap in Logitech G Hub](logitech-g600-ring-finger-button.png?raw=true "Logitech G600 ring finger button remap in Logitech G Hub")
+
+**Important note:** When using Karabiner-Elements, you need to uncheck both entries for the Logitech G600 ("Gaming Mouse G600 (Logitect)") under Devices, otherwise it seems to capture all the events and Hammerspoon doesn't get them.
+
+![Karabiner Elements with G600 devices disabled](Karabiner-Elements-with-G600-disabled.png?raw=true "Karabiner Elements with G600 devices disabled")

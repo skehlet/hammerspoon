@@ -1,6 +1,9 @@
 local logger = hs.logger.new('init.lua', 'debug')
 local util = require('util')
 
+local MISSION_CONTROL_KEYCODE = 0xa0
+local F17_KEYCODE = 0x40
+
 hs.window.animationDuration = 0
 -- eliminate some warnings from showing up in the log:
 for idx, name in ipairs({
@@ -109,43 +112,67 @@ end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)
 
--- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
--- See https://github.com/briankendall/missionControlFullDesktopBar
-local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
-local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
-if mcfdbSize then
-    local MISSION_CONTROL_KEYCODE = 160
-    local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
-    log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
-    function handleMissionControl(e)
-        local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
-        if code == MISSION_CONTROL_KEYCODE then
-            -- ignore auto-repeats
-            local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
-            if isAutoRepeat == 1 then
-                return true -- discard
-            end
-            -- don't intercept cmd+f3 or ctrl+f3
-            local flags = e:getFlags()
-            if (flags.cmd or flags.ctrl) then
-                return false -- propogate
-            end
-            local type = e:getType()
-            if type == hs.eventtap.event.types.keyDown then
-                --log.i('intercepted Mission Control DOWN')
-                os.execute(MCFDB_PATH..' -d -i')
-                return true -- discard
-            elseif type == hs.eventtap.event.types.keyUp then
-                --log.i('intercepted Mission Control UP')
-                os.execute(MCFDB_PATH..' -d -r')
-                return true -- discard
-            end
-        end
-        return false -- propogate
+-- -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
+-- -- See https://github.com/briankendall/missionControlFullDesktopBar
+-- local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
+-- local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
+-- if mcfdbSize then
+--     local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
+--     log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
+--     function handleMissionControl(e)
+--         local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+--         if code == MISSION_CONTROL_KEYCODE then
+--             -- ignore auto-repeats
+--             local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+--             if isAutoRepeat == 1 then
+--                 return true -- discard
+--             end
+--             -- don't intercept cmd+f3 or ctrl+f3
+--             local flags = e:getFlags()
+--             if (flags.cmd or flags.ctrl) then
+--                 return false -- propogate
+--             end
+--             local type = e:getType()
+--             if type == hs.eventtap.event.types.keyDown then
+--                 --log.i('intercepted Mission Control DOWN')
+--                 os.execute(MCFDB_PATH..' -d -i')
+--                 return true -- discard
+--             elseif type == hs.eventtap.event.types.keyUp then
+--                 --log.i('intercepted Mission Control UP')
+--                 os.execute(MCFDB_PATH..' -d -r')
+--                 return true -- discard
+--             end
+--         end
+--         return false -- propogate
+--     end
+--     trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
+--     trapMissionControl:start()
+-- end
+
+hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function (e)
+    local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+    if e:getType() == hs.eventtap.event.types.keyDown then
+        logger.i('intercepted '..code..' DOWN')
+    else
+        logger.i('intercepted '..code..' UP')
     end
-    trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
-    trapMissionControl:start()
-end
+    if code == F17_KEYCODE then
+        return true, { hs.eventtap.event.newKeyEvent(MISSION_CONTROL_KEYCODE, e:getType() == hs.eventtap.event.types.keyDown) }
+    end
+end):start()
+
+-- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
+hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, function (event)
+    local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+    local current_app = hs.application.frontmostApplication()
+    if (current_app:name() == 'Google Chrome') then
+        if (button == 3) then
+            hs.eventtap.keyStroke({'cmd'}, '[')
+        elseif (button == 4) then
+            hs.eventtap.keyStroke({'cmd'}, ']')
+        end
+    end
+end):start()
 
 -- Grid
 hs.grid.setGrid('4x6')

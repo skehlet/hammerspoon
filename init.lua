@@ -112,6 +112,7 @@ end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)
 
+-- I switched to https://github.com/briankendall/forceFullDesktopBar, it works better in Mojave, I longer need this.
 -- -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
 -- -- See https://github.com/briankendall/missionControlFullDesktopBar
 -- local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
@@ -149,18 +150,16 @@ hs.hotkey.bind({}, 'f19', lockScreen)
 --     trapMissionControl:start()
 -- end
 
+-- Set up my Logitech G600's ring finger button to F17.
+-- Then here, remap F17 to the Mission Control button.
 hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function (e)
     local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
-    if e:getType() == hs.eventtap.event.types.keyDown then
-        logger.i('intercepted '..code..' DOWN')
-    else
-        logger.i('intercepted '..code..' UP')
-    end
     if code == F17_KEYCODE then
         return true, { hs.eventtap.event.newKeyEvent(MISSION_CONTROL_KEYCODE, e:getType() == hs.eventtap.event.types.keyDown) }
     end
 end):start()
 
+-- Mouse Button4/Button5 to Back/Forward in Chrome.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
@@ -184,6 +183,5 @@ hyper:bind({}, 'pad1', function () hs.grid.set(hs.window.focusedWindow(), {0, 4,
 hyper:bind({}, 'pad9', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 2}) end)
 hyper:bind({}, 'pad6', function () hs.grid.set(hs.window.focusedWindow(), {2, 2, 2, 2}) end)
 hyper:bind({}, 'pad3', function () hs.grid.set(hs.window.focusedWindow(), {2, 4, 2, 2}) end)
-
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

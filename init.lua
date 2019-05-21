@@ -37,7 +37,7 @@ local function move(cb)
         local frame = win:frame()
         local screenFrame = win:screen():frame()
         frame.x, frame.y, frame.w, frame.h = cb(frame, screenFrame)
-        logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+        -- logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
         win:setFrame(frame)
   end
 end
@@ -152,26 +152,32 @@ hs.hotkey.bind({}, 'f19', lockScreen)
 
 -- Set up my Logitech G600's ring finger button to F17.
 -- Then here, remap F17 to the Mission Control button.
-hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function (e)
+-- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
+myG600RingFingerButtonEventTap = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function (e)
     local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+    -- logger.i('caught keycode: ' .. code)
     if code == F17_KEYCODE then
         return true, { hs.eventtap.event.newKeyEvent(MISSION_CONTROL_KEYCODE, e:getType() == hs.eventtap.event.types.keyDown) }
     end
-end):start()
+end)
+myG600RingFingerButtonEventTap:start()
 
 -- Mouse Button4/Button5 to Back/Forward in Chrome.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
-hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, function (event)
+-- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
+myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
-    local current_app = hs.application.frontmostApplication()
-    if (current_app:name() == 'Google Chrome') then
+    local frontmostAppName = hs.application.frontmostApplication():name()
+    -- logger.i('otherMouseUp event, button: ' .. button .. ', frontmostApp: ' .. frontmostAppName)
+    if (frontmostAppName == 'Google Chrome') then
         if (button == 3) then
             hs.eventtap.keyStroke({'cmd'}, '[')
         elseif (button == 4) then
             hs.eventtap.keyStroke({'cmd'}, ']')
         end
     end
-end):start()
+end)
+myButton4Button5EventTap:start()
 
 -- Grid
 hs.grid.setGrid('4x6')

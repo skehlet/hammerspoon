@@ -165,15 +165,25 @@ myG600RingFingerButtonEventTap:start()
 -- Mouse Button4/Button5 to Back/Forward in Chrome.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
-myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, function (event)
+myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
     local frontmostAppName = hs.application.frontmostApplication():name()
-    -- logger.i('otherMouseUp event, button: ' .. button .. ', frontmostApp: ' .. frontmostAppName)
-    if (frontmostAppName == 'Google Chrome') then
-        if (button == 3) then
+    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. frontmostAppName)
+    if frontmostAppName == 'Google Chrome' then
+        if button == 3 then
             hs.eventtap.keyStroke({'cmd'}, '[')
-        elseif (button == 4) then
+            return true
+        elseif button == 4 then
             hs.eventtap.keyStroke({'cmd'}, ']')
+            return true
+        end
+    elseif frontmostAppName == 'Slack' then
+        if button == 3 then
+            hs.eventtap.keyStroke({'cmd'}, 'left')
+            return true
+        elseif button == 4 then
+            hs.eventtap.keyStroke({'cmd'}, 'right')
+            return true
         end
     end
 end)

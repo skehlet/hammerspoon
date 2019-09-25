@@ -112,6 +112,22 @@ end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)
 
+-- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
+ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)
+    -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey
+    event = event:systemKey()
+    -- http://stackoverflow.com/a/1252776/1521064
+    local next = next
+    -- Check empty table
+    if next(event) then
+        if event.key == 'EJECT' and event.down then
+            -- logger.i('caught EJECT DOWN: ' .. event.key)
+            lockScreen()
+        end
+    end
+end)
+ejectKey:start()
+
 -- I switched to https://github.com/briankendall/forceFullDesktopBar, it works better in Mojave, I longer need this.
 -- -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
 -- -- See https://github.com/briankendall/missionControlFullDesktopBar

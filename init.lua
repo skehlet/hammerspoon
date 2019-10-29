@@ -49,7 +49,9 @@ local function lockScreen()
     --os.execute('/usr/local/bin/lockscreen')
     -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
     -- set under System Preferences, Security & Privacy, General.
-    os.execute('pmset displaysleepnow')
+    -- os.execute('pmset displaysleepnow')
+    -- As of Hammerspoon 0.9.76, this isn't bad, it shows the lock screen, which blanks after a few seconds:
+    hs.caffeinate.lockScreen()
 end
 
 -- Use Karabiner-Elements to map caps_lock to f18.

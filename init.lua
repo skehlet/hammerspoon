@@ -54,6 +54,14 @@ local function lockScreen()
     hs.caffeinate.lockScreen()
 end
 
+local function goldenRatioA(n)
+    return math.floor(.62 * n)
+end
+
+local function goldenRatioB(n)
+    return math.floor(.38 * n)
+end
+
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hyper = hs.hotkey.modal.new()
@@ -76,20 +84,20 @@ hyper:bind({}, 'left', function ()
 end)
 -- hyper:bind({}, 'left', function () hs.grid.set(hs.window.focusedWindow(), {0, 0, 2, 6}) end)
 hyper:bind({'option', 'shift'}, 'left', function ()
-    move(function (f, sf) return sf.x, sf.y, 2*sf.w/3, sf.h end)
+    move(function (f, sf) return sf.x, sf.y, goldenRatioA(sf.w), sf.h end)
 end)
 hyper:bind({'option'}, 'left', function ()
-    move(function (f, sf) return sf.x, sf.y, sf.w/3, sf.h end)
+    move(function (f, sf) return sf.x, sf.y, goldenRatioB(sf.w), sf.h end)
 end)
 
 hyper:bind({}, 'right', function ()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
 hyper:bind({'option', 'shift'}, 'right', function ()
-    move(function (f, sf) return (sf.x2 - 2*sf.w/3), sf.y, 2*sf.w/3, sf.h end)
+    move(function (f, sf) return (sf.x2 - goldenRatioA(sf.w)), sf.y, goldenRatioA(sf.w), sf.h end)
 end)
 hyper:bind({'option'}, 'right', function ()
-    move(function (f, sf) return (sf.x2 - sf.w/3), sf.y, sf.w/3, sf.h end)
+    move(function (f, sf) return (sf.x2 - goldenRatioB(sf.w)), sf.y, goldenRatioB(sf.w), sf.h end)
 end)
 -- hyper:bind({}, 'right', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 6}) end)
 

@@ -110,7 +110,8 @@ hyper:bind({}, 'down', function ()
 end)
 
 hyper:bind({}, 'r', hs.reload)
-hyper:bind({}, 'e', hs.hints.windowHints)
+-- turn this off, I don't use it, plus it's super slow on Catalina:
+-- hyper:bind({}, 'e', hs.hints.windowHints)
 hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
@@ -122,6 +123,7 @@ hyper:bind({}, 'g', function ()
         hs.alert.show('Error launching new Chrome window: '..result)
         return
     end
+    -- Commented out, super slow on Catalina, and doesn't seem necessary anyway
     -- local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
     --     currentSpace = true,
     --     visible = true,
@@ -153,44 +155,6 @@ ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventta
 end)
 ejectKey:start()
 
--- I switched to https://github.com/briankendall/forceFullDesktopBar, it works better in Mojave, I longer need this.
--- -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
--- -- See https://github.com/briankendall/missionControlFullDesktopBar
--- local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
--- local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
--- if mcfdbSize then
---     local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
---     log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
---     function handleMissionControl(e)
---         local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
---         if code == MISSION_CONTROL_KEYCODE then
---             -- ignore auto-repeats
---             local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
---             if isAutoRepeat == 1 then
---                 return true -- discard
---             end
---             -- don't intercept cmd+f3 or ctrl+f3
---             local flags = e:getFlags()
---             if (flags.cmd or flags.ctrl) then
---                 return false -- propogate
---             end
---             local type = e:getType()
---             if type == hs.eventtap.event.types.keyDown then
---                 --log.i('intercepted Mission Control DOWN')
---                 os.execute(MCFDB_PATH..' -d -i')
---                 return true -- discard
---             elseif type == hs.eventtap.event.types.keyUp then
---                 --log.i('intercepted Mission Control UP')
---                 os.execute(MCFDB_PATH..' -d -r')
---                 return true -- discard
---             end
---         end
---         return false -- propogate
---     end
---     trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
---     trapMissionControl:start()
--- end
-
 -- Set up my Logitech G600's ring finger button to F17.
 -- Then here, remap F17 to the Mission Control button.
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
@@ -203,7 +167,7 @@ myG600RingFingerButtonEventTap = hs.eventtap.new({hs.eventtap.event.types.keyDow
 end)
 myG600RingFingerButtonEventTap:start()
 
--- Mouse Button4/Button5 to Back/Forward in Chrome.
+-- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
 myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (event)

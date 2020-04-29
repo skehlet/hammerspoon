@@ -1,5 +1,7 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
+This is working on macOS Catalina and Hammerspoon 0.9.78.
+
 ## Window Management
 
 See [a video here](https://youtu.be/OjS6LqKEPcA):
@@ -10,39 +12,36 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 * Hotkey+right: Right Half
 * Hotkey+up: Top Half
 * Hotkey+down: Bottom Half
+* Hotkey+shift+left: Left 62% (Inspired by [the Golden Ratio](https://en.wikipedia.org/wiki/Golden_ratio))
+* Hotkey+shift+right: Right 62%
+* Hotkey+option+left: Left 38%
+* Hotkey+option+right: Right 38%
 
 ## Shortcuts
 
 * Hotkey+g: Open a new Google Chrome window
 * Hotkey+t: Launch a Terminal
 * Hotkey+l: Lock screen
-* Hotkey+e: Enable hints, a way to switch apps
+
+## Other Stuff
+* Mouse button 4 and 5 to Back/Forward in Chrome and Previous/Next channel in Slack
+* Hotkey + NumPad 1,4,7,3,6,9: Bottom left, left, top left, bottom right, right, top right.
 
 ## What is this "Hotkey"?
 
-`caps lock` is my hotkey.
-
-In my Hammerspoon config I turn `F18` into a modifier key (like Command, Shift, Control, etc). `F18` isn't used for anything as far as I know:
-
-![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
-
-Then I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap my Caps Lock key to `F18`:
+`caps lock` is my hotkey. I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (an unused key):
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
-This allows holding Caps Lock while hitting `f`, `c`, `left`, `right`, etc. There might be other ways to do this but this, for example you'll find examples out there of people binding Caps Lock to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
+Then in my Hammerspoon config I turn `F18` into a modifier key (like Command, Shift, Control, etc):
+
+![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
+
+This allows holding `caps lock` while hitting `f`, `c`, `left`, `right`, etc. There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
 
 ## Screen Lock
 
-Activate with `Hotkey`+`l` or `F19`.
-
-After updating to High Sierra, [the way I was using](https://apple.stackexchange.com/a/123738) no longer works, due to a change in the Keychain Access app.
-
-There's [another way here](https://stackoverflow.com/a/26492632), but it shows the login screen for a few seconds, I'd prefer just a blank screen.
-
-I've settled on `pmset displaysleepnow` ([credit](https://apple.stackexchange.com/a/111493)), which just puts the display to sleep. You'll need to set _Require password immediately after sleep or screen saver begins_ under System Preferences, Security & Privacy, General (a good idea anyway) for it to actually lock the screen.
-
-![Require password immediately after sleep or screen saver begins](L851F.png?raw=true "Require password immediately after sleep or screen saver begins")
+Activate with `Hotkey`+`l`, `F19`, or `eject`.
 
 ## Logitech G600 Support
 

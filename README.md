@@ -33,17 +33,19 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
-Then in my Hammerspoon config I turn `F18` into a modifier key (like Command, Shift, Control, etc):
-
 ![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
 
-This allows holding `caps lock` while hitting `f`, `c`, `left`, `right`, etc. There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
+Then in my Hammerspoon config I turn `F18` into a modifier key (like Command, Shift, Control, etc). This allows holding `caps lock` while hitting `f`, `c`, `left`, `right`, etc.
+
+There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
 
 ## Screen Lock
 
 Activate with `Hotkey`+`l`, `F19`, or `eject`.
 
 ## Logitech G600 Support
+
+Update: I haven't used this in a while, it was a little flakey, but that was more to do with the Logitech G Hub software for Mac.
 
 Using the Logitech G Hub software, I remapped the extra ring finger button to `F17`, and then remap `F17`'s down and up keypresses to the Mission Control key.
 

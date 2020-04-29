@@ -122,14 +122,17 @@ hyper:bind({}, 'g', function ()
         hs.alert.show('Error launching new Chrome window: '..result)
         return
     end
-    local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
-        currentSpace = true,
-        visible = true,
-        allowTitles = 'New Tab'
-    }):getWindows()[1]
-    if firstNewWindow then
-        firstNewWindow:focus()
-    end
+    -- local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
+    --     currentSpace = true,
+    --     visible = true,
+    --     allowTitles = 'New Tab'
+    -- }):getWindows()[1]
+    -- if firstNewWindow then
+    --     logger.i('Found the new Chrome window and told it to focus')
+    --     firstNewWindow:focus()
+    -- else
+    --     logger.i('Could not found the new Chrome window')
+    -- end
 end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)

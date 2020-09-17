@@ -83,6 +83,11 @@ hyper:bind({}, 'c', function ()
     end)
 end)
 
+-- "stretch" the window vertically
+hyper:bind({}, 's', function ()
+    move(function (f, sf) return f.x, sf.y, f.w, sf.h end)
+end)
+
 hyper:bind({}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
@@ -122,21 +127,37 @@ end)
 hyper:bind({}, 'l', lockScreen)
 hyper:bind({'shift'}, 'l', systemSleep)
 
--- click menu item "New Tab" of menu "Window" of menu bar 1
--- click (first menu item whose name contains "New Tab") of menu "Window" of menu bar 1
 hyper:bind({}, 'g', function ()
-    local ok, object, descriptor = hs.osascript._osascript([[
-        tell application "System Events"
-            tell process "Google Chrome"
-                click menu item "New Window" of menu "File" of menu bar 1
-            end tell
-        end tell
-    ]], "AppleScript")
-    if not ok then
-        hs.alert.show('Error launching new Chrome window: '..descriptor)
-        return
-    end
-    -- Commented out, super slow on Catalina, and the above, simple File -> New Window technique appears to work
+    -- -- click menu item "New Tab" of menu "Window" of menu bar 1
+    -- -- click (first menu item whose name contains "New Tab") of menu "Window" of menu bar 1
+    -- local ok, object, descriptor = hs.osascript._osascript([[
+    --     tell application "System Events"
+    --         tell process "Google Chrome"
+    --             click menu item "New Window" of menu "File" of menu bar 1
+    --         end tell
+    --     end tell
+    -- ]], "AppleScript")
+
+    -- -- Javascript alternative
+    -- -- https://github.com/JXA-Cookbook/JXA-Cookbook/wiki/System-Events#clicking-menu-items
+    -- local ok, object, descriptor = hs.javascript([[
+    --     Application('System Events')
+    --         .processes.byName('Google Chrome')
+    --         .menuBars[0]
+    --         .menuBarItems
+    --         .byName('File')
+    --         .menus[0]
+    --         .menuItems
+    --         .byName('New Window')
+    --         .click();
+    -- ]])
+
+    -- if not ok then
+    --     hs.alert.show('Error launching new Chrome window: '..descriptor)
+    --     return
+    -- end
+
+    -- Commented out, super slow on Catalina, and the above File -> New Window technique appears to work
     -- local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
     --     currentSpace = true,
     --     visible = true,
@@ -148,6 +169,12 @@ hyper:bind({}, 'g', function ()
     -- else
     --     logger.i('Could not found the new Chrome window')
     -- end
+
+    -- this is so much simpler/cleaner, no applescript/javascript, no issues with focusing
+    local chrome = hs.appfinder.appFromName("Google Chrome")
+    if chrome then
+        chrome:selectMenuItem({"File", "New Window"})
+    end
 end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)

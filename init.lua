@@ -54,6 +54,10 @@ local function lockScreen()
     hs.caffeinate.lockScreen()
 end
 
+local function systemSleep()
+    hs.caffeinate.systemSleep()
+end
+
 local function goldenRatioA(n)
     return math.floor(.62 * n)
 end
@@ -116,14 +120,23 @@ hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
 hyper:bind({}, 'l', lockScreen)
+hyper:bind({'shift'}, 'l', systemSleep)
 
+-- click menu item "New Tab" of menu "Window" of menu bar 1
+-- click (first menu item whose name contains "New Tab") of menu "Window" of menu bar 1
 hyper:bind({}, 'g', function ()
-    local ok, result = hs.osascript.applescript('tell application "Google Chrome" to make new window')
+    local ok, object, descriptor = hs.osascript._osascript([[
+        tell application "System Events"
+            tell process "Google Chrome"
+                click menu item "New Window" of menu "File" of menu bar 1
+            end tell
+        end tell
+    ]], "AppleScript")
     if not ok then
-        hs.alert.show('Error launching new Chrome window: '..result)
+        hs.alert.show('Error launching new Chrome window: '..descriptor)
         return
     end
-    -- Commented out, super slow on Catalina, and doesn't seem necessary anyway
+    -- Commented out, super slow on Catalina, and the above, simple File -> New Window technique appears to work
     -- local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
     --     currentSpace = true,
     --     visible = true,

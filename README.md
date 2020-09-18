@@ -22,11 +22,10 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 * Hotkey+g: Open a new Google Chrome window
 * Hotkey+t: Launch a Terminal
-* Hotkey+l: Lock screen
+* Hotkey+l: Lock screen (additional lock screen bindings in Screen Lock section below)
 
 ## Other Stuff
 * Mouse button 4 and 5 to Back/Forward in Chrome and Previous/Next channel in Slack
-* Hotkey + NumPad 1,4,7,3,6,9: Bottom left, left, top left, bottom right, right, top right.
 
 ## What is this "Hotkey"?
 

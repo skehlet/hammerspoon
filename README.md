@@ -34,7 +34,7 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 ![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
 
-There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
+There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps configured to use those modifier key combinations. I also use Karabiner-Elements for other purposes, like remapping the option and commands keys on Windows keyboards and binding additional keys to trigger Exposé/Mission Control.
 
 ## Screen Lock
 

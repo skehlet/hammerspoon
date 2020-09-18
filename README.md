@@ -12,10 +12,11 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 * Hotkey+right: Right Half
 * Hotkey+up: Top Half
 * Hotkey+down: Bottom Half
-* Hotkey+shift+left: Left 62% (Inspired by [the Golden Ratio](https://en.wikipedia.org/wiki/Golden_ratio))
-* Hotkey+shift+right: Right 62%
-* Hotkey+option+left: Left 38%
-* Hotkey+option+right: Right 38%
+* Hotkey+shift+left: Left 70%
+* Hotkey+shift+right: Right 70%
+* Hotkey+option+left: Left 30%
+* Hotkey+option+right: Right 30%
+* Hotkey+s: Maximize ("stretch") vertically
 
 ## Shortcuts
 
@@ -42,15 +43,3 @@ There might be other ways to do this but this, for example you'll find examples 
 ## Screen Lock
 
 Activate with `Hotkey`+`l`, `F19`, or `eject`.
-
-## Logitech G600 Support
-
-Update: I haven't used this in a while, it was a little flakey, but that was more to do with the Logitech G Hub software for Mac.
-
-Using the Logitech G Hub software, I remapped the extra ring finger button to `F17`, and then remap `F17`'s down and up keypresses to the Mission Control key.
-
-![Logitech G600 ring finger button remap in Logitech G Hub](logitech-g600-ring-finger-button.png?raw=true "Logitech G600 ring finger button remap in Logitech G Hub")
-
-**Important note:** When using Karabiner-Elements, you need to uncheck both entries for the Logitech G600 ("Gaming Mouse G600 (Logitect)") under Devices, otherwise it seems to capture all the events and Hammerspoon doesn't get them.
-
-![Karabiner Elements with G600 devices disabled](Karabiner-Elements-with-G600-disabled.png?raw=true "Karabiner Elements with G600 devices disabled")

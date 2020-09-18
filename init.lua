@@ -58,14 +58,6 @@ local function systemSleep()
     hs.caffeinate.systemSleep()
 end
 
-local function goldenRatioA(n)
-    return math.floor(.62 * n)
-end
-
-local function goldenRatioB(n)
-    return math.floor(.38 * n)
-end
-
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hyper = hs.hotkey.modal.new()
@@ -91,24 +83,22 @@ end)
 hyper:bind({}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
--- hyper:bind({}, 'left', function () hs.grid.set(hs.window.focusedWindow(), {0, 0, 2, 6}) end)
 hyper:bind({'shift'}, 'left', function ()
-    move(function (f, sf) return sf.x, sf.y, goldenRatioA(sf.w), sf.h end)
+    move(function (f, sf) return sf.x, sf.y, .7*sf.w, sf.h end)
 end)
 hyper:bind({'option'}, 'left', function ()
-    move(function (f, sf) return sf.x, sf.y, goldenRatioB(sf.w), sf.h end)
+    move(function (f, sf) return sf.x, sf.y, .3*sf.w, sf.h end)
 end)
 
 hyper:bind({}, 'right', function ()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
 hyper:bind({'shift'}, 'right', function ()
-    move(function (f, sf) return (sf.x2 - goldenRatioA(sf.w)), sf.y, goldenRatioA(sf.w), sf.h end)
+    move(function (f, sf) return (sf.x2 - .7*sf.w), sf.y, .7*sf.w, sf.h end)
 end)
 hyper:bind({'option'}, 'right', function ()
-    move(function (f, sf) return (sf.x2 - goldenRatioB(sf.w)), sf.y, goldenRatioB(sf.w), sf.h end)
+    move(function (f, sf) return (sf.x2 - .3*sf.w), sf.y, .3*sf.w, sf.h end)
 end)
--- hyper:bind({}, 'right', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 6}) end)
 
 hyper:bind({}, 'up', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
@@ -118,59 +108,14 @@ hyper:bind({}, 'down', function ()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end)
 
-hyper:bind({}, 'r', hs.reload)
--- turn this off, I don't use it, plus it's super slow on Catalina:
--- hyper:bind({}, 'e', hs.hints.windowHints)
 hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
+
 hyper:bind({}, 'l', lockScreen)
 hyper:bind({'shift'}, 'l', systemSleep)
 
 hyper:bind({}, 'g', function ()
-    -- -- click menu item "New Tab" of menu "Window" of menu bar 1
-    -- -- click (first menu item whose name contains "New Tab") of menu "Window" of menu bar 1
-    -- local ok, object, descriptor = hs.osascript._osascript([[
-    --     tell application "System Events"
-    --         tell process "Google Chrome"
-    --             click menu item "New Window" of menu "File" of menu bar 1
-    --         end tell
-    --     end tell
-    -- ]], "AppleScript")
-
-    -- -- Javascript alternative
-    -- -- https://github.com/JXA-Cookbook/JXA-Cookbook/wiki/System-Events#clicking-menu-items
-    -- local ok, object, descriptor = hs.javascript([[
-    --     Application('System Events')
-    --         .processes.byName('Google Chrome')
-    --         .menuBars[0]
-    --         .menuBarItems
-    --         .byName('File')
-    --         .menus[0]
-    --         .menuItems
-    --         .byName('New Window')
-    --         .click();
-    -- ]])
-
-    -- if not ok then
-    --     hs.alert.show('Error launching new Chrome window: '..descriptor)
-    --     return
-    -- end
-
-    -- Commented out, super slow on Catalina, and the above File -> New Window technique appears to work
-    -- local firstNewWindow = hs.window.filter.new(false):setAppFilter('Google Chrome', {
-    --     currentSpace = true,
-    --     visible = true,
-    --     allowTitles = 'New Tab'
-    -- }):getWindows()[1]
-    -- if firstNewWindow then
-    --     logger.i('Found the new Chrome window and told it to focus')
-    --     firstNewWindow:focus()
-    -- else
-    --     logger.i('Could not found the new Chrome window')
-    -- end
-
-    -- this is so much simpler/cleaner, no applescript/javascript, no issues with focusing
     local chrome = hs.appfinder.appFromName("Google Chrome")
     if chrome then
         chrome:selectMenuItem({"File", "New Window"})
@@ -179,6 +124,7 @@ end)
 
 hs.hotkey.bind({}, 'f19', lockScreen)
 
+-- Map eject to lock screen
 -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
 ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)
     -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey
@@ -194,18 +140,6 @@ ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventta
     end
 end)
 ejectKey:start()
-
--- Set up my Logitech G600's ring finger button to F17.
--- Then here, remap F17 to the Mission Control button.
--- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
-myG600RingFingerButtonEventTap = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function (e)
-    local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
-    -- logger.i('caught keycode: ' .. code)
-    if code == F17_KEYCODE then
-        return true, { hs.eventtap.event.newKeyEvent(MISSION_CONTROL_KEYCODE, e:getType() == hs.eventtap.event.types.keyDown) }
-    end
-end)
-myG600RingFingerButtonEventTap:start()
 
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html

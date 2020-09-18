@@ -36,10 +36,10 @@ Then in my Hammerspoon config I turn `F18` into a modifier key (like Command, Sh
 
 There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps that are listening for weird modifier key combinations.
 
-## Other Stuff
-
-* Mouse button 4 and 5 to Back/Forward in Chrome and Previous/Next channel in Slack
-
 ## Screen Lock
 
 Activate with `Hotkey`+`l`, `F19`, or `eject`.
+
+## Other Stuff
+
+* Mouse button 4 and 5 to Back/Forward in Chrome and Previous/Next channel in Slack

@@ -1,10 +1,8 @@
 local logger = hs.logger.new('init.lua', 'debug')
 local util = require('util')
 
-local MISSION_CONTROL_KEYCODE = 0xa0
-local F17_KEYCODE = 0x40
-
 hs.window.animationDuration = 0
+
 -- eliminate some warnings from showing up in the log:
 for idx, name in ipairs({
     'nplastpass',

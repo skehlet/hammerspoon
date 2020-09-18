@@ -42,14 +42,14 @@ end
 
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
-hyper = hs.hotkey.modal.new()
-f18 = hs.hotkey.bind({}, 'f18', function () hyper:enter() end, function () hyper:exit() end)
+hammer = hs.hotkey.modal.new()
+f18 = hs.hotkey.bind({}, 'f18', function () hammer:enter() end, function () hammer:exit() end)
 
-hyper:bind({}, 'f', function ()
+hammer:bind({}, 'f', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
 end)
 
-hyper:bind({}, 'c', function ()
+hammer:bind({}, 'c', function ()
     move(function (f, sf)
         local x = sf.x + ((sf.w - f.w) / 2)
         local y = sf.y + ((sf.h - f.h) / 2)
@@ -58,55 +58,55 @@ hyper:bind({}, 'c', function ()
 end)
 
 -- "stretch" the window vertically
-hyper:bind({}, 's', function ()
+hammer:bind({}, 's', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h end)
 end)
 
-hyper:bind({}, 'left', function ()
+hammer:bind({}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
 end)
-hyper:bind({'shift'}, 'left', function ()
+hammer:bind({'shift'}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, .7*sf.w, sf.h end)
 end)
-hyper:bind({'option'}, 'left', function ()
+hammer:bind({'option'}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, .3*sf.w, sf.h end)
 end)
-hyper:bind({'cmd'}, 'left', function ()
+hammer:bind({'cmd'}, 'left', function ()
     local win = hs.window.focusedWindow()
     if win then
         win:moveOneScreenWest()
     end
 end)
 
-hyper:bind({}, 'right', function ()
+hammer:bind({}, 'right', function ()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
 end)
-hyper:bind({'shift'}, 'right', function ()
+hammer:bind({'shift'}, 'right', function ()
     move(function (f, sf) return (sf.x2 - .7*sf.w), sf.y, .7*sf.w, sf.h end)
 end)
-hyper:bind({'option'}, 'right', function ()
+hammer:bind({'option'}, 'right', function ()
     move(function (f, sf) return (sf.x2 - .3*sf.w), sf.y, .3*sf.w, sf.h end)
 end)
-hyper:bind({'cmd'}, 'right', function ()
+hammer:bind({'cmd'}, 'right', function ()
     local win = hs.window.focusedWindow()
     if win then
         win:moveOneScreenEast()
     end
 end)
 
-hyper:bind({}, 'up', function ()
+hammer:bind({}, 'up', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
 end)
 
-hyper:bind({}, 'down', function ()
+hammer:bind({}, 'down', function ()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end)
 
-hyper:bind({}, 't', function ()
+hammer:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
 
-hyper:bind({}, 'g', function ()
+hammer:bind({}, 'g', function ()
     local chrome = hs.application.find("Google Chrome")
     if chrome then
         chrome:selectMenuItem({"File", "New Window"})
@@ -133,8 +133,8 @@ local function systemSleep()
     hs.caffeinate.systemSleep()
 end
 
-hyper:bind({}, 'l', lockScreen)
-hyper:bind({'shift'}, 'l', systemSleep)
+hammer:bind({}, 'l', lockScreen)
+hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f19', lockScreen)
 -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
 ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)

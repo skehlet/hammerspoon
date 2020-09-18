@@ -16,6 +16,8 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 * Hotkey+shift+right: Right 70%
 * Hotkey+option+left: Left 30%
 * Hotkey+option+right: Right 30%
+* Hotkey+command+left: Move one screen to the left
+* Hotkey+commmand+right: Move one screen to the right
 * Hotkey+s: Maximize ("stretch") vertically
 
 ## Shortcuts

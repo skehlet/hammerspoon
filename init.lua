@@ -73,6 +73,12 @@ end)
 hyper:bind({'option'}, 'left', function ()
     move(function (f, sf) return sf.x, sf.y, .3*sf.w, sf.h end)
 end)
+hyper:bind({'cmd'}, 'left', function ()
+    local win = hs.window.focusedWindow()
+    if win then
+        win:moveOneScreenWest()
+    end
+end)
 
 hyper:bind({}, 'right', function ()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
@@ -82,6 +88,12 @@ hyper:bind({'shift'}, 'right', function ()
 end)
 hyper:bind({'option'}, 'right', function ()
     move(function (f, sf) return (sf.x2 - .3*sf.w), sf.y, .3*sf.w, sf.h end)
+end)
+hyper:bind({'cmd'}, 'right', function ()
+    local win = hs.window.focusedWindow()
+    if win then
+        win:moveOneScreenEast()
+    end
 end)
 
 hyper:bind({}, 'up', function ()

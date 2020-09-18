@@ -42,22 +42,6 @@ local function move(cb)
   end
 end
 
-local function lockScreen()
-    -- built-in screensaver:
-    -- hs.caffeinate.startScreensaver()
-    -- this one just blanks the screen, no photos/etc
-    --os.execute('/usr/local/bin/lockscreen')
-    -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
-    -- set under System Preferences, Security & Privacy, General.
-    -- os.execute('pmset displaysleepnow')
-    -- As of Hammerspoon 0.9.76, this isn't bad, it shows the lock screen, which blanks after a few seconds:
-    hs.caffeinate.lockScreen()
-end
-
-local function systemSleep()
-    hs.caffeinate.systemSleep()
-end
-
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hyper = hs.hotkey.modal.new()
@@ -112,9 +96,6 @@ hyper:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
 
-hyper:bind({}, 'l', lockScreen)
-hyper:bind({'shift'}, 'l', systemSleep)
-
 hyper:bind({}, 'g', function ()
     local chrome = hs.application.find("Google Chrome")
     if chrome then
@@ -123,9 +104,28 @@ hyper:bind({}, 'g', function ()
     end
 end)
 
-hs.hotkey.bind({}, 'f19', lockScreen)
+-- Lock screen: map various keys
+local function lockScreen()
+    -- built-in screensaver:
+    -- hs.caffeinate.startScreensaver()
+    -- this one just blanks the screen, no photos/etc
+    --os.execute('/usr/local/bin/lockscreen')
+    -- To lock screen, the following requires you have "Require password immediately after sleep or screen saver begins" 
+    -- set under System Preferences, Security & Privacy, General.
+    -- os.execute('pmset displaysleepnow')
+    -- As of Hammerspoon 0.9.76, this technique is great: it shows the lock screen, which blanks after a few seconds.
+    -- However the docs warn:
+    -- "This function uses private Apple APIs and could therefore stop working in any given release of macOS without warning"
+    hs.caffeinate.lockScreen()
+end
 
--- Map eject to lock screen
+local function systemSleep()
+    hs.caffeinate.systemSleep()
+end
+
+hyper:bind({}, 'l', lockScreen)
+hyper:bind({'shift'}, 'l', systemSleep)
+hs.hotkey.bind({}, 'f19', lockScreen)
 -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
 ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)
     -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey

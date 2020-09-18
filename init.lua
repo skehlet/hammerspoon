@@ -157,17 +157,19 @@ ejectKey:start()
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
 myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
-    local frontmostAppName = hs.application.frontmostApplication():name()
-    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. frontmostAppName)
-    if frontmostAppName == 'Google Chrome' then
+    local app = hs.application.frontmostApplication()
+    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app)
+    if app:name() == 'Google Chrome' then
         if button == 3 then
-            hs.eventtap.keyStroke({'cmd'}, '[')
+            app:selectMenuItem({"History", "Back"})
             return true
         elseif button == 4 then
-            hs.eventtap.keyStroke({'cmd'}, ']')
+            app:selectMenuItem({"History", "Forward"})
             return true
         end
-    elseif frontmostAppName == 'Slack' then
+    elseif app:name() == 'Slack' then
+        -- Strangely, Hammerspoon can't see to get or otherwise work with the menu items.
+        -- So another way is to fake typing the keyboard shortcuts.
         if button == 3 then
             hs.eventtap.keyStroke({'cmd'}, 'left')
             return true

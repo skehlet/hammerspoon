@@ -28,7 +28,7 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 ## What is this "Hammer" key?
 
-`caps lock` is my hammer key. I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (a key unlikely to be used by anything), then in my Hammerspoon config I turn `F18` into a modifier key (like Command, Shift, Control, etc). This allows holding `caps lock` while hitting `f`, `c`, `left`, `right`, etc.
+`caps lock` is my hammer key, it has a prime location on the keyboard and isn't used very much. I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (a key unlikely to be used by anything), then in my Hammerspoon config I turn `F18` into a modifier key (like `command`, `shift`, `ctrl`, etc). Then I just hold down `caps lock` and hit `f`, `c`, `left`, `right`, etc.
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
@@ -38,7 +38,7 @@ There might be other ways to do this but this, for example you'll find examples 
 
 ## Screen Lock
 
-Activate with `Hotkey`+`l`, `F19`, or `eject`.
+Activate with `hammer`+`l`, `F19`, or `eject`.
 
 ## Other Stuff
 

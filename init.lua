@@ -116,9 +116,10 @@ hyper:bind({}, 'l', lockScreen)
 hyper:bind({'shift'}, 'l', systemSleep)
 
 hyper:bind({}, 'g', function ()
-    local chrome = hs.appfinder.appFromName("Google Chrome")
+    local chrome = hs.application.find("Google Chrome")
     if chrome then
         chrome:selectMenuItem({"File", "New Window"})
+        chrome:activate()
     end
 end)
 
@@ -167,16 +168,5 @@ myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDo
     end
 end)
 myButton4Button5EventTap:start()
-
--- Grid
-hs.grid.setGrid('4x6')
-hs.grid.setMargins({0, 0})
-hyper:bind({}, 'tab', function () hs.grid.show() end)
-hyper:bind({}, 'pad7', function () hs.grid.set(hs.window.focusedWindow(), {0, 0, 2, 2}) end)
-hyper:bind({}, 'pad4', function () hs.grid.set(hs.window.focusedWindow(), {0, 2, 2, 2}) end)
-hyper:bind({}, 'pad1', function () hs.grid.set(hs.window.focusedWindow(), {0, 4, 2, 2}) end)
-hyper:bind({}, 'pad9', function () hs.grid.set(hs.window.focusedWindow(), {2, 0, 2, 2}) end)
-hyper:bind({}, 'pad6', function () hs.grid.set(hs.window.focusedWindow(), {2, 2, 2, 2}) end)
-hyper:bind({}, 'pad3', function () hs.grid.set(hs.window.focusedWindow(), {2, 4, 2, 2}) end)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

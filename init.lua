@@ -135,6 +135,7 @@ end
 
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
+hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 hs.hotkey.bind({}, 'f19', lockScreen)
 -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
 ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)

@@ -43,7 +43,34 @@ end
 -- Use Karabiner-Elements to map caps_lock to f18.
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hammer = hs.hotkey.modal.new()
-f18 = hs.hotkey.bind({}, 'f18', function () hammer:enter() end, function () hammer:exit() end)
+
+local function hammerDown()
+    logger.i("Hammer down")
+    hammer:enter()
+end
+
+local function hammerUp()
+    logger.i("Hammer up")
+    hammer:exit()
+end
+
+f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
+
+-- If the weird Caps lock issue happens again
+-- Try F14 ("Scroll Lock" on my PC keyboard) as an alternate hammer key
+-- Try hidutil to see if it changes the behavior (https://stackoverflow.com/a/46460200/296829):
+-- hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}'
+-- To clear:
+-- hidutil property --set '{"UserKeyMapping":[]}'
+-- See https://www.naseer.dev/post/hidutil/ to make it set on reboot
+-- Update: it happened again. F14/Scroll Lock+g did NOT work (typed a 'g' into my window)
+--     I ran the hidutil command, and that didn't help. I ran the clear command.
+--     Some time later, unexplainably, Caps Lock started working again.
+-- 2021-06-30: this time, it was busted until I added logging to the F18 down and up functions. That reloaded hammerspoon,
+-- and then it started working again. I KNOW I restarted hammerspoon earlier and that did NOT help though. So not sure
+-- why this helped.
+f14 = hs.hotkey.bind({}, 'f14', hammerDown, hammerUp)
+
 
 hammer:bind({}, 'f', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
@@ -176,6 +203,14 @@ myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDo
             return true
         elseif button == 4 then
             hs.eventtap.keyStroke({'cmd'}, 'right')
+            return true
+        end
+    elseif app:name() == 'Visual Studio' then
+        if button == 3 then
+            app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})
+            return true
+        elseif button == 4 then
+            app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
             return true
         end
     end

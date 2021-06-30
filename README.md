@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Catalina and Hammerspoon 0.9.78.
+This is working on macOS Big Sur (11.4) and Hammerspoon 0.9.90.
 
 ## Window Management
 
@@ -34,7 +34,21 @@ See [a video here](https://youtu.be/OjS6LqKEPcA):
 
 ![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
 
-There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to weird key modifier combinations (like `cmd`+`alt`+`ctrl`), but this way is really straightforward and doesn't accidentally trigger other apps configured to use those modifier key combinations. I also use Karabiner-Elements for other purposes, like remapping the option and commands keys on Windows keyboards and binding additional keys to trigger Exposé/Mission Control.
+There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to exotic key modifier combinations (like `cmd`+`alt`+`ctrl`), but I feel the way I do it is straightforward and doesn't accidentally trigger other apps configured to use those modifier key combinations. Plus, I use Karabiner-Elements for other purposes like swapping the option and commands keys on my PC keyboard and binding additional keys to trigger Exposé/Mission Control.
+
+If you don't want to use Karabiner-Elements, and just want to remap your Caps Lock to F18, the following will do the same:
+
+```
+hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}'
+```
+
+To undo it:
+```
+hidutil property --set '{"UserKeyMapping":[]}'
+```
+
+See [Hyper Key on Mac without Karabiner](https://www.naseer.dev/post/hidutil/) for how to make it apply on every reboot.
+
 
 ## Screen Lock
 
@@ -42,4 +56,4 @@ Activate with `hammer`+`l`, `F19`, or `eject`.
 
 ## Other Stuff
 
-* Mouse button 4 and 5 to Back/Forward in Chrome and Previous/Next channel in Slack
+* Mouse button 4 and 5 to perform Back/Forward in Chrome, Slack, Chrome, and Visual Studio for Mac.

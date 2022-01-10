@@ -54,8 +54,6 @@ local function hammerUp()
     hammer:exit()
 end
 
-f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
-
 -- If the weird Caps lock issue happens again
 -- Try F14 ("Scroll Lock" on my PC keyboard) as an alternate hammer key
 -- Try hidutil to see if it changes the behavior (https://stackoverflow.com/a/46460200/296829):
@@ -69,8 +67,17 @@ f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
 -- 2021-06-30: this time, it was busted until I added logging to the F18 down and up functions. That reloaded hammerspoon,
 -- and then it started working again. I KNOW I restarted hammerspoon earlier and that did NOT help though. So not sure
 -- why this helped.
+-- Update 2021-08-20:
+-- I've found that locking the screen then unlocking clears the problem.
+-- I found using Karabiner-Elements EventViewer that it stops seeing CapsLock events.
+-- Once I lock screen and return, it then begins showing {"key_code":"f18"} down/up events.
+-- So this implies it's something either with Karabiner-Elements or upstream of it.
+-- But then why doesn't F14/Scroll Lock work?? Try that next time.
+-- 2021-08-25: Today, Caps Lock stopped working, but only in Chrome.
+-- Karabiner EventViewer saw Caps Lock, and Caps+f worked in all apps but Chrome.
+-- Restarting Hammerspoon fixed it.
+f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
 f14 = hs.hotkey.bind({}, 'f14', hammerDown, hammerUp)
-
 
 hammer:bind({}, 'f', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)

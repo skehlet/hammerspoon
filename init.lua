@@ -37,7 +37,7 @@ local function move(cb)
         frame.x, frame.y, frame.w, frame.h = cb(frame, screenFrame)
         -- logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
         win:setFrame(frame)
-  end
+    end
 end
 
 -- Use Karabiner-Elements to map caps_lock to f18.
@@ -76,8 +76,35 @@ end
 -- 2021-08-25: Today, Caps Lock stopped working, but only in Chrome.
 -- Karabiner EventViewer saw Caps Lock, and Caps+f worked in all apps but Chrome.
 -- Restarting Hammerspoon fixed it.
-f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
+
+-- f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
 f14 = hs.hotkey.bind({}, 'f14', hammerDown, hammerUp)
+
+-- 2022-01-27 "Better" way to capture f18, this way it'll trigger whether or not
+-- you already had shift, alt, cmd, etc held down. With hd.hotkey.bind, I'd have
+-- to create bindings for all the combinations of modifier keys.
+f18 = hs.eventtap.new({
+    -- hs.eventtap.event.types:
+    -- https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/eventtap/libeventtap_event.m#L1305
+    hs.eventtap.event.types.keyDown,
+    hs.eventtap.event.types.keyUp
+}, function(event)
+    -- logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
+    if event:getKeyCode() == hs.keycodes.map['f18'] then
+        local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+        if isRepeat > 0 then
+            return true -- ignore and discard
+        end
+        if event:getType() == hs.eventtap.event.types.keyDown then
+            hammerDown()
+            return true
+        else
+            hammerUp()
+            return true
+        end
+    end
+end)
+f18:start()
 
 hammer:bind({}, 'f', function ()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
@@ -171,21 +198,25 @@ hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 hs.hotkey.bind({}, 'f19', lockScreen)
--- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
-ejectKey = hs.eventtap.new({ hs.eventtap.event.types.NSSystemDefined, hs.eventtap.event.types.keyDown }, function(event)
-    -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey
-    event = event:systemKey()
-    -- http://stackoverflow.com/a/1252776/1521064
-    local next = next
-    -- Check empty table
-    if next(event) then
-        if event.key == 'EJECT' and event.down then
-            -- logger.i('caught EJECT DOWN: ' .. event.key)
-            lockScreen()
-        end
-    end
-end)
-ejectKey:start()
+
+-- comment this out for now, I don't have a keyboard with eject anymore
+-- -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
+-- ejectKey = hs.eventtap.new({
+--     hs.eventtap.event.types.NSSystemDefined
+-- }, function(event)
+--     -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey
+--     event = event:systemKey()
+--     -- http://stackoverflow.com/a/1252776/1521064
+--     local next = next
+--     -- Check empty table
+--     if next(event) then
+--         if event.key == 'EJECT' and event.down then
+--             -- logger.i('caught EJECT DOWN: ' .. event.key)
+--             lockScreen()
+--         end
+--     end
+-- end)
+-- ejectKey:start()
 
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
@@ -225,3 +256,18 @@ end)
 myButton4Button5EventTap:start()
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()
+
+function dumpTable(table, depth)
+    if (depth > 200) then
+        print("Error: Depth > 200 in dumpTable()")
+        return
+    end
+    for k,v in pairs(table) do
+        if (type(v) == "table") then
+            logger.i(string.rep("  ", depth)..k..":")
+            dumpTable(v, depth+1)
+        else
+            logger.i(string.rep("  ", depth)..k..": ",v)
+        end
+    end
+end

@@ -13,6 +13,10 @@ for idx, name in ipairs({
     hs.window.filter.ignoreAlways[name] = true
 end
 
+-- sanity checks
+logger.i('Is Hammerspoon enabled under Privacy/Accessibility: ' .. (hs.accessibilityState() and "true" or "false"))
+logger.i('hs.eventtap.isSecureInputEnabled(): ' .. (hs.eventtap.isSecureInputEnabled() and "true" or "false"))
+
 -- reload hammerspoon config automatically on save
 local function reloadConfig(files)
     local doReload = false
@@ -76,6 +80,20 @@ end
 -- 2021-08-25: Today, Caps Lock stopped working, but only in Chrome.
 -- Karabiner EventViewer saw Caps Lock, and Caps+f worked in all apps but Chrome.
 -- Restarting Hammerspoon fixed it.
+--
+-- 2022-02-03: This is the issue: https://github.com/Hammerspoon/hammerspoon/issues/1743
+-- Occasionally some process on macOS will put the system into a state where "secure input" is enabled and this prevents
+-- hs.eventtap (or hs.hostkey.bind) from working.
+-- You can prove this is the case with: ioreg -l -w 0 | grep SecureInput
+-- Then find the PID with: ps axo pid,command | grep <PID>
+-- For me, today it was Google Chrome. The WD MyCloud UI had auto-logged me out and was sitting at a password prompt.
+-- Once I entered a password, then it released the secure input hold, and my hammer key started working again.
+-- Now that I have a better idea what the problem is, there are lots of hits googling for "secure input" and
+-- tools like TextExpander, Keyboard Maestro, Alfred, etc.
+-- [This reddit posts](https://www.reddit.com/r/TextExpander/comments/440yal/little_tip_if_you_use_lastpass_textexpander/)
+-- suggests just clicking on the LastPass icon in Chrome, and that might clear it up.
+-- I tried turning off LastPass' auto-fill feature, maybe this will stop it from triggering.
+-- Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information
 
 -- f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
 f14 = hs.hotkey.bind({}, 'f14', hammerDown, hammerUp)

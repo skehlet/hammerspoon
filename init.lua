@@ -49,12 +49,12 @@ end
 hammer = hs.hotkey.modal.new()
 
 local function hammerDown()
-    logger.i("Hammer down")
+    -- logger.i("Hammer down")
     hammer:enter()
 end
 
 local function hammerUp()
-    logger.i("Hammer up")
+    -- logger.i("Hammer up")
     hammer:exit()
 end
 

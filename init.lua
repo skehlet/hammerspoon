@@ -188,7 +188,23 @@ end)
 hammer:bind({}, 'g', function ()
     local chrome = hs.application.find("Google Chrome")
     if chrome then
+        -- go to great lengths to make sure the new window appears on the current screen
+        local currentScreen = hs.screen.mainScreen()
+        local preExistingChromeWindowIds = {}
+        for _,win in ipairs(chrome:visibleWindows()) do
+            preExistingChromeWindowIds[win:id()] = true
+        end
+
         chrome:selectMenuItem({"File", "New Window"})
+
+        for i,win in ipairs(chrome:visibleWindows()) do
+            -- if it's a new window, and it's on the wrong screen...
+            if not preExistingChromeWindowIds[win:id()] and win:screen() ~= currentScreen then
+                win:moveToScreen(currentScreen)
+                print("Moving New Chrome window (" .. win:title() .. ") to current screen")
+            end
+        end
+
         chrome:activate()
     end
 end)

@@ -273,8 +273,6 @@ myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDo
 end)
 myButton4Button5EventTap:start()
 
-hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()
-
 function dumpTable(table, depth)
     if (depth > 200) then
         print("Error: Depth > 200 in dumpTable()")
@@ -289,3 +287,106 @@ function dumpTable(table, depth)
         end
     end
 end
+
+
+-- This approach did not work very well, macOS moves windows around and resizes them, it's a mess.
+-- The problem seems to be that it moves the displays around one at a time.
+-- The python script version works better because it moves them all at once.
+
+
+-- -- monkey patch string...
+-- function string.startswith(String,Start)
+--     return string.sub(String,1,string.len(Start))==Start
+--  end
+ 
+-- function getMyScreens()
+--     local screen1, screen2, laptopScreen
+
+--     for i,screen in ipairs(hs.screen.allScreens()) do
+--         -- print(screen:name())
+--         if screen:name() == "VG27A (1)" then
+--             screen1 = screen
+--         elseif screen:name() == "VG27A (2)" then
+--             screen2 = screen
+--         elseif screen:name() == "Built-in Retina Display" then
+--             laptopScreen = screen
+--         else
+--             print("skipping unrecognized screen " .. screen:name())
+--         end
+--     end
+
+--     -- logger.i("screen1: " .. screen1:name() .. ", screen2: " .. screen2:name() .. ", laptopScreen: " .. laptopScreen:name())
+    
+--     return screen1, screen2, laptopScreen
+-- end
+
+-- hammer:bind({'shift'}, 's', function ()
+--     local primary = hs.screen.primaryScreen()
+--     local screen1, screen2, laptopScreen = getMyScreens()
+
+--     -- local newPrimary
+--     -- if screen1 == primary then
+--     --     newPrimary = screen2
+--     -- else
+--     --     newPrimary = screen1
+--     -- end
+
+--     -- local newPrimaryX = -1 * newPrimary:fullFrame().w
+--     -- logger.i("Moving " .. newPrimary:name() .. " to " .. newPrimaryX .. ",0")
+--     -- newPrimary:setOrigin(newPrimaryX, 0)
+
+--     -- local newLaptopScreenX = -1 * (laptopScreen:fullFrame().w + newPrimary:fullFrame().w)
+--     -- local newLaptopScreenY = newPrimary:fullFrame().h
+--     -- logger.i("Moving " .. laptopScreen:name() .. " to " .. newLaptopScreenX .. "," .. newLaptopScreenY)
+--     -- laptopScreen:setOrigin(newLaptopScreenX, newLaptopScreenY)
+
+--     -- logger.i("Making " .. newPrimary:name() .. " the primary")
+--     -- newPrimary:setPrimary()
+
+--     local newLeft, newRight, x, y
+
+--     -- x, y = screen1:position()
+--     -- if x == 0 and y == 0 then
+--     --     logger.i("screen1 was detected at 0,0")
+--     --     newRight = screen1
+--     --     newLeft = screen2
+--     -- else
+--     --     logger.i("screen2 was inferred at 0,0")
+--     --     newRight = screen2
+--     --     newLeft = screen1
+--     -- end
+
+--     if screen1 == primary then
+--         -- newPrimary = screen2
+--         newRight = screen1
+--         newLeft = screen2
+--     else
+--         -- newPrimary = screen1
+--         newRight = screen2
+--         newLeft = screen1
+--     end
+
+--     logger.i("Making " .. newLeft:name() .. " the primary")
+--     newLeft:setPrimary()
+
+--     -- logger.i("Moving " .. newLeft:name() .. " to 0,0")
+--     -- newLeft:setOrigin(0, 0)
+
+--     -- local newRightX = newLeft:fullFrame().w
+--     -- logger.i("Moving " .. newRight:name() .. " to " .. newRightX .. ",0")
+--     -- newRight:setOrigin(newRightX, 0)
+
+--     local newLaptopScreenX = -1 * laptopScreen:fullFrame().w
+--     local newLaptopScreenY = newLeft:fullFrame().h
+--     logger.i("Moving " .. laptopScreen:name() .. " to " .. newLaptopScreenX .. "," .. newLaptopScreenY)
+--     laptopScreen:setOrigin(newLaptopScreenX, newLaptopScreenY)
+
+-- end)
+
+hammer:bind({'shift'}, 's', function ()
+    logger.i("Swapping monitors")
+    os.execute(hs.fs.currentDir() .. '/swap-monitors.py')
+end)
+
+
+hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

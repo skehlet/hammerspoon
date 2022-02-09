@@ -29,9 +29,8 @@ for id in activeDisplays:
     )
     if Quartz.CGDisplayIsBuiltin(id):
         builtinDisplayId = id
-    else:
-        if id != mainExternalDisplayId:
-            otherExternalDisplayId = id
+    elif id != mainExternalDisplayId:
+        otherExternalDisplayId = id
 
 print(
     "Swapping external monitor #"

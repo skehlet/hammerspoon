@@ -2,21 +2,28 @@
 
 import Quartz
 
-mainDisplayId = Quartz.CGMainDisplayID() # "Main" means "the one at 0,0"
-laptopId = 0
+mainExternalDisplayId = Quartz.CGMainDisplayID() # "Main" means "the one at 0,0"
+laptopDisplayId = 0
 otherExternalDisplayId = 0
 
+# Assumes three monitor setup: laptop screen plus two externals
 (activeErr, activeDisplays, displayCount) = Quartz.CGGetActiveDisplayList(3, None, None)
 for id in activeDisplays:
-    vendorId = Quartz.CGDisplayVendorNumber(id)
-    print(str(id) + ', is main? ' + (Quartz.CGDisplayIsMain(id) and "yes" or "no") + ', is built in? ' + (Quartz.CGDisplayIsBuiltin(id) and "yes" or "no"))
+    print(
+        str(id) + ', is main? ' +(Quartz.CGDisplayIsMain(id) and "yes" or "no") + 
+        ', is built in? ' + (Quartz.CGDisplayIsBuiltin(id) and "yes" or "no")
+    )
     if Quartz.CGDisplayIsBuiltin(id):
-        laptopId = id
+        laptopDisplayId = id
     else:
-        if id != mainDisplayId:
+        if id != mainExternalDisplayId:
             otherExternalDisplayId = id
 
-print("Swapping external monitor #" + str(mainDisplayId) + " with #" + str(otherExternalDisplayId) + ", laptop is #" + str(laptopId))
+print(
+    "Swapping external monitor #" + str(mainExternalDisplayId) +
+    " with #" + str(otherExternalDisplayId) +
+    ", laptop is #" + str(laptopDisplayId)
+)
 
 (configErr, config) = Quartz.CGBeginDisplayConfiguration(None)
 
@@ -31,7 +38,7 @@ Quartz.CGConfigureDisplayOrigin(
 # Move the main display to the right
 Quartz.CGConfigureDisplayOrigin(
     config,
-    int(mainDisplayId),
+    int(mainExternalDisplayId),
     int(Quartz.CGDisplayPixelsWide(int(otherExternalDisplayId))),
     0
 )
@@ -39,8 +46,8 @@ Quartz.CGConfigureDisplayOrigin(
 # Move the laptop below and to the left
 Quartz.CGConfigureDisplayOrigin(
     config,
-    laptopId,
-    -1 * int(Quartz.CGDisplayPixelsWide(int(laptopId))),
+    laptopDisplayId,
+    -1 * int(Quartz.CGDisplayPixelsWide(int(laptopDisplayId))),
     int(Quartz.CGDisplayPixelsHigh(int(otherExternalDisplayId)))
 )
 

@@ -40,7 +40,7 @@ Then you just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `r
 
 ## How is your "Hammer" key different than a "Hyper"/Modal key?
 
-There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but I've never really used a computer that way (except for Emacs back in college). The "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press, and has the bonus that they're guaranteeed not to conflict with existing keybindings.
+There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but I've never really used a computer that way (except for some strange Emacs combinations when I used it a long time ago). The "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press, and has the bonus over some hyper key implementations (e.g. that use exotic combinations of `cmd`+`option`+`ctrl`) that they're guaranteeed not to accidentally trigger existing application keybindings.
 
 ## Why does my Hammer key sometimes stop working?
 

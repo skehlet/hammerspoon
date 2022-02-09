@@ -2,57 +2,45 @@
 
 This is working on macOS Monterey (12.2) and Hammerspoon 0.9.93.
 
-## Window Management
+## Window Management via keypresses
 
-See [a video here](https://youtu.be/OjS6LqKEPcA):
+Focus on a window and press one of the following key combinations. See [a video here](https://youtu.be/OjS6LqKEPcA).
 
-* Hammer+f: Full screen
-* Hammer+c: Centered on screen
-* Hammer+left: Left Half
-* Hammer+right: Right Half
-* Hammer+up: Top Half
-* Hammer+down: Bottom Half
-* Hammer+shift+left: Left 70%
-* Hammer+shift+right: Right 70%
-* Hammer+option+left: Left 30%
-* Hammer+option+right: Right 30%
-* Hammer+command+left: Move one screen to the left
-* Hammer+commmand+right: Move one screen to the right
-* Hammer+s: Maximize ("stretch") vertically
+* `hammer`+`f`: Full screen
+* `hammer`+`c`: Centered on screen
+* `hammer`+`left`: Left Half
+* `hammer`+`right`: Right Half
+* `hammer`+`up`: Top Half
+* `hammer`+`down`: Bottom Half
+* `hammer`+`shift`+`left`: Left 70%
+* `hammer`+`shift`+`right`: Right 70%
+* `hammer`+`option`+`left`: Left 30%
+* `hammer`+`option`+`right`: Right 30%
+* `hammer`+`command`+`left`: Move one screen to the left
+* `hammer`+`commmand`+`right`: Move one screen to the right
+* `hammer`+`s`: Maximize ("stretch") vertically
 
 ## Shortcuts
 
-* Hammer+g: Open a new Google Chrome window
-* Hammer+t: Launch a Terminal
-* Hammer+l: Lock screen (additional lock screen bindings in Screen Lock section below)
+* `hammer`+`g`: Open a new Google Chrome window
+* `hammer`+`t`: Launch a Terminal
+* `hammer`+`l`: Lock screen (additional lock screen bindings in Screen Lock section below)
 
 ## What is this "Hammer" key?
 
-`caps lock` is my hammer key, it has a prime location on the keyboard for a key that isn't used very much, if ever. I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (a key unlikely to be used by anything), then in my Hammerspoon config I turn `F18` into a modifier key (like `command`, `shift`, `ctrl`, etc). Then I just hold down `caps lock` and hit `f`, `c`, `left`, `right`, etc.
+`Caps Lock` is my chosen Hammer key, it has a prime location on the keyboard for a key that isn't used very much.
+
+## How do I turn Caps Lock into a Hammer key?
+
+Hammerspoon can't intercept Caps Lock reliably for various technical reasons, e.g. it's a toggle on/off, may have an LED, etc. So instead, I use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (another key unlikely to be used by anything). Then it's easy via Hammerspoon to to turn `F18` into a modifier key (like `command`, `shift`, `ctrl`, etc) and assign keybindings.
+
+Then you just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
-![F18](apple-wireless-keyboard-numeric.png?raw=true "F18")
+## How is your "Hammer" key different than a "Hyper"/Modal key?
 
-There might be other ways to do this but this, for example you'll find examples out there of people binding `caps lock` to exotic key modifier combinations (like `cmd`+`alt`+`ctrl`), but I feel this way is straightforward and doesn't accidentally trigger other apps configured to use those modifier key combinations. Plus, I use Karabiner-Elements for other purposes like swapping the option and commands keys on my PC keyboard and binding additional keys to trigger Exposé/Mission Control.
-
-If you don't want to use Karabiner-Elements, and just want to remap your Caps Lock to F18, the following will do the same:
-
-```
-hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}'
-```
-
-To undo it:
-```
-hidutil property --set '{"UserKeyMapping":[]}'
-```
-
-See [Hyper Key on Mac without Karabiner](https://www.naseer.dev/post/hidutil/) for how to make it apply on every reboot.
-
-## How is your "Hammer" key different than a "Hyper" key?
-
-There are plenty of Hammerspoon examples of creating a "hyper" key where you press and release a key (e.g. `caps lock`), or combination of keys, and then hit another button to do what you want. If that keypress flow works better for you, great, but I've never really used a computer that way. The "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are guaranteeed not to conflict with existing keybindings.
-
+There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but I've never really used a computer that way (except for Emacs back in college). The "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press, and has the bonus that they're guaranteeed not to conflict with existing keybindings.
 
 ## Why does my Hammer key sometimes stop working?
 

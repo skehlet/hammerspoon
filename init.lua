@@ -309,6 +309,8 @@ end
 -- The problem seems to be that it moves the displays around one at a time.
 -- The python script version works better because it moves them all at once.
 
+-- 2560x1440
+-- 1512x982
 
 -- -- monkey patch string...
 -- function string.startswith(String,Start)
@@ -336,67 +338,100 @@ end
 --     return screen1, screen2, laptopScreen
 -- end
 
--- hammer:bind({'shift'}, 's', function ()
---     local primary = hs.screen.primaryScreen()
+-- hammer:bind({'shift'}, 'd', function ()
+--     local oldPrimary = hs.screen.primaryScreen()
 --     local screen1, screen2, laptopScreen = getMyScreens()
+--     local newPrimary
 
---     -- local newPrimary
---     -- if screen1 == primary then
---     --     newPrimary = screen2
---     -- else
---     --     newPrimary = screen1
---     -- end
+--     -- make primary whichever of screen1 or screen2 that is NOT currently the primary
+--     -- move the laptop screen to -laptop.w, newPrimary,h
+--     -- move oldPrimary to newPrimary.w,0
 
---     -- local newPrimaryX = -1 * newPrimary:fullFrame().w
---     -- logger.i("Moving " .. newPrimary:name() .. " to " .. newPrimaryX .. ",0")
---     -- newPrimary:setOrigin(newPrimaryX, 0)
-
---     -- local newLaptopScreenX = -1 * (laptopScreen:fullFrame().w + newPrimary:fullFrame().w)
---     -- local newLaptopScreenY = newPrimary:fullFrame().h
---     -- logger.i("Moving " .. laptopScreen:name() .. " to " .. newLaptopScreenX .. "," .. newLaptopScreenY)
---     -- laptopScreen:setOrigin(newLaptopScreenX, newLaptopScreenY)
-
---     -- logger.i("Making " .. newPrimary:name() .. " the primary")
---     -- newPrimary:setPrimary()
-
---     local newLeft, newRight, x, y
-
---     -- x, y = screen1:position()
---     -- if x == 0 and y == 0 then
---     --     logger.i("screen1 was detected at 0,0")
---     --     newRight = screen1
---     --     newLeft = screen2
---     -- else
---     --     logger.i("screen2 was inferred at 0,0")
---     --     newRight = screen2
---     --     newLeft = screen1
---     -- end
-
---     if screen1 == primary then
---         -- newPrimary = screen2
---         newRight = screen1
---         newLeft = screen2
+--     if screen1 == oldPrimary then
+--         newPrimary = screen2
 --     else
---         -- newPrimary = screen1
---         newRight = screen2
---         newLeft = screen1
+--         newPrimary = screen1
 --     end
 
---     logger.i("Making " .. newLeft:name() .. " the primary")
---     newLeft:setPrimary()
+--     -- local myScreenWatcher
+--     -- myScreenWatcher = hs.screen.watcher.new(function ()
+--     --     print("A change in screen layout has occurred")
+--     --     logger.i("newPrimary.x:" .. newPrimary:fullFrame().x)
+--     --     logger.i("Moving laptop to " .. (-1 * laptopScreen:fullFrame().w) .. "," .. newPrimary:fullFrame().h)
+--     --     laptopScreen:setOrigin(-1 * laptopScreen:fullFrame().w, newPrimary:fullFrame().h)
 
---     -- logger.i("Moving " .. newLeft:name() .. " to 0,0")
---     -- newLeft:setOrigin(0, 0)
+--     --     -- hs.timer.doAfter(1, function ()
+--     --     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
+--     --     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
+--     --     -- end)
 
---     -- local newRightX = newLeft:fullFrame().w
---     -- logger.i("Moving " .. newRight:name() .. " to " .. newRightX .. ",0")
---     -- newRight:setOrigin(newRightX, 0)
+--     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
+--     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
 
---     local newLaptopScreenX = -1 * laptopScreen:fullFrame().w
---     local newLaptopScreenY = newLeft:fullFrame().h
---     logger.i("Moving " .. laptopScreen:name() .. " to " .. newLaptopScreenX .. "," .. newLaptopScreenY)
---     laptopScreen:setOrigin(newLaptopScreenX, newLaptopScreenY)
+--     --     myScreenWatcher:stop()
+--     -- end):start()
 
+
+--     logger.i("Making " .. newPrimary:name() .. " the primary")
+--     newPrimary:setPrimary()
+
+--     -- hs.timer.doAfter(1, function ()
+--     --     logger.i("Moving laptop to " .. (-1 * laptopScreen:fullFrame().w) .. "," .. newPrimary:fullFrame().h)
+--     --     laptopScreen:setOrigin(-1 * laptopScreen:fullFrame().w, newPrimary:fullFrame().h)
+
+--     --     -- hs.timer.doAfter(1, function ()
+--     --     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
+--     --     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
+--     --     -- end)
+
+--     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
+--     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
+--     -- end)
+
+--     function screenIsPrimary(screenId)
+--         local screen = hs.screen.find(screenId)
+--         logger.i(
+--             "Checking if " .. screen:name() .. " is primary: " ..
+--             (screen == hs.screen.primaryScreen() and "yes" or "no")
+--         )
+--         return screen == hs.screen.primaryScreen()
+--     end
+
+--     function screenIsInPosition(screenId, expectedX, expectedY)
+--         local screen = hs.screen.find(screenId)
+--         logger.i(
+--             "Checking if " .. screen:name() .. " is at " ..
+--             expectedX .. "," .. expectedY .. ": " .. 
+--             screen:fullFrame().x .. "," .. screen:fullFrame().y
+--         )
+--         return screen:fullFrame().x == expectedX and screen:fullFrame().y == expectedY
+--     end
+
+--     function moveScreen(screen, x, y)
+--         logger.i("Moving " .. screen:name() .. " to " .. x .. "," .. y)
+--         screen:setOrigin(x, y)
+--     end
+
+--     hs.timer.waitUntil(
+--         function ()
+--             return screenIsPrimary(newPrimary:id()) and screenIsInPosition(newPrimary:id(), 0, 0)
+--         end,
+--         function ()
+--             local x = -1 * laptopScreen:fullFrame().w
+--             local y = newPrimary:fullFrame().h
+--             moveScreen(laptopScreen, x, y)
+--             hs.timer.waitUntil(
+--                 function ()
+--                     return screenIsInPosition(laptopScreen, x, y)
+--                 end,
+--                 function ()
+--                     moveScreen(oldPrimary, newPrimary:fullFrame().w, 0)
+--                 end,
+--                 .01
+--             )
+--         end,
+--         .01
+--     )
 -- end)
 
 hammer:bind({'shift'}, 's', function ()

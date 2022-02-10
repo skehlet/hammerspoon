@@ -209,6 +209,16 @@ hammer:bind({}, 'g', function ()
     end
 end)
 
+hammer:bind({'shift'}, 'f', function ()
+    logger.i("Frontmost application: " .. hs.application.frontmostApplication():name())
+    local chrome = hs.application.find("Google Chrome")
+    if chrome then
+        chrome:setFrontmost()
+    end
+end)
+
+
+
 -- Lock screen: map various keys
 local function lockScreen()
     -- built-in screensaver:
@@ -475,6 +485,59 @@ hammer:bind({'shift'}, 's', function ()
 end)
 
 
+-- Caffeine from https://github.com/kbd/setup/blob/master/HOME/.hammerspoon/init.lua#L150
+caffeine = hs.menubar.new()
+function showCaffeine(awake)
+    local title = awake and '☕' or '🍵'
+    caffeine:setTitle(title)
+end
+
+function toggleCaffeine()
+    showCaffeine(hs.caffeinate.toggle("displayIdle"))
+end
+
+if caffeine then
+    caffeine:setClickCallback(toggleCaffeine)
+    showCaffeine(hs.caffeinate.get("displayIdle"))
+end
+
+
+
+MIC_PREFERED_DEVICE = "External Microphone"
+micMenuItem = hs.menubar.new()
+
+function setInputToExternalMic()
+    local externalMic = hs.audiodevice.findDeviceByName(MIC_PREFERED_DEVICE)
+    if externalMic then
+        externalMic:setDefaultInputDevice()
+    else
+        logger.w("Could not find " .. MIC_PREFERED_DEVICE .. ", cannot make it the default input")
+        micMenuItem:setTitle('🎤⛔️')
+    end
+end
+
+function updateAudioInputIcon()
+    local audioDefaultInput = hs.audiodevice.defaultInputDevice()
+    if audioDefaultInput:name() == MIC_PREFERED_DEVICE then
+        micMenuItem:setTitle('🎤👍')
+    else
+        micMenuItem:setTitle('🎤⚠️')
+    end
+    micMenuItem:setTooltip("Default input device is: " .. audioDefaultInput:name())
+end
+
+if micMenuItem then
+    hs.audiodevice.watcher.setCallback(function (event)
+        -- the space in "dIn " is intentional, see
+        -- [docs](https://www.hammerspoon.org/docs/hs.audiodevice.watcher.html#setCallback)
+        if event == "dIn " then
+            updateAudioInputIcon()
+        end
+    end)
+    hs.audiodevice.watcher.start()
+    updateAudioInputIcon()
+    micMenuItem:setClickCallback(setInputToExternalMic)
+end
 
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

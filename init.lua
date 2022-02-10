@@ -434,10 +434,47 @@ end
 --     )
 -- end)
 
+-- https://github.com/Hammerspoon/hammerspoon/issues/1462#issuecomment-568534028
+
+local VIRTUALLY_LEFT_MONITOR_UUID = "4CE08EDE-BF77-49A0-8F23-6453DBAF6DCD"
+local VIRTUALLY_RIGHT_MONITOR_UUID = "DEBC10C3-DF73-4222-B5D1-3027F6954EBC"
+local PHYSICALLY_LEFT_MONITOR_SERIAL = "M5LMQS070425"
+local PHYSICALLY_RIGHT_MONITOR_SERIAL = "M5LMQS064778"
+
+local EXT_MONITOR_NAME_PATTERN = 'VG27A'
+local DISPLAYPLACER_PATH = '/opt/homebrew/bin/displayplacer'
+
+function screenLayoutWatcher()
+    local d1, d2 = hs.screen.find(EXT_MONITOR_NAME_PATTERN)
+    local currentPrimary = hs.screen.primaryScreen()
+    local newPrimary
+    if d1 == currentPrimary then
+        newPrimary = d2
+    else
+        newPrimary = d1
+    end
+
+    local cmd = string.format(
+        '%s "id:%s origin:(%d,%d)" "id:%s origin:(%d,%d)"',
+        DISPLAYPLACER_PATH,
+        newPrimary:getUUID(), 0, 0,
+        currentPrimary:getUUID(), newPrimary:fullFrame().w, 0
+    )
+
+    print(cmd)
+    print(hs.execute(cmd))
+end
+--   screenWatcher = hs.screen.watcher.new(screenLayoutWatcher)
+--   screenWatcher:start()
+--   screenLayoutWatcher()
+
 hammer:bind({'shift'}, 's', function ()
     logger.i("Swapping monitors")
-    os.execute(hs.fs.currentDir() .. '/swap-monitors.py')
+    -- os.execute(hs.fs.currentDir() .. '/swap-monitors.py')
+    screenLayoutWatcher()
 end)
+
+
 
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

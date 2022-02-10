@@ -209,13 +209,13 @@ hammer:bind({}, 'g', function ()
     end
 end)
 
-hammer:bind({'shift'}, 'f', function ()
-    logger.i("Frontmost application: " .. hs.application.frontmostApplication():name())
-    local chrome = hs.application.find("Google Chrome")
-    if chrome then
-        chrome:setFrontmost()
-    end
-end)
+-- hammer:bind({'shift'}, 'f', function ()
+--     logger.i("Frontmost application: " .. hs.application.frontmostApplication():name())
+--     local chrome = hs.application.find("Google Chrome")
+--     if chrome then
+--         chrome:setFrontmost()
+--     end
+-- end)
 
 
 

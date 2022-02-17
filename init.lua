@@ -48,14 +48,14 @@ end
 -- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
 hammer = hs.hotkey.modal.new()
 
-local function hammerDown()
+function hammer:entered()
     -- logger.i("Hammer down")
-    hammer:enter()
+    self.isDown = true
 end
 
-local function hammerUp()
+function hammer:exited()
     -- logger.i("Hammer up")
-    hammer:exit()
+    self.isDown = false
 end
 
 -- If the weird Caps lock issue happens again
@@ -96,7 +96,7 @@ end
 -- Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information
 
 -- f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
-f14 = hs.hotkey.bind({}, 'f14', hammerDown, hammerUp)
+f14 = hs.hotkey.bind({}, 'f14', function () hammer:enter() end, function () hammer:exit() end)
 
 -- 2022-01-27 "Better" way to capture f18, this way it'll trigger whether or not
 -- you already had shift, alt, cmd, etc held down. With hd.hotkey.bind, I'd have
@@ -114,10 +114,10 @@ f18 = hs.eventtap.new({
             return true -- ignore and discard
         end
         if event:getType() == hs.eventtap.event.types.keyDown then
-            hammerDown()
+            hammer:enter()
             return true
         else
-            hammerUp()
+            hammer:exit()
             return true
         end
     end
@@ -141,37 +141,52 @@ hammer:bind({}, 's', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h end)
 end)
 
-hammer:bind({}, 'left', function ()
+function moveLeft()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
-end)
-hammer:bind({'shift'}, 'left', function ()
+end
+
+function moveLeftBig()
     move(function (f, sf) return sf.x, sf.y, .7*sf.w, sf.h end)
-end)
-hammer:bind({'option'}, 'left', function ()
+end
+
+function moveLeftSmall()
     move(function (f, sf) return sf.x, sf.y, .3*sf.w, sf.h end)
-end)
-hammer:bind({'cmd'}, 'left', function ()
+end
+
+function moveWest()
     local win = hs.window.focusedWindow()
     if win then
         win:moveOneScreenWest()
     end
-end)
+end
 
-hammer:bind({}, 'right', function ()
+function moveRight()
     move(function (f, sf) return (sf.x2 - sf.w/2), sf.y, sf.w/2, sf.h end)
-end)
-hammer:bind({'shift'}, 'right', function ()
+end
+
+function moveRightBig()
     move(function (f, sf) return (sf.x2 - .7*sf.w), sf.y, .7*sf.w, sf.h end)
-end)
-hammer:bind({'option'}, 'right', function ()
+end
+
+function moveRightSmall()
     move(function (f, sf) return (sf.x2 - .3*sf.w), sf.y, .3*sf.w, sf.h end)
-end)
-hammer:bind({'cmd'}, 'right', function ()
+end
+
+function moveEast()
     local win = hs.window.focusedWindow()
     if win then
         win:moveOneScreenEast()
     end
-end)
+end
+
+hammer:bind({}, 'left', moveLeft)
+hammer:bind({'shift'}, 'left', moveLeftBig)
+hammer:bind({'option'}, 'left', moveLeftSmall)
+hammer:bind({'cmd'}, 'left', moveWest)
+hammer:bind({}, 'right', moveRight)
+hammer:bind({'shift'}, 'right', moveRightBig)
+hammer:bind({'option'}, 'right', moveRightSmall)
+hammer:bind({'cmd'}, 'right', moveEast)
 
 hammer:bind({}, 'up', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
@@ -265,8 +280,40 @@ hs.hotkey.bind({}, 'f19', lockScreen)
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
-myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (event)
+myButton4Button5EventTap = hs.eventtap.new({
+    hs.eventtap.event.types.otherMouseDown
+}, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+
+    -- Hammer+mouse4/mouse5 keybindings, same as hammer+left/hammer+right.
+    -- This fells hacky to duplicate the logic like this... would be nice to abstract this somehow,
+    -- and do the same thing whether via a hammer binding or here via mouse4/mouse5.
+    if hammer.isDown then
+        local flags = event:getFlags()
+        if button == 3 then
+            if flags.shift then
+                moveLeftBig()
+            elseif flags.alt then
+                moveLeftSmall()
+            elseif flags.cmd then
+                moveWest()
+            else
+                moveLeft()
+            end
+        elseif button == 4 then
+            if flags.shift then
+                moveRightBig()
+            elseif flags.alt then
+                moveRightSmall()
+            elseif flags.cmd then
+                moveEast()
+            else
+                moveRight()
+            end
+        end
+        return true
+    end
+
     local app = hs.application.frontmostApplication()
     -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app)
     if app:name() == 'Google Chrome' then
@@ -298,22 +345,6 @@ myButton4Button5EventTap = hs.eventtap.new({hs.eventtap.event.types.otherMouseDo
     end
 end)
 myButton4Button5EventTap:start()
-
-function dumpTable(table, depth)
-    if (depth > 200) then
-        print("Error: Depth > 200 in dumpTable()")
-        return
-    end
-    for k,v in pairs(table) do
-        if (type(v) == "table") then
-            logger.i(string.rep("  ", depth)..k..":")
-            dumpTable(v, depth+1)
-        else
-            logger.i(string.rep("  ", depth)..k..": ",v)
-        end
-    end
-end
-
 
 -- This approach did not work very well, macOS moves windows around and resizes them, it's a mess.
 -- The problem seems to be that it moves the displays around one at a time.

@@ -11,4 +11,20 @@ function util.dumpWindows(appName, filter)
     end
 end
 
+function util.dumpTable(table, depth)
+    depth = depth or 0
+    if (depth > 200) then
+        print("Error: Depth > 200 in dumpTable()")
+        return
+    end
+    for k,v in pairs(table) do
+        if (type(v) == "table") then
+            logger.i(string.rep("  ", depth)..k..":")
+            dumpTable(v, depth+1)
+        else
+            logger.i(string.rep("  ", depth)..k..": ",v)
+        end
+    end
+end
+
 return util

@@ -256,7 +256,7 @@ end
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
-hs.hotkey.bind({}, 'f19', lockScreen)
+-- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
 -- comment this out for now, I don't have a keyboard with eject anymore
 -- -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
@@ -285,7 +285,7 @@ myButton4Button5EventTap = hs.eventtap.new({
 }, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
 
-    -- Hammer+mouse4/mouse5 keybindings, same as hammer+left/hammer+right.
+    -- Make Hammer+mouse4/mouse5 behave like hammer+left/hammer+right.
     -- This fells hacky to duplicate the logic like this... would be nice to abstract this somehow,
     -- and do the same thing whether via a hammer binding or here via mouse4/mouse5.
     if hammer.isDown then
@@ -346,141 +346,20 @@ myButton4Button5EventTap = hs.eventtap.new({
 end)
 myButton4Button5EventTap:start()
 
--- This approach did not work very well, macOS moves windows around and resizes them, it's a mess.
--- The problem seems to be that it moves the displays around one at a time.
--- The python script version works better because it moves them all at once.
 
--- 2560x1440
--- 1512x982
+-- Switch monitors
+-- This is a workaround to deal with macOS getting confused on which of my external monitors is left and right.
+-- Hit the key binding and it will swap them.
+-- Note I tried built-in Hammerspoon APIs, a C program, and a Python script, but 
+-- found just calling out to `displayplacer` to be the simplest/most effective and it's a
+-- maintained solution.
+-- See https://github.com/Hammerspoon/hammerspoon/issues/1462#issuecomment-568534028
 
--- -- monkey patch string...
--- function string.startswith(String,Start)
---     return string.sub(String,1,string.len(Start))==Start
---  end
- 
--- function getMyScreens()
---     local screen1, screen2, laptopScreen
-
---     for i,screen in ipairs(hs.screen.allScreens()) do
---         -- print(screen:name())
---         if screen:name() == "VG27A (1)" then
---             screen1 = screen
---         elseif screen:name() == "VG27A (2)" then
---             screen2 = screen
---         elseif screen:name() == "Built-in Retina Display" then
---             laptopScreen = screen
---         else
---             print("skipping unrecognized screen " .. screen:name())
---         end
---     end
-
---     -- logger.i("screen1: " .. screen1:name() .. ", screen2: " .. screen2:name() .. ", laptopScreen: " .. laptopScreen:name())
-    
---     return screen1, screen2, laptopScreen
--- end
-
--- hammer:bind({'shift'}, 'd', function ()
---     local oldPrimary = hs.screen.primaryScreen()
---     local screen1, screen2, laptopScreen = getMyScreens()
---     local newPrimary
-
---     -- make primary whichever of screen1 or screen2 that is NOT currently the primary
---     -- move the laptop screen to -laptop.w, newPrimary,h
---     -- move oldPrimary to newPrimary.w,0
-
---     if screen1 == oldPrimary then
---         newPrimary = screen2
---     else
---         newPrimary = screen1
---     end
-
---     -- local myScreenWatcher
---     -- myScreenWatcher = hs.screen.watcher.new(function ()
---     --     print("A change in screen layout has occurred")
---     --     logger.i("newPrimary.x:" .. newPrimary:fullFrame().x)
---     --     logger.i("Moving laptop to " .. (-1 * laptopScreen:fullFrame().w) .. "," .. newPrimary:fullFrame().h)
---     --     laptopScreen:setOrigin(-1 * laptopScreen:fullFrame().w, newPrimary:fullFrame().h)
-
---     --     -- hs.timer.doAfter(1, function ()
---     --     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
---     --     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
---     --     -- end)
-
---     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
---     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
-
---     --     myScreenWatcher:stop()
---     -- end):start()
-
-
---     logger.i("Making " .. newPrimary:name() .. " the primary")
---     newPrimary:setPrimary()
-
---     -- hs.timer.doAfter(1, function ()
---     --     logger.i("Moving laptop to " .. (-1 * laptopScreen:fullFrame().w) .. "," .. newPrimary:fullFrame().h)
---     --     laptopScreen:setOrigin(-1 * laptopScreen:fullFrame().w, newPrimary:fullFrame().h)
-
---     --     -- hs.timer.doAfter(1, function ()
---     --     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
---     --     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
---     --     -- end)
-
---     --     logger.i("Moving " .. oldPrimary:name() .. " to " .. newPrimary:fullFrame().w .. ",0")
---     --     oldPrimary:setOrigin(newPrimary:fullFrame().w, 0)
---     -- end)
-
---     function screenIsPrimary(screenId)
---         local screen = hs.screen.find(screenId)
---         logger.i(
---             "Checking if " .. screen:name() .. " is primary: " ..
---             (screen == hs.screen.primaryScreen() and "yes" or "no")
---         )
---         return screen == hs.screen.primaryScreen()
---     end
-
---     function screenIsInPosition(screenId, expectedX, expectedY)
---         local screen = hs.screen.find(screenId)
---         logger.i(
---             "Checking if " .. screen:name() .. " is at " ..
---             expectedX .. "," .. expectedY .. ": " .. 
---             screen:fullFrame().x .. "," .. screen:fullFrame().y
---         )
---         return screen:fullFrame().x == expectedX and screen:fullFrame().y == expectedY
---     end
-
---     function moveScreen(screen, x, y)
---         logger.i("Moving " .. screen:name() .. " to " .. x .. "," .. y)
---         screen:setOrigin(x, y)
---     end
-
---     hs.timer.waitUntil(
---         function ()
---             return screenIsPrimary(newPrimary:id()) and screenIsInPosition(newPrimary:id(), 0, 0)
---         end,
---         function ()
---             local x = -1 * laptopScreen:fullFrame().w
---             local y = newPrimary:fullFrame().h
---             moveScreen(laptopScreen, x, y)
---             hs.timer.waitUntil(
---                 function ()
---                     return screenIsInPosition(laptopScreen, x, y)
---                 end,
---                 function ()
---                     moveScreen(oldPrimary, newPrimary:fullFrame().w, 0)
---                 end,
---                 .01
---             )
---         end,
---         .01
---     )
--- end)
-
--- https://github.com/Hammerspoon/hammerspoon/issues/1462#issuecomment-568534028
-
-local VIRTUALLY_LEFT_MONITOR_UUID = "4CE08EDE-BF77-49A0-8F23-6453DBAF6DCD"
-local VIRTUALLY_RIGHT_MONITOR_UUID = "DEBC10C3-DF73-4222-B5D1-3027F6954EBC"
-local PHYSICALLY_LEFT_MONITOR_SERIAL = "M5LMQS070425"
-local PHYSICALLY_RIGHT_MONITOR_SERIAL = "M5LMQS064778"
+-- Unneeded, but keeping, where else am I going to store this:
+-- local VIRTUALLY_LEFT_MONITOR_UUID = "4CE08EDE-BF77-49A0-8F23-6453DBAF6DCD"
+-- local VIRTUALLY_RIGHT_MONITOR_UUID = "DEBC10C3-DF73-4222-B5D1-3027F6954EBC"
+-- local PHYSICALLY_LEFT_MONITOR_SERIAL = "M5LMQS070425"
+-- local PHYSICALLY_RIGHT_MONITOR_SERIAL = "M5LMQS064778"
 
 local EXT_MONITOR_NAME_PATTERN = 'VG27A'
 local DISPLAYPLACER_PATH = '/opt/homebrew/bin/displayplacer'
@@ -505,6 +384,8 @@ function screenLayoutWatcher()
     print(cmd)
     print(hs.execute(cmd))
 end
+
+-- A screen watcher might be nice but for now just handling manually.
 --   screenWatcher = hs.screen.watcher.new(screenLayoutWatcher)
 --   screenWatcher:start()
 --   screenLayoutWatcher()
@@ -532,43 +413,43 @@ if caffeine then
     showCaffeine(hs.caffeinate.get("displayIdle"))
 end
 
+-- On my work laptop, add a menubar item to confirm my headset's mic is the current input.
+if hs.host.localizedName() == "NXGN31966" then
+    MIC_PREFERED_DEVICE = "External Microphone"
+    micMenuItem = hs.menubar.new()
 
-
-MIC_PREFERED_DEVICE = "External Microphone"
-micMenuItem = hs.menubar.new()
-
-function setInputToExternalMic()
-    local externalMic = hs.audiodevice.findDeviceByName(MIC_PREFERED_DEVICE)
-    if externalMic then
-        externalMic:setDefaultInputDevice()
-    else
-        logger.w("Could not find " .. MIC_PREFERED_DEVICE .. ", cannot make it the default input")
-        micMenuItem:setTitle('🎤⛔️')
-    end
-end
-
-function updateAudioInputIcon()
-    local audioDefaultInput = hs.audiodevice.defaultInputDevice()
-    if audioDefaultInput:name() == MIC_PREFERED_DEVICE then
-        micMenuItem:setTitle('🎤👍')
-    else
-        micMenuItem:setTitle('🎤⚠️')
-    end
-    micMenuItem:setTooltip("Default input device is: " .. audioDefaultInput:name())
-end
-
-if micMenuItem then
-    hs.audiodevice.watcher.setCallback(function (event)
-        -- the space in "dIn " is intentional, see
-        -- [docs](https://www.hammerspoon.org/docs/hs.audiodevice.watcher.html#setCallback)
-        if event == "dIn " then
-            updateAudioInputIcon()
+    function setInputToExternalMic()
+        local externalMic = hs.audiodevice.findDeviceByName(MIC_PREFERED_DEVICE)
+        if externalMic then
+            externalMic:setDefaultInputDevice()
+        else
+            logger.w("Could not find " .. MIC_PREFERED_DEVICE .. ", cannot make it the default input")
+            micMenuItem:setTitle('🎤⛔️')
         end
-    end)
-    hs.audiodevice.watcher.start()
-    updateAudioInputIcon()
-    micMenuItem:setClickCallback(setInputToExternalMic)
-end
+    end
 
+    function updateAudioInputIcon()
+        local audioDefaultInput = hs.audiodevice.defaultInputDevice()
+        if audioDefaultInput:name() == MIC_PREFERED_DEVICE then
+            micMenuItem:setTitle('🎤👍')
+        else
+            micMenuItem:setTitle('🎤⚠️')
+        end
+        micMenuItem:setTooltip("Default input device is: " .. audioDefaultInput:name())
+    end
+
+    if micMenuItem then
+        hs.audiodevice.watcher.setCallback(function (event)
+            -- the space in "dIn " is intentional, see
+            -- [docs](https://www.hammerspoon.org/docs/hs.audiodevice.watcher.html#setCallback)
+            if event == "dIn " then
+                updateAudioInputIcon()
+            end
+        end)
+        hs.audiodevice.watcher.start()
+        updateAudioInputIcon()
+        micMenuItem:setClickCallback(setInputToExternalMic)
+    end
+end
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

@@ -415,7 +415,8 @@ end
 
 -- On my work laptop, add a menubar item to confirm my headset's mic is the current input.
 if hs.host.localizedName() == "NXGN31966" then
-    MIC_PREFERED_DEVICE = "External Microphone"
+    -- MIC_PREFERED_DEVICE = "External Microphone"
+    MIC_PREFERED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
     micMenuItem = hs.menubar.new()
 
     function setInputToExternalMic()
@@ -430,6 +431,7 @@ if hs.host.localizedName() == "NXGN31966" then
 
     function updateAudioInputIcon()
         local audioDefaultInput = hs.audiodevice.defaultInputDevice()
+        logger.i("MIC_PREFERED_DEVICE: " .. MIC_PREFERED_DEVICE .. ", actual device: " .. audioDefaultInput:name())
         if audioDefaultInput:name() == MIC_PREFERED_DEVICE then
             micMenuItem:setTitle('🎤👍')
         else

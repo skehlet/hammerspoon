@@ -413,8 +413,11 @@ if caffeine then
     showCaffeine(hs.caffeinate.get("displayIdle"))
 end
 
--- On my work laptop, add a menubar item to confirm my headset's mic is the current input.
-if hs.host.localizedName() == "NXGN31966" then
+-- On my laptops, add a menubar item to confirm my headset's mic is the current input.
+if
+    hs.host.localizedName() == "NXGN31966"
+    or hs.host.localizedName() == "Steve's MacBook Air"
+then
     -- MIC_PREFERED_DEVICE = "External Microphone"
     MIC_PREFERED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
     micMenuItem = hs.menubar.new()

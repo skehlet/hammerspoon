@@ -417,6 +417,7 @@ end
 if
     hs.host.localizedName() == "NXGN31966"
     or hs.host.localizedName() == "Steve's MacBook Air"
+    or hs.host.localizedName() == "Steve’s MacBook Pro"
 then
     -- MIC_PREFERED_DEVICE = "External Microphone"
     MIC_PREFERED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote

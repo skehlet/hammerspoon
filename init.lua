@@ -277,6 +277,44 @@ hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 -- end)
 -- ejectKey:start()
 
+-- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
+-- See https://github.com/briankendall/missionControlFullDesktopBar
+local MISSION_CONTROL_KEYCODE = 0xa0
+local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
+local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
+if mcfdbSize then
+    local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
+    log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
+    function handleMissionControl(e)
+        local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
+        if code == MISSION_CONTROL_KEYCODE then
+            -- ignore auto-repeats
+            local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+            if isAutoRepeat == 1 then
+                return true -- discard
+            end
+            -- don't intercept cmd+f3 or ctrl+f3
+            local flags = e:getFlags()
+            if (flags.cmd or flags.ctrl) then
+                return false -- propogate
+            end
+            local type = e:getType()
+            if type == hs.eventtap.event.types.keyDown then
+                --log.i('intercepted Mission Control DOWN')
+                os.execute(MCFDB_PATH..' -d -i')
+                return true -- discard
+            elseif type == hs.eventtap.event.types.keyUp then
+                --log.i('intercepted Mission Control UP')
+                os.execute(MCFDB_PATH..' -d -r')
+                return true -- discard
+            end
+        end
+        return false -- propogate
+    end
+    trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
+    trapMissionControl:start()
+end
+
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(

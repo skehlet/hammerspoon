@@ -179,14 +179,14 @@ function moveEast()
     end
 end
 
-hammer:bind({}, 'left', moveLeft)
-hammer:bind({'shift'}, 'left', moveLeftBig)
-hammer:bind({'option'}, 'left', moveLeftSmall)
-hammer:bind({'cmd'}, 'left', moveWest)
-hammer:bind({}, 'right', moveRight)
-hammer:bind({'shift'}, 'right', moveRightBig)
+hammer:bind({},         'left',  moveLeft)
+hammer:bind({'shift'},  'left',  moveLeftBig)
+hammer:bind({'option'}, 'left',  moveLeftSmall)
+hammer:bind({'cmd'},    'left',  moveWest)
+hammer:bind({},         'right', moveRight)
+hammer:bind({'shift'},  'right', moveRightBig)
 hammer:bind({'option'}, 'right', moveRightSmall)
-hammer:bind({'cmd'}, 'right', moveEast)
+hammer:bind({'cmd'},    'right', moveEast)
 
 hammer:bind({}, 'up', function ()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
@@ -284,34 +284,34 @@ local MISSION_CONTROL_KEYCODE = 0xa0
 local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacOS/missionControlFullDesktopBar'
 local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
 if mcfdbSize then
-    local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
-    log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
-    function handleMissionControl(e)
-        if e:getKeyCode() == MISSION_CONTROL_KEYCODE then
-            -- ignore auto-repeats
-            local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
-            if isAutoRepeat == 1 then
-                return true -- discard
+    logger.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
+    -- trapMissionControl must be a global variable so Lua doesn't garbage collect it
+    trapMissionControl = hs.eventtap.new({
+        hs.eventtap.event.types.keyDown,
+        hs.eventtap.event.types.keyUp
+    }, function (event)
+        if event:getKeyCode() == MISSION_CONTROL_KEYCODE then
+            local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+            if isRepeat == 1 then
+                return true -- ignore and discard
             end
             -- don't intercept cmd+f3 or ctrl+f3
-            local flags = e:getFlags()
+            local flags = event:getFlags()
             if (flags.cmd or flags.ctrl) then
                 return false -- propogate
             end
-            local type = e:getType()
-            if type == hs.eventtap.event.types.keyDown then
-                log.i('intercepted Mission Control DOWN')
+            if event:getType() == hs.eventtap.event.types.keyDown then
+                -- logger.i('intercepted Mission Control DOWN')
                 os.execute(MCFDB_PATH..' -d -i')
                 return true -- discard
-            elseif type == hs.eventtap.event.types.keyUp then
-                log.i('intercepted Mission Control UP')
+            else
+                -- logger.i('intercepted Mission Control UP')
                 os.execute(MCFDB_PATH..' -d -r')
                 return true -- discard
             end
         end
         return false -- propogate
-    end
-    trapMissionControl = hs.eventtap.new({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, handleMissionControl)
+    end)
     trapMissionControl:start()
 end
 

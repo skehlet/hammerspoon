@@ -277,6 +277,7 @@ hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 -- end)
 -- ejectKey:start()
 
+
 -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
 -- See https://github.com/briankendall/missionControlFullDesktopBar
 local MISSION_CONTROL_KEYCODE = 0xa0
@@ -286,8 +287,7 @@ if mcfdbSize then
     local log = hs.logger.new('missionControlFullDesktopBar', 'debug')
     log.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
     function handleMissionControl(e)
-        local code = e:getProperty(hs.eventtap.event.properties.keyboardEventKeycode)
-        if code == MISSION_CONTROL_KEYCODE then
+        if e:getKeyCode() == MISSION_CONTROL_KEYCODE then
             -- ignore auto-repeats
             local isAutoRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
             if isAutoRepeat == 1 then
@@ -300,11 +300,11 @@ if mcfdbSize then
             end
             local type = e:getType()
             if type == hs.eventtap.event.types.keyDown then
-                --log.i('intercepted Mission Control DOWN')
+                log.i('intercepted Mission Control DOWN')
                 os.execute(MCFDB_PATH..' -d -i')
                 return true -- discard
             elseif type == hs.eventtap.event.types.keyUp then
-                --log.i('intercepted Mission Control UP')
+                log.i('intercepted Mission Control UP')
                 os.execute(MCFDB_PATH..' -d -r')
                 return true -- discard
             end
@@ -349,7 +349,7 @@ myButton4Button5EventTap = hs.eventtap.new({
                 moveRight()
             end
         end
-        return true
+        return true -- discard
     end
 
     local app = hs.application.frontmostApplication()
@@ -360,25 +360,25 @@ myButton4Button5EventTap = hs.eventtap.new({
             return true
         elseif button == 4 then
             app:selectMenuItem({"History", "Forward"})
-            return true
+            return true -- discard
         end
     elseif app:name() == 'Slack' then
         -- Strangely, Hammerspoon can't see to get or otherwise work with the menu items.
         -- So another way is to fake typing the keyboard shortcuts.
         if button == 3 then
             hs.eventtap.keyStroke({'cmd'}, 'left')
-            return true
+            return true -- discard
         elseif button == 4 then
             hs.eventtap.keyStroke({'cmd'}, 'right')
-            return true
+            return true -- discard
         end
     elseif app:name() == 'Visual Studio' then
         if button == 3 then
             app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})
-            return true
+            return true -- discard
         elseif button == 4 then
             app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
-            return true
+            return true -- discard
         end
     end
 end)

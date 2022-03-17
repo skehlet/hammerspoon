@@ -451,48 +451,73 @@ if caffeine then
     showCaffeine(hs.caffeinate.get("displayIdle"))
 end
 
--- On my laptops, add a menubar item to confirm my headset's mic is the current input.
+-- On my laptops, add a menubar item to help me be sure my audio input and output are the expected devices (my AirPods)
 if
-    hs.host.localizedName() == "NXGN31966"
-    or hs.host.localizedName() == "Steve's MacBook Air"
+    hs.host.localizedName() == "Steve's MacBook Air"
     or hs.host.localizedName() == "Steve’s MacBook Pro"
 then
-    -- MIC_PREFERED_DEVICE = "External Microphone"
-    MIC_PREFERED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
-    micMenuItem = hs.menubar.new()
+    -- INPUT_PREFERRED_DEVICE = "External Microphone"
+    INPUT_PREFERRED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
+    OUTPUT_PREFERRED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
 
-    function setInputToExternalMic()
-        local externalMic = hs.audiodevice.findDeviceByName(MIC_PREFERED_DEVICE)
-        if externalMic then
-            externalMic:setDefaultInputDevice()
+    myAudioMenuBar = hs.menubar.new()
+
+    function setAudioToPreferredDevices()
+        local output = hs.audiodevice.findOutputByName(OUTPUT_PREFERRED_DEVICE)
+        if not output then
+            logger.w("Could not find preferred output device: " .. OUTPUT_PREFERRED_DEVICE)
         else
-            logger.w("Could not find " .. MIC_PREFERED_DEVICE .. ", cannot make it the default input")
-            micMenuItem:setTitle('🎤⛔️')
+            if not output:setDefaultOutputDevice() then
+                logger.w("Could not set the default output device to " .. OUTPUT_PREFERRED_DEVICE)
+            end
         end
+
+        local input = hs.audiodevice.findInputByName(INPUT_PREFERRED_DEVICE)
+        if not input then
+            inputGood = false
+            logger.w("Could not find preferred input device: " .. INPUT_PREFERRED_DEVICE)
+        else
+            if not input:setDefaultInputDevice() then
+                logger.w("Could not set the default input device to " .. INPUT_PREFERRED_DEVICE)
+            end
+        end
+
+        updateAudioDeviceIcon(true)
     end
 
-    function updateAudioInputIcon()
+    function updateAudioDeviceIcon(wasManual)
+        local outputGood
+        local inputGood
+        local tooltip
+
+        local audioDefaultOutput = hs.audiodevice.defaultOutputDevice()
+        logger.i("OUTPUT_PREFERRED_DEVICE: " .. OUTPUT_PREFERRED_DEVICE .. ", actual device: " .. audioDefaultOutput:name())
+        local outputGood = audioDefaultOutput:name() == OUTPUT_PREFERRED_DEVICE
+        tooltip = "Output: " .. audioDefaultOutput:name()
+
         local audioDefaultInput = hs.audiodevice.defaultInputDevice()
-        logger.i("MIC_PREFERED_DEVICE: " .. MIC_PREFERED_DEVICE .. ", actual device: " .. audioDefaultInput:name())
-        if audioDefaultInput:name() == MIC_PREFERED_DEVICE then
-            micMenuItem:setTitle('🎤👍')
-        else
-            micMenuItem:setTitle('🎤⚠️')
-        end
-        micMenuItem:setTooltip("Default input device is: " .. audioDefaultInput:name())
+        logger.i("INPUT_PREFERRED_DEVICE: " .. INPUT_PREFERRED_DEVICE .. ", actual device: " .. audioDefaultInput:name())
+        local inputGood = audioDefaultInput:name() == INPUT_PREFERRED_DEVICE
+        tooltip = tooltip .. ", Input: " .. audioDefaultInput:name()
+
+        local title = '🎧' .. (outputGood and '👍' or (wasManual and '⛔️' or '⚠️')) ..
+            '🎤' .. (inputGood and '👍' or (wasManual and '⛔️' or '⚠️'))
+
+        myAudioMenuBar:setTitle(title)
+        myAudioMenuBar:setTooltip(tooltip)
     end
 
-    if micMenuItem then
+    if myAudioMenuBar then
         hs.audiodevice.watcher.setCallback(function (event)
             -- the space in "dIn " is intentional, see
             -- [docs](https://www.hammerspoon.org/docs/hs.audiodevice.watcher.html#setCallback)
-            if event == "dIn " then
-                updateAudioInputIcon()
+            if event == "dOut" or event == "dIn " then
+                updateAudioDeviceIcon()
             end
         end)
         hs.audiodevice.watcher.start()
-        updateAudioInputIcon()
-        micMenuItem:setClickCallback(setInputToExternalMic)
+        updateAudioDeviceIcon()
+        myAudioMenuBar:setClickCallback(setAudioToPreferredDevices)
     end
 end
 

@@ -213,10 +213,16 @@ hammer:bind({}, 'g', function ()
         chrome:selectMenuItem({"File", "New Window"})
 
         for i,win in ipairs(chrome:visibleWindows()) do
-            -- if it's a new window, and it's on the wrong screen...
-            if not preExistingChromeWindowIds[win:id()] and win:screen() ~= currentScreen then
-                win:moveToScreen(currentScreen)
-                print("Moving New Chrome window (" .. win:title() .. ") to current screen")
+            if not preExistingChromeWindowIds[win:id()] then
+                -- if it's a new window, and it's on the wrong screen...
+                if win:screen() ~= currentScreen then
+                    logger.i("Moving New Chrome window (" .. win:title() .. ") to current screen")
+                    win:moveToScreen(currentScreen)
+                end
+                -- I've noticed sometimes it still gets buried under other windows, let's see if this helps:
+                logger.i("Focusing on New Chrome window (" .. win:title() .. ")")
+                win:focus()
+                break
             end
         end
 
@@ -314,6 +320,14 @@ if mcfdbSize then
     end)
     trapMissionControl:start()
 end
+
+-- sometimes missionControlFullDesktopBar stops working, use this to easily restart it
+hammer:bind({'shift'}, 'm', function ()
+    local mcfdb = hs.application.find("missionControlFullDesktopBar"):kill()
+    if mcfdb then
+        mcfdb:kill()
+    end
+end)
 
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html

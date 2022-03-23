@@ -262,6 +262,35 @@ end
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
+
+-- This one actually clicks on the "Login Window..." item on the Fast User
+-- Switching menu bar item to switch to the login screen. This technique seems
+-- to work better than locking the screen for restoring all spaces and their
+-- windows to the correct monitors. Unfortunately however this requires typing
+-- my username and password every time :-(. Note there does not seem to be any
+-- better way to hotkey this (hence the AppleScript), there used to be a command
+-- line utlity called CGSession but it was removed in Big Sur.
+-- Source: https://forum.keyboardmaestro.com/t/tip-resolving-big-sur-accessibility-security-and-other-issues/20159/20
+hammer:bind({}, 'f15', function ()
+    logger.i("Clicking Login Window...")
+    hs.applescript([[
+        tell application "System Events"
+            tell its application process "ControlCenter"
+                tell its menu bar 1
+                    click its menu bar item "User"
+                end tell
+                tell its window "Control Center"
+                    set btns to its buttons
+                    repeat with btn in btns
+                        if name of btn = "Login Window..." then
+                            click btn
+                        end if
+                    end repeat
+                end tell
+            end tell
+        end tell
+    ]])
+end)
 -- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
 -- comment this out for now, I don't have a keyboard with eject anymore

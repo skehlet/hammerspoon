@@ -124,22 +124,35 @@ f18 = hs.eventtap.new({
 end)
 f18:start()
 
-hammer:bind({}, 'f', function ()
+function makeFullScreen()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
-end)
+end
 
-hammer:bind({}, 'c', function ()
+function makeHalfScreen()
+    move(function (f, sf) return f.x, f.y, sf.w/2, sf.h end)
+end
+
+function makeHalfScreenCentered()
+    move(function (f, sf)
+        local w = sf.w / 2
+        local h = sf.h
+        local x = sf.x + ((sf.w - w) / 2)
+        local y = sf.y + ((sf.h - h) / 2)
+        return x, y, w, h
+    end)
+end
+
+function moveToCenter()
     move(function (f, sf)
         local x = sf.x + ((sf.w - f.w) / 2)
         local y = sf.y + ((sf.h - f.h) / 2)
         return x, y, f.w, f.h
     end)
-end)
+end
 
--- "stretch" the window vertically
-hammer:bind({}, 's', function ()
+function stretchVertically()
     move(function (f, sf) return f.x, sf.y, f.w, sf.h end)
-end)
+end
 
 function moveLeft()
     move(function (f, sf) return sf.x, sf.y, sf.w/2, sf.h end)
@@ -179,6 +192,9 @@ function moveEast()
     end
 end
 
+hammer:bind({},         'f',     makeFullScreen)
+hammer:bind({},         'c',     moveToCenter)
+hammer:bind({},         's',     stretchVertically)
 hammer:bind({},         'left',  moveLeft)
 hammer:bind({'shift'},  'left',  moveLeftBig)
 hammer:bind({'option'}, 'left',  moveLeftSmall)
@@ -227,6 +243,7 @@ hammer:bind({}, 'g', function ()
         end
 
         chrome:activate()
+        makeHalfScreenCentered()
     end
 end)
 
@@ -262,6 +279,7 @@ end
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
+-- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
 -- This one actually clicks on the "Login Window..." item on the Fast User
 -- Switching menu bar item to switch to the login screen. This technique seems
@@ -291,7 +309,6 @@ hammer:bind({}, 'f15', function ()
         end tell
     ]])
 end)
--- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
 -- comment this out for now, I don't have a keyboard with eject anymore
 -- -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617

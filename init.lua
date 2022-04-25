@@ -259,6 +259,12 @@ end)
 
 -- Lock screen: map various keys
 local function lockScreen()
+    -- For now, make sure caffeine is on when I lock my screen. This may not make sense for most, but I need to make sure
+    -- my monitors don't go to sleep
+    if not hs.caffeinate.get("displayIdle") then
+        toggleCaffeine()
+    end
+
     -- built-in screensaver:
     -- hs.caffeinate.startScreensaver()
     -- this one just blanks the screen, no photos/etc
@@ -281,34 +287,34 @@ hammer:bind({'shift'}, 'l', systemSleep)
 hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 -- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
--- This one actually clicks on the "Login Window..." item on the Fast User
--- Switching menu bar item to switch to the login screen. This technique seems
--- to work better than locking the screen for restoring all spaces and their
--- windows to the correct monitors. Unfortunately however this requires typing
--- my username and password every time :-(. Note there does not seem to be any
--- better way to hotkey this (hence the AppleScript), there used to be a command
--- line utlity called CGSession but it was removed in Big Sur.
--- Source: https://forum.keyboardmaestro.com/t/tip-resolving-big-sur-accessibility-security-and-other-issues/20159/20
-hammer:bind({}, 'f15', function ()
-    logger.i("Clicking Login Window...")
-    hs.applescript([[
-        tell application "System Events"
-            tell its application process "ControlCenter"
-                tell its menu bar 1
-                    click its menu bar item "User"
-                end tell
-                tell its window "Control Center"
-                    set btns to its buttons
-                    repeat with btn in btns
-                        if name of btn = "Login Window..." then
-                            click btn
-                        end if
-                    end repeat
-                end tell
-            end tell
-        end tell
-    ]])
-end)
+-- -- This one actually clicks on the "Login Window..." item on the Fast User
+-- -- Switching menu bar item to switch to the login screen. This technique seems
+-- -- to work better than locking the screen for restoring all spaces and their
+-- -- windows to the correct monitors. Unfortunately however this requires typing
+-- -- my username and password every time :-(. Note there does not seem to be any
+-- -- better way to hotkey this (hence the AppleScript), there used to be a command
+-- -- line utlity called CGSession but it was removed in Big Sur.
+-- -- Source: https://forum.keyboardmaestro.com/t/tip-resolving-big-sur-accessibility-security-and-other-issues/20159/20
+-- hammer:bind({}, 'f15', function ()
+--     logger.i("Clicking Login Window...")
+--     hs.applescript([[
+--         tell application "System Events"
+--             tell its application process "ControlCenter"
+--                 tell its menu bar 1
+--                     click its menu bar item "User"
+--                 end tell
+--                 tell its window "Control Center"
+--                     set btns to its buttons
+--                     repeat with btn in btns
+--                         if name of btn = "Login Window..." then
+--                             click btn
+--                         end if
+--                     end repeat
+--                 end tell
+--             end tell
+--         end tell
+--     ]])
+-- end)
 
 -- comment this out for now, I don't have a keyboard with eject anymore
 -- -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617

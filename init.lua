@@ -259,12 +259,6 @@ end)
 
 -- Lock screen: map various keys
 local function lockScreen()
-    -- For now, make sure caffeine is on when I lock my screen. This may not make sense for most, but I need to make sure
-    -- my monitors don't go to sleep
-    if not hs.caffeinate.get("displayIdle") then
-        toggleCaffeine()
-    end
-
     -- built-in screensaver:
     -- hs.caffeinate.startScreensaver()
     -- this one just blanks the screen, no photos/etc
@@ -585,6 +579,29 @@ then
         updateAudioDeviceIcon()
         myAudioMenuBar:setClickCallback(setAudioToPreferredDevices)
     end
+end
+
+-- On my work laptop, activate caffeine basically any time
+if hs.host.localizedName() == "Steve’s MacBook Pro"
+then
+    caffeinateWatcher = hs.caffeinate.watcher.new(function (event)
+        logger.i('caffeinate watcher caught:', event)
+        -- On basically any screen event, make sure caffeine is on.
+        -- This is to make sure my monitors don't go to sleep.
+        if
+            event == hs.caffeinate.watcher.screensaverDidStart
+            or event == hs.caffeinate.watcher.screensaverDidStop
+            or event == hs.caffeinate.watcher.screensDidLock
+            or event == hs.caffeinate.watcher.screensDidUnlock
+            or event == hs.caffeinate.watcher.screensDidWake
+            or event == hs.caffeinate.watcher.sessionDidBecomeActive
+        then
+            if not hs.caffeinate.get("displayIdle") then
+                toggleCaffeine()
+            end            
+        end
+    end)
+    caffeinateWatcher:start()
 end
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

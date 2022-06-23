@@ -33,19 +33,9 @@ end
 -- note myWatcher and other variables are deliberately global so they're never garbage collected
 myWatcher = hs.pathwatcher.new(os.getenv('HOME')..'/.hammerspoon/', reloadConfig):start()
 
-local function move(cb)
-    local win = hs.window.focusedWindow()
-    if win then
-        local frame = win:frame()
-        local screenFrame = win:screen():frame()
-        frame.x, frame.y, frame.w, frame.h = cb(frame, screenFrame)
-        -- logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
-        win:setFrame(frame)
-    end
-end
-
+-- F18 is my Hammer key
 -- Use Karabiner-Elements to map caps_lock to f18.
--- Then use Hammerspoon to bind f18 to a new modal key, which we configure with a number of combinations below.
+-- Then use Hammerspoon to bind f18 to a new modifier key, which we configure with a number of combinations below.
 hammer = hs.hotkey.modal.new()
 
 function hammer:entered()
@@ -58,52 +48,14 @@ function hammer:exited()
     self.isDown = false
 end
 
--- If the weird Caps lock issue happens again
--- Try F14 ("Scroll Lock" on my PC keyboard) as an alternate hammer key
--- Try hidutil to see if it changes the behavior (https://stackoverflow.com/a/46460200/296829):
--- hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}'
--- To clear:
--- hidutil property --set '{"UserKeyMapping":[]}'
--- See https://www.naseer.dev/post/hidutil/ to make it set on reboot
--- Update: it happened again. F14/Scroll Lock+g did NOT work (typed a 'g' into my window)
---     I ran the hidutil command, and that didn't help. I ran the clear command.
---     Some time later, unexplainably, Caps Lock started working again.
--- 2021-06-30: this time, it was busted until I added logging to the F18 down and up functions. That reloaded hammerspoon,
--- and then it started working again. I KNOW I restarted hammerspoon earlier and that did NOT help though. So not sure
--- why this helped.
--- Update 2021-08-20:
--- I've found that locking the screen then unlocking clears the problem.
--- I found using Karabiner-Elements EventViewer that it stops seeing CapsLock events.
--- Once I lock screen and return, it then begins showing {"key_code":"f18"} down/up events.
--- So this implies it's something either with Karabiner-Elements or upstream of it.
--- But then why doesn't F14/Scroll Lock work?? Try that next time.
--- 2021-08-25: Today, Caps Lock stopped working, but only in Chrome.
--- Karabiner EventViewer saw Caps Lock, and Caps+f worked in all apps but Chrome.
--- Restarting Hammerspoon fixed it.
---
--- 2022-02-03: This is the issue: https://github.com/Hammerspoon/hammerspoon/issues/1743
--- Occasionally some process on macOS will put the system into a state where "secure input" is enabled and this prevents
--- hs.eventtap (or hs.hostkey.bind) from working.
--- You can prove this is the case with: ioreg -l -w 0 | grep SecureInput
--- Then find the PID with: ps axo pid,command | grep <PID>
--- For me, today it was Google Chrome. The WD MyCloud UI had auto-logged me out and was sitting at a password prompt.
--- Once I entered a password, then it released the secure input hold, and my hammer key started working again.
--- Now that I have a better idea what the problem is, there are lots of hits googling for "secure input" and
--- tools like TextExpander, Keyboard Maestro, Alfred, etc.
--- [This reddit posts](https://www.reddit.com/r/TextExpander/comments/440yal/little_tip_if_you_use_lastpass_textexpander/)
--- suggests just clicking on the LastPass icon in Chrome, and that might clear it up.
--- I tried turning off LastPass' auto-fill feature, maybe this will stop it from triggering.
--- Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information
-
 -- f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
 f14 = hs.hotkey.bind({}, 'f14', function () hammer:enter() end, function () hammer:exit() end)
 
 -- 2022-01-27 "Better" way to capture f18, this way it'll trigger whether or not
 -- you already had shift, alt, cmd, etc held down. With hd.hotkey.bind, I'd have
 -- to create bindings for all the combinations of modifier keys.
-f18 = hs.eventtap.new({
-    -- hs.eventtap.event.types:
-    -- https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/eventtap/libeventtap_event.m#L1305
+-- 2022-06-23 I mocked it as "better", but it really is better.
+myF18EventTap = hs.eventtap.new({
     hs.eventtap.event.types.keyDown,
     hs.eventtap.event.types.keyUp
 }, function(event)
@@ -122,7 +74,19 @@ f18 = hs.eventtap.new({
         end
     end
 end)
-f18:start()
+myF18EventTap:start()
+
+-- Window movement functions
+local function move(cb)
+    local win = hs.window.focusedWindow()
+    if win then
+        local frame = win:frame()
+        local screenFrame = win:screen():frame()
+        frame.x, frame.y, frame.w, frame.h = cb(frame, screenFrame)
+        -- logger.d(win:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+        win:setFrame(frame)
+    end
+end
 
 function makeFullScreen()
     move(function (f, sf) return sf.x, sf.y, sf.w, sf.h end)
@@ -212,39 +176,53 @@ hammer:bind({}, 'down', function ()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end)
 
+-- Application quick launch keys
+
 hammer:bind({}, 't', function ()
     os.execute('/usr/bin/open -a Terminal ~')
 end)
 
-hammer:bind({}, 'g', function ()
-    local chrome = hs.application.find("Google Chrome")
-    if chrome then
+function openNewCenteredHalfWidthWindowOnCurrentScreen(applicationName, openNewWindowFn)
+    local app = hs.application.find(applicationName)
+    if app then
         -- go to great lengths to make sure the new window appears on the current screen
         local currentScreen = hs.screen.mainScreen()
-        local preExistingChromeWindowIds = {}
-        for _,win in ipairs(chrome:visibleWindows()) do
-            preExistingChromeWindowIds[win:id()] = true
+        local preExistingAppWindowIds = {}
+        for _, win in ipairs(app:visibleWindows()) do
+            preExistingAppWindowIds[win:id()] = true
         end
 
-        chrome:selectMenuItem({"File", "New Window"})
+        openNewWindowFn(app)
 
-        for i,win in ipairs(chrome:visibleWindows()) do
-            if not preExistingChromeWindowIds[win:id()] then
+        for i, win in ipairs(app:visibleWindows()) do
+            if not preExistingAppWindowIds[win:id()] then
                 -- if it's a new window, and it's on the wrong screen...
                 if win:screen() ~= currentScreen then
-                    logger.i("Moving New Chrome window (" .. win:title() .. ") to current screen")
+                    logger.i("Moving New " .. applicationName .. " window (" .. win:title() .. ") to current screen")
                     win:moveToScreen(currentScreen)
                 end
-                -- I've noticed sometimes it still gets buried under other windows, let's see if this helps:
-                logger.i("Focusing on New Chrome window (" .. win:title() .. ")")
+                -- I've noticed sometimes it still gets buried under other windows, this helps:
+                logger.i("Focusing on New " .. applicationName .. " window (" .. win:title() .. ")")
                 win:focus()
                 break
             end
         end
 
-        chrome:activate()
+        app:activate()
         makeHalfScreenCentered()
     end
+end
+
+hammer:bind({}, 'g', function ()
+    openNewCenteredHalfWidthWindowOnCurrentScreen("Google Chrome", function (app)
+        app:selectMenuItem({"File", "New Window"})
+    end)
+end)
+
+hammer:bind({}, 'b', function ()
+    openNewCenteredHalfWidthWindowOnCurrentScreen("Brave Browser", function (app)
+        app:selectMenuItem({"File", "New Window"})
+    end)
 end)
 
 -- hammer:bind({'shift'}, 'f', function ()
@@ -337,8 +315,8 @@ local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacO
 local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
 if mcfdbSize then
     logger.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
-    -- trapMissionControl must be a global variable so Lua doesn't garbage collect it
-    trapMissionControl = hs.eventtap.new({
+    -- myMissionControlEventTap must be a global variable so Lua doesn't garbage collect it
+    myMissionControlEventTap = hs.eventtap.new({
         hs.eventtap.event.types.keyDown,
         hs.eventtap.event.types.keyUp
     }, function (event)
@@ -364,7 +342,7 @@ if mcfdbSize then
         end
         return false -- propogate
     end)
-    trapMissionControl:start()
+    myMissionControlEventTap:start()
 end
 
 -- sometimes missionControlFullDesktopBar stops working, use this to easily restart it
@@ -378,7 +356,7 @@ end)
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
-myButton4Button5EventTap = hs.eventtap.new({
+myOtherMouseButtonEventTap = hs.eventtap.new({
     hs.eventtap.event.types.otherMouseDown
 }, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
@@ -442,7 +420,7 @@ myButton4Button5EventTap = hs.eventtap.new({
         end
     end
 end)
-myButton4Button5EventTap:start()
+myOtherMouseButtonEventTap:start()
 
 
 -- Switch monitors

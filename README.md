@@ -44,16 +44,12 @@ There are plenty of Hammerspoon examples of creating a "hyper" key where you pre
 
 ## Why does my Hammer key sometimes stop working?
 
-I finally got to the root of this problem: macOS can sometimes enter a state of "secure input" where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. This is great, except for when it activates unexpectedly in the background, for example, when you get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and your LastPass extension for Chrome kicks in. I am currently testing out disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information) to see if this goes away for good.
-
-Otherwise, a quick workaround is to lock screen (`hammer`+`l`) and touch-id back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well. You can run `hs.eventtap.isSecureInputEnabled()` in the Hammerspoon console to see if secure input is currently enabled.
+See [hammerspoon#1743](https://github.com/Hammerspoon/hammerspoon/issues/1743): macOS can sometimes enter a state of "secure input" where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. This is great, except for when it activates unexpectedly in the background, for example, when you get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and your LastPass extension for Chrome kicks in. You can avoid this problem by disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information). Or, a quick workaround is to lock screen (`hammer`+`l`) and touch-id back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well. You can run `hs.eventtap.isSecureInputEnabled()` in the Hammerspoon console to see if secure input is currently enabled.
 
 
 ## External monitor swapping issues
 
-Recently, since getting some new equipment, I've found that my two (identical) external monitors will randomly swap places. It seems to be a race condition, e.g. the order in which they wake up and register with macOS. This and many other similar problems I found googling around seems to be a major issue with macOS keeping track of displays and their positions. My issue may be that the serial number reported by the monitors (`ioreg -lw0 | grep DisplayAttributes | grep SerialNumber`) are identical.
-
-I've added a Python script, based on [this very helpful Ask Different post](https://apple.stackexchange.com/a/48977/10204), to swap them. Note that I first tried to do this just with Hammerspoon's `hs.screen` APIs, however I found that moving screens around individually caused a lot of window chaos (resizing and repositioning). The Python script uses the Quartz APIs and are able to move the screens in a single API call, which has the effect of leaving all the windows unchanged. This is only a quick workaround, hopefully macOS fixes this, or I can find another way.
+I have a keybindings to run `displayplacer` to swap my external monitors. Sometimes after waking my laptop up from sleep, it gets the two mixed up (they're identical make/model).
 
 ## Screen Lock
 
@@ -62,3 +58,6 @@ Activate with `hammer`+`l`, or other hotkeys like `F19` or `Pause` (see the code
 ## Other Stuff
 
 * Mouse button 4 and 5 to perform Back/Forward in Chrome, Slack, Chrome, and Visual Studio for Mac.
+* Hammer+mouse4 or mouse4 to move windows to left/right half
+* Caffeine equivalent
+* Microphone and speaker indicators to confirm my Airpods are the active input/output

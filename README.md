@@ -29,11 +29,11 @@ Focus on a window and press one of the following key combinations. See [a video 
 
 ## What is this "Hammer" key?
 
-`Caps Lock` is my Hammer key, it has a perfect location on the keyboard and I'd never use it otherwise. It acts like just another modifier key, like `command`, `shift`, or `ctrl`, but exclusive for Hammerspoon keybindings.
+`Caps Lock` is my Hammer key, it has a perfect location on the keyboard and I'd never use it otherwise. It acts like just another modifier key, like `command`, `shift`, or `ctrl`, but exclusively for Hammerspoon keybindings.
 
 ## How do I turn my Caps Lock into a Hammer key?
 
-Use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18` (`F18` is another key I would never otherwise use). Then you just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
+Use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18`. I chose `F18` because it's another key I would never otherwise use. Then you just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
 
 ![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
 
@@ -41,11 +41,11 @@ Note: I've found that Hammerspoon itself doesn't intercept Caps Lock reliably fo
 
 ## How is your "Hammer" key different than a "Hyper"/Modal key?
 
-There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but my "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press, and has the advantage over some implementations (e.g. that use exotic combinations of `cmd`+`option`+`ctrl`) that it won't inadvertently trigger application keybindings.
+There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but my "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press. It also has an advantage over some implementations (e.g. that use exotic combinations of `cmd`+`option`+`ctrl`) that it won't inadvertently trigger application keybindings.
 
 ## Why does my Hammer key sometimes stop working?
 
-This was happening to me because of my Chrome Lastpass extension. Every once in a while a background Chrome window would get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and LastPass would kick in, triggering macOS's "secure input" state where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. See [hammerspoon#1743](https://github.com/Hammerspoon/hammerspoon/issues/1743). You can prevent this from happening by disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information). Prior to figuring this out, I used the workaround of locking screen (`hammer`+`l`) then using touch-id to quickly log back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well.
+This was happening to me because of my Chrome Lastpass extension. Every once in a while a background Chrome window would get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and LastPass would kick in, triggering macOS's "secure input" state where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. See [hammerspoon#1743](https://github.com/Hammerspoon/hammerspoon/issues/1743). You can avoid this headache by disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information). Prior to figuring this out, I used the workaround of locking screen (`hammer`+`l`) then using touch-id to quickly log back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well.
 
 
 ## External monitor swapping issues
@@ -54,12 +54,12 @@ I have a keybindings to run `displayplacer` to swap my external monitors. Someti
 
 ## Screen Lock
 
-Activate with `hammer`+`l`, or other hotkeys like `F19` or `Pause` (see the code).
+Activate with `hammer`+`l`, or other hotkeys like `F15` or `Pause` (see the code).
 
 ## Other Stuff
 
 * Mouse button 4 and 5 to perform Back/Forward in Chrome, Slack, Chrome, and Visual Studio for Mac.
-* Hammer+mouse4 or mouse4 to move windows to left/right half of screen
+* Hammer+mouse4 or mouse5 to move windows to left/right half of screen
 * Caffeine equivalent
 * Microphone and speaker indicators to confirm my Airpods are the active input/output
 * Lots of little things added here and there

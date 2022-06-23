@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Monterey (12.2) and Hammerspoon 0.9.93.
+This is working on macOS Monterey (12.3.1) and Hammerspoon 0.9.97.
 
 ## Window Management via keypresses
 

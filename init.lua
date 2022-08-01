@@ -586,20 +586,20 @@ end
 -- instead send: option-shift-left then delete
 -- Currently this is a very annoying bug in O365:
 -- https://answers.microsoft.com/en-us/msoffice/forum/all/mac-option-delete-keyboard-shortcut-to-delete-word/2907b079-e37d-4032-add3-ffb0d67cedd8
-myO365OptionDeleteEventTap = hs.eventtap.new({
-    hs.eventtap.event.types.keyDown
-}, function(event)
-    if event:getKeyCode() == hs.keycodes.map['delete'] and event:getFlags().alt then
-        local win = hs.window.focusedWindow()
-        if win:title():find('- Outlook -') then
-            logger.i('O365 option-delete workaround firing!')
-            hs.eventtap.keyStroke({'alt', 'shift'}, 'left', 0)
-            hs.eventtap.keyStroke({}, 'delete', 0)
-            return true -- discard
-        end
-    end
-end)
-myO365OptionDeleteEventTap:start()
+-- myO365OptionDeleteEventTap = hs.eventtap.new({
+--     hs.eventtap.event.types.keyDown
+-- }, function(event)
+--     if event:getKeyCode() == hs.keycodes.map['delete'] and event:getFlags().alt then
+--         local win = hs.window.focusedWindow()
+--         if win:title():find('- Outlook -') then
+--             logger.i('O365 option-delete workaround firing!')
+--             hs.eventtap.keyStroke({'alt', 'shift'}, 'left', 0)
+--             hs.eventtap.keyStroke({}, 'delete', 0)
+--             return true -- discard
+--         end
+--     end
+-- end)
+-- myO365OptionDeleteEventTap:start()
 
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

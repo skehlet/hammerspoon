@@ -22,9 +22,21 @@ function util.dumpTable(table, depth)
             logger.i(string.rep("  ", depth)..k..":")
             dumpTable(v, depth+1)
         else
-            logger.i(string.rep("  ", depth)..k..": ",v)
+            print(string.rep("  ", depth)..k..": ",v)
         end
     end
+end
+
+function util.getKeys(tab)
+    local keyset={}
+    local n=0
+    
+    for k,v in pairs(tab) do
+      n=n+1
+      keyset[n]=k
+    end
+
+    return keyset
 end
 
 return util

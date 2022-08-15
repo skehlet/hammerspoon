@@ -603,7 +603,7 @@ end
 
 
 -- If using Excel, fix broken keybindings
-myO365OptionDeleteEventTap = hs.eventtap.new({
+myExcelEventTap = hs.eventtap.new({
     hs.eventtap.event.types.keyDown
 }, function(event)
     if hs.application.frontmostApplication():name() == "Microsoft Excel" then
@@ -632,6 +632,6 @@ myO365OptionDeleteEventTap = hs.eventtap.new({
 
     end
 end)
-myO365OptionDeleteEventTap:start()
+myExcelEventTap:start()
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

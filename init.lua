@@ -495,8 +495,8 @@ if
     or hs.host.localizedName() == "Steve’s MacBook Pro"
 then
     -- INPUT_PREFERRED_DEVICE = "External Microphone"
-    INPUT_PREFERRED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
-    OUTPUT_PREFERRED_DEVICE = "Steven’s AirPods Pro" -- note the funny non-ascii single quote
+    INPUT_PREFERRED_DEVICE = "AirPods Pro"
+    OUTPUT_PREFERRED_DEVICE = "AirPods Pro"
 
     myAudioMenuBar = hs.menubar.new()
 

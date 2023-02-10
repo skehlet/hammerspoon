@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Monterey (12.3.1) and Hammerspoon 0.9.97.
+This is working on macOS Ventura (13.2) and Hammerspoon 0.9.97.
 
 ## Window Management via keypresses
 
@@ -33,11 +33,17 @@ Focus on a window and press one of the following key combinations. See [a video 
 
 ## How do I turn my Caps Lock into a Hammer key?
 
-Use [Karabiner-Elements](https://github.com/tekezo/Karabiner-Elements) to remap `caps lock` to `F18`. I chose `F18` because it's another key I would never otherwise use. Then you just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
+Use macOS's `hidutil` program to remap your keys. To do this automatically at boot, copy the file `com.stevekehlet.RemapCapsLockToF18.plist` to your `~/Library/LaunchAgents` (create that directory if it doesn't already exist).
 
-![How to configure Karabiner-Elements](Karabiner-Elements.png?raw=true "How to configure Karabiner-Elements")
+Then either reboot, or simply run:
 
-Note: I've found that Hammerspoon itself doesn't intercept Caps Lock reliably for various technical reasons, e.g. it's a toggle on/off, may have an LED, etc. I don't mind using Karabiner-Elements because I use it for other key mappings.
+```bash
+launchctl load com.stevekehlet.RemapCapsLockToF18.plist
+```
+
+Now just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
+
+Note: I've found that Hammerspoon itself doesn't intercept Caps Lock reliably for various reasons (e.g. it's a toggle on/off, may have an LED, etc), so we need another tool. I used to use Karabiner-Elements, but some systems I use have restrictions on extensions that can be loaded, so now I just use `hidutil`.
 
 ## How is your "Hammer" key different than a "Hyper"/Modal key?
 

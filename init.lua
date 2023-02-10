@@ -332,7 +332,8 @@ if mcfdbSize then
             end
             if event:getType() == hs.eventtap.event.types.keyDown then
                 -- logger.i('intercepted Mission Control DOWN')
-                os.execute(MCFDB_PATH..' -d -i')
+                -- os.execute(MCFDB_PATH..' -d -i')
+                os.execute(MCFDB_PATH..' -d')
                 return true -- discard
             else
                 -- logger.i('intercepted Mission Control UP')
@@ -437,6 +438,13 @@ myOtherMouseButtonEventTap:start()
 -- local PHYSICALLY_LEFT_MONITOR_SERIAL = "M5LMQS070425"
 -- local PHYSICALLY_RIGHT_MONITOR_SERIAL = "M5LMQS064778"
 
+-- Example command:
+--[[
+ /opt/homebrew/bin/displayplacer \
+	"id:6DF848C4-4A01-4378-8222-02DBF53E0627 origin:(0,0)" \
+	"id:24B7AB28-EABA-46DE-90EA-2F69C91E67C5 origin:(2560,0)"
+]]--
+
 local EXT_MONITOR_NAME_PATTERN = 'VG27A'
 local DISPLAYPLACER_PATH = '/opt/homebrew/bin/displayplacer'
 
@@ -468,7 +476,6 @@ end
 
 hammer:bind({'shift'}, 's', function ()
     logger.i("Swapping monitors")
-    -- os.execute(hs.fs.currentDir() .. '/swap-monitors.py')
     screenLayoutWatcher()
 end)
 

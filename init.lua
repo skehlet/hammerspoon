@@ -483,8 +483,10 @@ end)
 -- Caffeine from https://github.com/kbd/setup/blob/master/HOME/.hammerspoon/init.lua#L150
 caffeine = hs.menubar.new()
 function showCaffeine(awake)
-    local title = awake and '☕' or '🍵'
-    caffeine:setTitle(title)
+    -- local title = awake and '☕' or '🍵'
+    -- caffeine:setTitle(title)
+    local icon = hs.image.imageFromPath(awake and 'cup-steaming.png' or 'cup-empty.png'):setSize({w=16,h=16})
+    caffeine:setIcon(icon)
 end
 
 function toggleCaffeine()

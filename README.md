@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Ventura (13.2) and Hammerspoon 0.9.97.
+This is working on macOS Ventura (13.2) and Hammerspoon 0.9.100.
 
 ## Window Management via keypresses
 

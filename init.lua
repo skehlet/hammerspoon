@@ -392,7 +392,7 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
     end
 
     local app = hs.application.frontmostApplication()
-    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app)
+    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app:name())
     if app:name() == 'Google Chrome' then
         if button == 3 then
             app:selectMenuItem({"History", "Back"})
@@ -401,16 +401,19 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
             app:selectMenuItem({"History", "Forward"})
             return true -- discard
         end
-    elseif app:name() == 'Slack' then
-        -- Strangely, Hammerspoon can't see to get or otherwise work with the menu items.
-        -- So another way is to fake typing the keyboard shortcuts.
-        if button == 3 then
-            hs.eventtap.keyStroke({'cmd'}, 'left')
-            return true -- discard
-        elseif button == 4 then
-            hs.eventtap.keyStroke({'cmd'}, 'right')
-            return true -- discard
-        end
+    -- 2023-09-05: Appears Slack added button3/4 support at some point, and I'm seeing double back/forward behavior, so comment it out.
+    -- elseif app:name() == 'Slack' then
+    --     -- Strangely, Hammerspoon can't see to get or otherwise work with the menu items.
+    --     -- So another way is to fake typing the keyboard shortcuts.
+    --     if button == 3 then
+    --         --logger.i("Slack: intercepted button3")
+    --         hs.eventtap.keyStroke({'cmd'}, 'left')
+    --         return true -- discard
+    --     elseif button == 4 then
+    --         --logger.i("Slack: intercepted button4")
+    --         hs.eventtap.keyStroke({'cmd'}, 'right')
+    --         return true -- discard
+    --     end
     elseif app:name() == 'Visual Studio' then
         if button == 3 then
             app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})

@@ -433,11 +433,11 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
 
     elseif app:name() == 'Notes' then
         if button == 3 then
-            logger.i("Notes: intercepted button3")
+            -- logger.i("Notes: intercepted button3")
             hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
             return true -- discard
         elseif button == 4 then
-            logger.i("Notes: intercepted button4")
+            -- logger.i("Notes: intercepted button4")
             hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
             return true -- discard
         end

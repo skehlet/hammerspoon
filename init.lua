@@ -393,11 +393,19 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
 
     local app = hs.application.frontmostApplication()
     -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app:name())
-    if app:name() == 'Google Chrome' then
+    -- if app:name() == 'Google Chrome' then
+    if app:name() == 'Google Chrome' or app:name() == 'Brave Browser' then
+        local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+        if isRepeat == 1 then
+            logger.i("Chrome/Brave: discarding repeat button 3/4")
+            return true -- ignore and discard
+        end
         if button == 3 then
+            -- logger.i("Chrome/Brave: intercepted button3")
             app:selectMenuItem({"History", "Back"})
             return true
         elseif button == 4 then
+            -- logger.i("Chrome/Brave: intercepted button4")
             app:selectMenuItem({"History", "Forward"})
             return true -- discard
         end
@@ -422,6 +430,18 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
             app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
             return true -- discard
         end
+
+    elseif app:name() == 'Notes' then
+        if button == 3 then
+            logger.i("Notes: intercepted button3")
+            hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
+            return true -- discard
+        elseif button == 4 then
+            logger.i("Notes: intercepted button4")
+            hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
+            return true -- discard
+        end
+
     end
 end)
 myOtherMouseButtonEventTap:start()

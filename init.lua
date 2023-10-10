@@ -33,9 +33,14 @@ end
 -- note myWatcher and other variables are deliberately global so they're never garbage collected
 myWatcher = hs.pathwatcher.new(os.getenv('HOME')..'/.hammerspoon/', reloadConfig):start()
 
--- F18 is my Hammer key
--- Use Karabiner-Elements to map caps_lock to f18.
--- Then use Hammerspoon to bind f18 to a new modifier key, which we configure with a number of combinations below.
+-- Convenience method to create and start an eventTap then store it in a global variable so it doesn't get garbage collected
+myEventTaps = {} -- global
+function createEventTap(types, handler)
+    table.insert(myEventTaps, hs.eventtap.new(types, handler):start())
+end
+
+-- The Hammer key
+-- Install com.stevekehlet.RemapCapsLockToF18.plist (see the README) to map Caps Lock to F18.
 hammer = hs.hotkey.modal.new()
 
 function hammer:entered()
@@ -48,14 +53,8 @@ function hammer:exited()
     self.isDown = false
 end
 
--- f18 = hs.hotkey.bind({}, 'f18', hammerDown, hammerUp)
-f14 = hs.hotkey.bind({}, 'f14', function () hammer:enter() end, function () hammer:exit() end)
-
--- 2022-01-27 "Better" way to capture f18, this way it'll trigger whether or not
--- you already had shift, alt, cmd, etc held down. With hd.hotkey.bind, I'd have
--- to create bindings for all the combinations of modifier keys.
--- 2022-06-23 I mocked it as "better", but it really is better.
-myF18EventTap = hs.eventtap.new({
+-- Capture presses and releases of F18 to activate the hammer
+createEventTap({
     hs.eventtap.event.types.keyDown,
     hs.eventtap.event.types.keyUp
 }, function(event)
@@ -74,7 +73,6 @@ myF18EventTap = hs.eventtap.new({
         end
     end
 end)
-myF18EventTap:start()
 
 -- Window movement functions
 local function move(cb)
@@ -198,11 +196,11 @@ function openNewCenteredHalfWidthWindowOnCurrentScreen(applicationName, openNewW
             if not preExistingAppWindowIds[win:id()] then
                 -- if it's a new window, and it's on the wrong screen...
                 if win:screen() ~= currentScreen then
-                    logger.i("Moving New " .. applicationName .. " window (" .. win:title() .. ") to current screen")
+                    -- logger.i("Moving New " .. applicationName .. " window (" .. win:title() .. ") to current screen")
                     win:moveToScreen(currentScreen)
                 end
                 -- I've noticed sometimes it still gets buried under other windows, this helps:
-                logger.i("Focusing on New " .. applicationName .. " window (" .. win:title() .. ")")
+                -- logger.i("Focusing on New " .. applicationName .. " window (" .. win:title() .. ")")
                 win:focus()
                 break
             end
@@ -256,7 +254,7 @@ end
 
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
-hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
+-- hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS (disabled, no longer using PC keyboard)
 -- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
 
 -- -- This one actually clicks on the "Login Window..." item on the Fast User
@@ -290,8 +288,8 @@ hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 
 -- comment this out for now, I don't have a keyboard with eject anymore
 -- -- https://github.com/Hammerspoon/hammerspoon/issues/1220#issuecomment-276941617
--- ejectKey = hs.eventtap.new({
---     hs.eventtap.event.types.NSSystemDefined
+-- createEventTap({
+--     hs.eventtap.event.types.NSSystemDefined -- should be ...systemDefined instead?
 -- }, function(event)
 --     -- http://www.hammerspoon.org/docs/hs.eventtap.event.html#systemKey
 --     event = event:systemKey()
@@ -305,7 +303,6 @@ hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS
 --         end
 --     end
 -- end)
--- ejectKey:start()
 
 
 -- if missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
@@ -316,7 +313,7 @@ local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
 if mcfdbSize then
     logger.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
     -- myMissionControlEventTap must be a global variable so Lua doesn't garbage collect it
-    myMissionControlEventTap = hs.eventtap.new({
+    createEventTap({
         hs.eventtap.event.types.keyDown,
         hs.eventtap.event.types.keyUp
     }, function (event)
@@ -343,7 +340,6 @@ if mcfdbSize then
         end
         return false -- propogate
     end)
-    myMissionControlEventTap:start()
 end
 
 -- sometimes missionControlFullDesktopBar stops working, use this to easily restart it
@@ -357,14 +353,12 @@ end)
 -- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
 -- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 -- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
-myOtherMouseButtonEventTap = hs.eventtap.new({
+createEventTap({
     hs.eventtap.event.types.otherMouseDown
 }, function (event)
     local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
 
     -- Make Hammer+mouse4/mouse5 behave like hammer+left/hammer+right.
-    -- This fells hacky to duplicate the logic like this... would be nice to abstract this somehow,
-    -- and do the same thing whether via a hammer binding or here via mouse4/mouse5.
     if hammer.isDown then
         local flags = event:getFlags()
         if button == 3 then
@@ -444,8 +438,6 @@ myOtherMouseButtonEventTap = hs.eventtap.new({
 
     end
 end)
-myOtherMouseButtonEventTap:start()
-
 
 -- Switch monitors
 -- This is a workaround to deal with macOS getting confused on which of my external monitors is left and right.
@@ -618,7 +610,7 @@ end
 -- instead send: option-shift-left then delete
 -- Currently this is a very annoying bug in O365:
 -- https://answers.microsoft.com/en-us/msoffice/forum/all/mac-option-delete-keyboard-shortcut-to-delete-word/2907b079-e37d-4032-add3-ffb0d67cedd8
--- myO365OptionDeleteEventTap = hs.eventtap.new({
+-- createEventTap({
 --     hs.eventtap.event.types.keyDown
 -- }, function(event)
 --     if event:getKeyCode() == hs.keycodes.map['delete'] and event:getFlags().alt then
@@ -631,11 +623,10 @@ end
 --         end
 --     end
 -- end)
--- myO365OptionDeleteEventTap:start()
 
 
 -- If using Excel, fix broken keybindings
-myExcelEventTap = hs.eventtap.new({
+createEventTap({
     hs.eventtap.event.types.keyDown
 }, function(event)
     if hs.application.frontmostApplication():name() == "Microsoft Excel" then
@@ -664,6 +655,5 @@ myExcelEventTap = hs.eventtap.new({
 
     end
 end)
-myExcelEventTap:start()
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

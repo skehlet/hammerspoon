@@ -344,7 +344,7 @@ end
 
 -- sometimes missionControlFullDesktopBar stops working, use this to easily restart it
 hammer:bind({'shift'}, 'm', function ()
-    local mcfdb = hs.application.find("missionControlFullDesktopBar"):kill()
+    local mcfdb = hs.application.find("missionControlFullDesktopBar")
     if mcfdb then
         mcfdb:kill()
     end

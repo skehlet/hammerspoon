@@ -154,6 +154,14 @@ function moveEast()
     end
 end
 
+function moveUp()
+    move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
+end
+
+function moveDown()
+    move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
+end
+
 hammer:bind({},         'f',     makeFullScreen)
 hammer:bind({},         'c',     moveToCenter)
 hammer:bind({},         's',     stretchVertically)
@@ -165,14 +173,8 @@ hammer:bind({},         'right', moveRight)
 hammer:bind({'shift'},  'right', moveRightBig)
 hammer:bind({'option'}, 'right', moveRightSmall)
 hammer:bind({'cmd'},    'right', moveEast)
-
-hammer:bind({}, 'up', function ()
-    move(function (f, sf) return f.x, sf.y, f.w, sf.h/2 end)
-end)
-
-hammer:bind({}, 'down', function ()
-    move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
-end)
+hammer:bind({},         'up',    moveUp)
+hammer:bind({},         'down',  moveDown)
 
 -- Application quick launch keys
 
@@ -254,8 +256,8 @@ end
 
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
--- hs.hotkey.bind({}, 'f15', lockScreen) -- Pause on my PC keyboard is F15 on macOS (disabled, no longer using PC keyboard)
--- hs.hotkey.bind({}, 'f19', lockScreen) -- Remove, no longer using a (Mac) keyboard with F19
+hs.hotkey.bind({}, 'f15', lockScreen) -- F15/Pause (on my PC keyboard)
+-- hs.hotkey.bind({}, 'f19', lockScreen) -- Disabled, no longer using a (Mac) keyboard with F19
 
 -- -- This one actually clicks on the "Login Window..." item on the Fast User
 -- -- Switching menu bar item to switch to the login screen. This technique seems
@@ -312,7 +314,6 @@ local MCFDB_PATH = '/Applications/missionControlFullDesktopBar.app/Contents/MacO
 local mcfdbSize = hs.fs.attributes(MCFDB_PATH, 'size')
 if mcfdbSize then
     logger.i('missionControlFullDesktopBar found, intercepting Mission Control key events')
-    -- myMissionControlEventTap must be a global variable so Lua doesn't garbage collect it
     createEventTap({
         hs.eventtap.event.types.keyDown,
         hs.eventtap.event.types.keyUp
@@ -350,9 +351,8 @@ hammer:bind({'shift'}, 'm', function ()
     end
 end)
 
--- Mouse Button4/Button5 to Back/Forward in Chrome and Slack.
--- thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
--- Note: assigned to global variable so it doesn't get garbage collected and mysteriously stop working :-(
+-- Mouse buttons 4/5 to go Back/Forward in various apps, or move left/right if the hammer key is down
+-- Thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 createEventTap({
     hs.eventtap.event.types.otherMouseDown
 }, function (event)

@@ -656,4 +656,6 @@ createEventTap({
     end
 end)
 
+hs.hotkey.bind({"cmd", "alt"}, "v", function() hs.eventtap.keyStrokes(hs.pasteboard.getContents()) end)
+
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

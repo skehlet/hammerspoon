@@ -330,6 +330,13 @@ if mcfdbSize then
             end
             if event:getType() == hs.eventtap.event.types.keyDown then
                 -- logger.i('intercepted Mission Control DOWN')
+                if hammer.isDown then
+                    logger.i('intercepted Hammer+Mission Control DOWN, finding and killing missionControlFullDesktopBar...')
+                    local mcfdb = hs.application.find("missionControlFullDesktopBar")
+                    if mcfdb then
+                        mcfdb:kill()
+                    end
+                end
                 -- os.execute(MCFDB_PATH..' -d -i')
                 os.execute(MCFDB_PATH..' -d')
                 return true -- discard
@@ -657,5 +664,23 @@ createEventTap({
 end)
 
 hs.hotkey.bind({"cmd", "alt"}, "v", function() hs.eventtap.keyStrokes(hs.pasteboard.getContents()) end)
+
+-- myDoKeyStroke = function(modifiers, character)
+--     local event = require("hs.eventtap").event
+--     event.newKeyEvent(modifiers, string.lower(character), true):post()
+--     event.newKeyEvent(modifiers, string.lower(character), false):post()
+-- end
+
+-- function slowPaste()
+--     local str = hs.pasteboard.getContents()
+--     for i = 1, #str do
+--         local c = str:sub(i,i)
+--         logger.i("do key stroke: " .. c)
+--         myDoKeyStroke({}, c)
+--         hs.timer.usleep(100000) 
+--     end
+-- end
+
+-- hs.hotkey.bind({"cmd", "alt"}, "v", slowPaste)
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

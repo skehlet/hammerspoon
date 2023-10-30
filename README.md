@@ -33,7 +33,7 @@ Focus on a window and press one of the following key combinations. See [a video 
 
 ## How do I turn my Caps Lock into a Hammer key?
 
-Use macOS's `hidutil` program to remap your keys. To do this automatically at boot, copy the file `com.stevekehlet.RemapCapsLockToF18.plist` to your `~/Library/LaunchAgents` (create that directory if it doesn't already exist).
+Use macOS's `hidutil` program to remap your keys. To do this automatically at boot, copy the file `com.stevekehlet.RemapCapsLockToF18.plist` to your `~/Library/LaunchAgents`. Create that directory if it doesn't already exist, and feel free to rename the file if you don't want my name in it.
 
 Then either reboot, or simply run:
 
@@ -47,9 +47,11 @@ Note: I've found that Hammerspoon itself doesn't intercept Caps Lock reliably fo
 
 ## How is your "Hammer" key different than a "Hyper"/Modal key?
 
-There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that keypress flow works better for you, great, but my "hammer key" approach simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press. It also has an advantage over some implementations (e.g. that use exotic combinations of `cmd`+`option`+`ctrl`) that it won't inadvertently trigger application keybindings.
+There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that works better for you, great, but my "hammer key" simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press. It also works more reliably than some implementations I've seen (e.g. those that use exotic combinations of `cmd`+`option`+`ctrl`), that it won't inadvertently trigger application keybindings.
 
 ## Why does my Hammer key sometimes stop working?
+
+This is no longer a problem, but I'll leave it here for historical value.
 
 This was happening to me because of my Chrome Lastpass extension. Every once in a while a background Chrome window would get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and LastPass would kick in, triggering macOS's "secure input" state where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. See [hammerspoon#1743](https://github.com/Hammerspoon/hammerspoon/issues/1743). You can avoid this headache by disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information). Prior to figuring this out, I used the workaround of locking screen (`hammer`+`l`) then using touch-id to quickly log back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well.
 

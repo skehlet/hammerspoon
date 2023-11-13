@@ -204,12 +204,11 @@ function openNewCenteredHalfWidthWindowOnCurrentScreen(applicationName, openNewW
                 -- I've noticed sometimes it still gets buried under other windows, this helps:
                 -- logger.i("Focusing on New " .. applicationName .. " window (" .. win:title() .. ")")
                 win:focus()
+                app:activate()
+                makeHalfScreenCentered()
                 break
             end
         end
-
-        app:activate()
-        makeHalfScreenCentered()
     end
 end
 
@@ -221,7 +220,9 @@ end)
 
 hammer:bind({}, 'b', function ()
     openNewCenteredHalfWidthWindowOnCurrentScreen("Brave Browser", function (app)
-        app:selectMenuItem({"File", "New Window"})
+        -- app:selectMenuItem({"File", "New Window"})
+        -- alternate, CLI-based approach: guaranteed to open a window using my Default profile (not whatever I have currently focused)
+        os.execute('/Applications/Brave\\ Browser.app/Contents/MacOS/Brave\\ Browser --profile-directory="Default" --new-window')
     end)
 end)
 

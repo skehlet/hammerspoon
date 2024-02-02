@@ -76,7 +76,7 @@ createEventTap({
     hs.eventtap.event.types.keyDown,
     hs.eventtap.event.types.keyUp
 }, function(event)
-    logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
+    --logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
     if event:getKeyCode() == hs.keycodes.map['f18'] then
         local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
         if isRepeat > 0 then

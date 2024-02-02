@@ -15,7 +15,25 @@ end
 
 -- sanity checks
 logger.i('Is Hammerspoon enabled under Privacy/Accessibility: ' .. (hs.accessibilityState() and "true" or "false"))
+if not hs.accessibilityState() then
+    hs.alert("😱 WARNING! Privacy/Accessibility is NOT enabled for Hammerspoon. You need to turn it on.")
+end
 logger.i('hs.eventtap.isSecureInputEnabled(): ' .. (hs.eventtap.isSecureInputEnabled() and "true" or "false"))
+if hs.eventtap.isSecureInputEnabled() then
+    hs.alert(
+        "😱 WARNING! macOS Secure Input mode is currently activated!\nHammerspoon can't read keystrokes while this is on!\nFigure out what's got it turned on and stop it.",
+        6
+    )
+end
+
+--[[
+Find the offending PID (kCGSSessionSecureInputPID) with:
+
+    ioreg -l -w 0 | grep SecureInput
+
+Careful, don't kill loginwindow.
+Next time try locking screen (Menu Bar: Apple -> Lock Screen), then unlocking.
+]]--
 
 -- reload hammerspoon config automatically on save
 local function reloadConfig(files)
@@ -44,12 +62,12 @@ end
 hammer = hs.hotkey.modal.new()
 
 function hammer:entered()
-    -- logger.i("Hammer down")
+    logger.i("Hammer down")
     self.isDown = true
 end
 
 function hammer:exited()
-    -- logger.i("Hammer up")
+    logger.i("Hammer up")
     self.isDown = false
 end
 
@@ -58,7 +76,7 @@ createEventTap({
     hs.eventtap.event.types.keyDown,
     hs.eventtap.event.types.keyUp
 }, function(event)
-    -- logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
+    logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
     if event:getKeyCode() == hs.keycodes.map['f18'] then
         local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
         if isRepeat > 0 then
@@ -257,7 +275,7 @@ end
 
 hammer:bind({}, 'l', lockScreen)
 hammer:bind({'shift'}, 'l', systemSleep)
-hs.hotkey.bind({}, 'f15', lockScreen) -- F15/Pause (on my PC keyboard)
+hs.hotkey.bind({}, 'f15', lockScreen) -- F15 (Pause on my PC keyboard)
 -- hs.hotkey.bind({}, 'f19', lockScreen) -- Disabled, no longer using a (Mac) keyboard with F19
 
 -- -- This one actually clicks on the "Login Window..." item on the Fast User

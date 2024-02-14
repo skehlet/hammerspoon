@@ -20,16 +20,17 @@ if not hs.accessibilityState() then
 end
 logger.i('hs.eventtap.isSecureInputEnabled(): ' .. (hs.eventtap.isSecureInputEnabled() and "true" or "false"))
 if hs.eventtap.isSecureInputEnabled() then
-    hs.alert(
-        "😱 WARNING! macOS Secure Input mode is currently activated!\nHammerspoon can't read keystrokes while this is on!\nFigure out what's got it turned on and stop it.",
-        6
-    )
+    hs.alert([[
+😱 WARNING! macOS Secure Input mode is currently activated!
+Hammerspoon can't read keystrokes while this is on!
+Figure out what's got it turned on and stop it.
+ioreg -l -w 0 | grep SecureInput | ggrep -Po 'kCGSSessionSecureInputPID"=\d+']], 6)
 end
 
 --[[
 Find the offending PID (kCGSSessionSecureInputPID) with:
 
-    ioreg -l -w 0 | grep SecureInput
+    ioreg -l -w 0 | grep SecureInput | ggrep -Po 'kCGSSessionSecureInputPID"=\d+'
 
 Careful, don't kill loginwindow.
 Next time try locking screen (Menu Bar: Apple -> Lock Screen), then unlocking.
@@ -782,6 +783,28 @@ hs.hotkey.bind({"cmd", "alt"}, "v", function() hs.eventtap.keyStrokes(hs.pastebo
 --     end
 -- end)
 
+
+-- Show macOS Secure Input status in a menubar icon
+function updateSecureInputIndicatorIcon(wasManual)
+    local title = ""
+    local tooltip = ""
+    -- logger.i('hs.eventtap.isSecureInputEnabled(): ' .. (hs.eventtap.isSecureInputEnabled() and "true" or "false"))
+    if hs.eventtap.isSecureInputEnabled() then
+        title = '⛔️'
+        tooltip = "macOS Secure Input is ENABLED"
+    else
+        title = '✅'
+        tooltip = "macOS Secure Input is NOT enabled"
+    end
+    mySecureInputIndicator:setTitle(title)
+    mySecureInputIndicator:setTooltip(tooltip)
+end
+
+mySecureInputIndicator = hs.menubar.new()
+if mySecureInputIndicator then
+    updateSecureInputIndicatorIcon()
+    hs.timer.doEvery(1, updateSecureInputIndicatorIcon)
+end
 
 
 hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()

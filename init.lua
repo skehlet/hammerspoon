@@ -67,9 +67,18 @@ function hammer:entered()
     self.isDown = true
 end
 
+onNextHammerUpCallbacks = {}
+function onNextHammerUp(fn)
+    table.insert(onNextHammerUpCallbacks, fn)
+end
+
 function hammer:exited()
     logger.i("Hammer up")
     self.isDown = false
+    while #onNextHammerUpCallbacks > 0 do
+        fn = table.remove(onNextHammerUpCallbacks, 1)
+        fn()
+    end
 end
 
 -- Capture presses and releases of F18 to activate the hammer
@@ -274,8 +283,15 @@ local function systemSleep()
     hs.caffeinate.systemSleep()
 end
 
-hammer:bind({}, 'l', lockScreen)
-hammer:bind({'shift'}, 'l', systemSleep)
+hammer:bind({}, 'l', function()
+    -- Wait for the release of the hammer key before activating screen lock.
+    -- This solves issues I was having of the hammer key getting "stuck" since
+    -- the release wouldn't be noticed once the screen was locked.
+    onNextHammerUp(lockScreen)
+end)
+hammer:bind({'shift'}, 'l', function()
+    onNextHammerUp(systemSleep)
+end)
 hs.hotkey.bind({}, 'f15', lockScreen) -- F15 (Pause on my PC keyboard)
 -- hs.hotkey.bind({}, 'f19', lockScreen) -- Disabled, no longer using a (Mac) keyboard with F19
 

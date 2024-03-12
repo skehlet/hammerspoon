@@ -624,6 +624,7 @@ then
             or event == hs.caffeinate.watcher.screensDidUnlock
             or event == hs.caffeinate.watcher.screensDidWake
             or event == hs.caffeinate.watcher.sessionDidBecomeActive
+            or event == hs.caffeinate.watcher.systemDidWake
         then
             if not hs.caffeinate.get("displayIdle") then
                 toggleCaffeine()
@@ -785,7 +786,7 @@ hs.hotkey.bind({"cmd", "alt"}, "v", function() hs.eventtap.keyStrokes(hs.pastebo
 
 
 -- Show macOS Secure Input status in a menubar icon
-function updateSecureInputIndicatorIcon(wasManual)
+function updateSecureInputIndicatorIcon()
     local title = ""
     local tooltip = ""
     -- logger.i('hs.eventtap.isSecureInputEnabled(): ' .. (hs.eventtap.isSecureInputEnabled() and "true" or "false"))
@@ -798,12 +799,41 @@ function updateSecureInputIndicatorIcon(wasManual)
     end
     mySecureInputIndicator:setTitle(title)
     mySecureInputIndicator:setTooltip(tooltip)
+    return true
 end
 
 mySecureInputIndicator = hs.menubar.new()
 if mySecureInputIndicator then
     updateSecureInputIndicatorIcon()
-    hs.timer.doEvery(1, updateSecureInputIndicatorIcon)
+    secureInputMonitorTimer = hs.timer.new(1, updateSecureInputIndicatorIcon)
+    secureInputMonitorTimer:start()
+
+    -- have to restart the timer after system sleep
+    caffeinateWatcher2 = hs.caffeinate.watcher.new(function (event)
+        -- logger.i('caffeinate watcher 2 caught:', event)
+
+        if
+            event == hs.caffeinate.watcher.screensaverDidStop
+            or event == hs.caffeinate.watcher.screensDidUnlock
+            or event == hs.caffeinate.watcher.screensDidWake
+            or event == hs.caffeinate.watcher.sessionDidBecomeActive
+            or event == hs.caffeinate.watcher.systemDidWake
+        then
+            if secureInputMonitorTimer:running()
+            then
+                logger.i('secureInputMonitorTimer is already running')
+            else
+                secureInputMonitorTimer:start()
+                logger.i('secureInputMonitorTimer: RESTARTED!!!!!!!')
+            end
+        else
+            logger.i('secureInputMonitorTimer: ignoring caffeinate event ' .. event)
+        end
+
+
+    end)
+    caffeinateWatcher2:start()
+
 end
 
 

@@ -1,17 +1,17 @@
 -- Mouse buttons 4/5 to go Back/Forward in various apps, or move left/right if the hammer key is down
 -- Thanks to: https://tom-henderson.github.io/2018/12/14/hammerspoon.html
 
+local logger = hs.logger.new('mouseBackForward.lua', 'debug')
 local eventTaps = require("lib.eventTaps")
 local hammer = require("lib.hammer")
 local windowManagement = require("lib.windowManagement")
 
+-- Make Hammer+mouse4/mouse5 behave like hammer+left/hammer+right.
 eventTaps:createEventTap({
     hs.eventtap.event.types.otherMouseDown
 }, function (event)
-    local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
-
-    -- Make Hammer+mouse4/mouse5 behave like hammer+left/hammer+right.
     if hammer.isDown then
+        local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
         local flags = event:getFlags()
         if button == 3 then
             if flags.shift then
@@ -36,56 +36,73 @@ eventTaps:createEventTap({
         end
         return true -- discard
     end
-
-    local app = hs.application.frontmostApplication()
-    -- logger.i('otherMouseDown event, button: ' .. button .. ', frontmostApp: ' .. app:name())
-    if app:name() == 'Google Chrome' or app:name() == 'Brave Browser' then
-        local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
-        if isRepeat == 1 then
-            logger.i("Chrome/Brave: discarding repeat button 3/4")
-            return true -- ignore and discard
-        end
-        if button == 3 then
-            -- logger.i("Chrome/Brave: intercepted button3")
-            app:selectMenuItem({"History", "Back"})
-            return true
-        elseif button == 4 then
-            -- logger.i("Chrome/Brave: intercepted button4")
-            app:selectMenuItem({"History", "Forward"})
-            return true -- discard
-        end
-    -- 2023-09-05: Appears Slack added button3/4 support at some point, and I'm seeing double back/forward behavior, so comment it out.
-    -- elseif app:name() == 'Slack' then
-    --     -- Strangely, Hammerspoon can't see to get or otherwise work with the menu items.
-    --     -- So another way is to fake typing the keyboard shortcuts.
-    --     if button == 3 then
-    --         --logger.i("Slack: intercepted button3")
-    --         hs.eventtap.keyStroke({'cmd'}, 'left')
-    --         return true -- discard
-    --     elseif button == 4 then
-    --         --logger.i("Slack: intercepted button4")
-    --         hs.eventtap.keyStroke({'cmd'}, 'right')
-    --         return true -- discard
-    --     end
-    elseif app:name() == 'Visual Studio' then
-        if button == 3 then
-            app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})
-            return true -- discard
-        elseif button == 4 then
-            app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
-            return true -- discard
-        end
-
-    elseif app:name() == 'Notes' then
-        if button == 3 then
-            -- logger.i("Notes: intercepted button3")
-            hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
-            return true -- discard
-        elseif button == 4 then
-            -- logger.i("Notes: intercepted button4")
-            hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
-            return true -- discard
-        end
-
-    end
 end)
+
+local function onMouseBackForward(appName, onBack, onForward)
+    eventTaps:createEventTap({
+        hs.eventtap.event.types.otherMouseDown
+    }, function (event)
+        if hammer.isDown then
+            return false
+        end
+        local app = hs.application.frontmostApplication()
+        logger.i('otherMouseDown event, app: ' .. app:name())
+        if app:name() == appName then
+            local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+            local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+            logger.i('otherMouseDown event, app: ' .. app:name() .. ', button: ' .. button)
+            if isRepeat == 1 then
+                logger.i(appName .. ": Discarding repeat button 3/4")
+                return true -- ignore and discard
+            end
+            if button == 3 then
+                logger.i(appName .. ": intercepted button3")
+                onBack(event, app)
+            elseif button == 4 then
+                logger.i(appName .. ": intercepted button4")
+                onForward(event, app)
+            end
+            return true -- discard
+        end
+    end)
+end
+
+onMouseBackForward(
+    "Google Chrome", 
+    function(event, app)
+        app:selectMenuItem({"History", "Back"})
+    end,
+    function(event, app)
+        app:selectMenuItem({"History", "Forward"})
+    end
+)
+
+onMouseBackForward(
+    "Brave Browser", 
+    function(event, app)
+        app:selectMenuItem({"History", "Back"})
+    end,
+    function(event, app)
+        app:selectMenuItem({"History", "Forward"})
+    end
+)
+
+onMouseBackForward(
+    "Visual Studio",
+    function()
+        app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})
+    end,
+    function()
+        app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
+    end
+)
+
+onMouseBackForward(
+    "Notes",
+    function()
+        hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
+    end,
+    function()
+        hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
+    end
+)

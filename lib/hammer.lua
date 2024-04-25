@@ -12,7 +12,7 @@ local hammer = hs.hotkey.modal.new()
 hammer.onUpOnceCallbacks = {}
 
 function hammer:entered()
-    logger.i("Hammer down (" .. util.getId(hammer) .. ")")
+    -- logger.i("Hammer down (" .. util.getId(hammer) .. ")")
     self.isDown = true
 end
 
@@ -21,7 +21,7 @@ function hammer:onUpOnce(fn)
 end
 
 function hammer:exited()
-    logger.i("Hammer up (" .. util.getId(hammer) .. ")")
+    -- logger.i("Hammer up (" .. util.getId(hammer) .. ")")
     self.isDown = false
     while #self.onUpOnceCallbacks > 0 do
         fn = table.remove(self.onUpOnceCallbacks, 1)

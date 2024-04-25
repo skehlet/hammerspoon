@@ -39,4 +39,8 @@ function util.getKeys(tab)
     return keyset
 end
 
+function util.getId(t)
+    return string.format("%p", t)
+end
+
 return util

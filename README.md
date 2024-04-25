@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Ventura (13.2) and Hammerspoon 0.9.100.
+This is working on macOS Sonoma (14.4.1) and Hammerspoon 0.9.100.
 
 ## Window Management via keypresses
 
@@ -43,22 +43,13 @@ launchctl load com.stevekehlet.RemapCapsLockToF18.plist
 
 Now just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.
 
-Note: I've found that Hammerspoon itself doesn't intercept Caps Lock reliably for various reasons (e.g. it's a toggle on/off, may have an LED, etc), so we need another tool. I used to use Karabiner-Elements, but some systems I use have restrictions on extensions that can be loaded, so now I just use `hidutil`.
-
 ## How is your "Hammer" key different than a "Hyper"/Modal key?
 
-There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If that works better for you, great, but my "hammer key" simply creates another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press. It also works more reliably than some implementations I've seen (e.g. those that use exotic combinations of `cmd`+`option`+`ctrl`), that it won't inadvertently trigger application keybindings.
+There are plenty of Hammerspoon examples of creating a "hyper" key where you press *and release* a key (e.g. `caps lock`) and then hit another button to do what you want. If you like that, great, but I just turn `caps lock` into another modifier key that allows new key combinations (e.g. `hammer`+`g`) that are quick and easy to press. It also works more reliably than some implementations I've seen (e.g. those that use exotic combinations of `cmd`+`option`+`ctrl`) that can inadvertently trigger application keybindings.
 
-## Why does my Hammer key sometimes stop working?
+## Why does Hammerspoon sometimes stop working?
 
-This is no longer a problem, but I'll leave it here for historical value.
-
-This was happening to me because of my Chrome Lastpass extension. Every once in a while a background Chrome window would get auto-logged out of a website, redirected to a login page, auto-focused on a password field, and LastPass would kick in, triggering macOS's "secure input" state where tools like Hammerspoon, TextExpander, Keyboard Maestro, Alfred, etc, are unable to intercept keypresses. This is a security feature, so keyloggers can't sniff your password input. See [hammerspoon#1743](https://github.com/Hammerspoon/hammerspoon/issues/1743). You can avoid this headache by disabling LastPass' auto-fill feature (Chrome -> LastPass -> Account Options -> Extension Preferences, uncheck Automatically fill login information). Prior to figuring this out, I used the workaround of locking screen (`hammer`+`l`) then using touch-id to quickly log back in. Some have reporting clicking on the LastPass extension in Chrome may undo it as well.
-
-
-## External monitor swapping issues
-
-I have a keybindings to run `displayplacer` to swap my external monitors. Sometimes after waking my laptop up from sleep, it gets the two mixed up (they're identical make/model).
+macOS has a security feature called *Secure Input* where it prevents Hammerspoon (and applications like it, including TextExpander, Keyboard Maestro, Alfred, etc) from watching keyboard input. This can get turned on without your knowledge, for example, if a background browser window gets logged out and is sitting at a password prompt. I've added some detections for this with a menu bar indicator, and a huge alert on Hammerspoon startup to alert you. There is no way to stop this other than finding the offending window and dealing with it, either entering your password and submitting it, focusing away from that field, or closing the window.
 
 ## Screen Lock
 
@@ -70,4 +61,4 @@ Activate with `hammer`+`l`, or other hotkeys like `F15` or `Pause` (see the code
 * Hammer+mouse4 or mouse5 to move windows to left/right half of screen
 * Caffeine equivalent
 * Microphone and speaker indicators to confirm my Airpods are the active input/output
-* Lots of little things added here and there
+* Lots of little things added here and there, see the [include](./include/) folder for all my scripts.

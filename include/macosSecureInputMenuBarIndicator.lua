@@ -9,7 +9,7 @@ function updateSecureInputIndicatorIcon()
         title = '⛔️'
         tooltip = "macOS Secure Input is ENABLED"
     else
-        title = '✅'
+        title = '☑️'
         tooltip = "macOS Secure Input is NOT enabled"
     end
     mySecureInputIndicator:setTitle(title)

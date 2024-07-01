@@ -5,4 +5,7 @@ for file in hs.fs.dir("include/") do
     end
 end
 
-hs.notify.new({title='Hammerspoon', informativeText='Config loaded'}):send()
+hs.notify.new({
+    title = 'Hammerspoon',
+    informativeText = 'Config loaded'
+}):send()

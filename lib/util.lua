@@ -19,8 +19,8 @@ function util.dumpTable(table, depth)
     end
     for k,v in pairs(table) do
         if (type(v) == "table") then
-            logger.i(string.rep("  ", depth)..k..":")
-            dumpTable(v, depth+1)
+            print(string.rep("  ", depth)..k..":")
+            util.dumpTable(v, depth+1)
         else
             print(string.rep("  ", depth)..k..": ",v)
         end

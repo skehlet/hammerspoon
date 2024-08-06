@@ -43,4 +43,9 @@ function util.getId(t)
     return string.format("%p", t)
 end
 
+function util.getCurrentMilliseconds()
+    local now = hs.timer.absoluteTime() -- returns absolute time in nanoseconds since the last system boot
+    return now // 1000000 -- convert to milliseconds
+end
+
 return util

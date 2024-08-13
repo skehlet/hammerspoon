@@ -5,6 +5,10 @@ local logger = hs.logger.new('mouseBackForward.lua', 'debug')
 local eventTaps = require("lib.eventTaps")
 local hammer = require("lib.hammer")
 local windowManagement = require("lib.windowManagement")
+local util = require("lib.util")
+
+local OTHER_MOUSE_DOWN_DEBOUNCE_TIME = 200 -- ms
+local otherMouseDownAt = 0
 
 -- Make Hammer+mouse4/mouse5 behave like hammer+left/hammer+right.
 eventTaps:createEventTap({
@@ -48,6 +52,7 @@ local function onMouseBackForward(appName, onBack, onForward)
         hs.eventtap.event.types.otherMouseDown
     }, function (event)
         if hammer.isDown then
+            -- a little hacky, but ignore this handler if the hammer key is down, that's handled in the code above
             return false
         end
         local app = hs.application.frontmostApplication()
@@ -55,9 +60,16 @@ local function onMouseBackForward(appName, onBack, onForward)
         if app:name() == appName then
             local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
             local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
-            logger.i('otherMouseDown event, app: ' .. app:name() .. ', button: ' .. button)
+            logger.i('otherMouseDown event, app: ' .. app:name() .. ', button: ' .. button .. ", isRepeat: " .. isRepeat)
             if isRepeat > 0 then
                 logger.i(appName .. ": Discarding repeat button 3/4")
+                return true -- ignore and discard
+            end
+            -- implement my own debounce since I'm getting rapid/duplicate events, and they're not considered autorepeat
+            local timeSinceLastDown = util.getCurrentMilliseconds() - otherMouseDownAt
+            otherMouseDownAt = util.getCurrentMilliseconds()
+            if timeSinceLastDown < OTHER_MOUSE_DOWN_DEBOUNCE_TIME then
+                print('Ignoring fast repeat press of otherMouse button (' .. timeSinceLastDown .. 'ms)')
                 return true -- ignore and discard
             end
             if button == 3 then
@@ -104,10 +116,13 @@ onMouseBackForward(
 
 onMouseBackForward(
     "Notes",
-    function()
-        hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
+    function(event, app)
+        -- hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
+        -- update: they added menu items, so use them instead, but leave the keyStroke code for reference
+        app:selectMenuItem({"View", "Previous Note"})
     end,
-    function()
-        hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
+    function(event, app)
+        -- hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
+        app:selectMenuItem({"View", "Next Note"})
     end
 )

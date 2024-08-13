@@ -12,6 +12,11 @@ eventTaps:createEventTap({
 }, function (event)
     if hammer.isDown then
         local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+        local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
+        if isRepeat > 0 then
+            logger.i("Ignoring otherMouseDown auto repeat")
+            return true -- ignore and discard
+        end
         local flags = event:getFlags()
         if button == 3 then
             if flags.shift then
@@ -46,12 +51,12 @@ local function onMouseBackForward(appName, onBack, onForward)
             return false
         end
         local app = hs.application.frontmostApplication()
-        logger.i('otherMouseDown event, app: ' .. app:name())
+        -- logger.i('otherMouseDown event, app: ' .. app:name())
         if app:name() == appName then
             local button = event:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
             local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
             logger.i('otherMouseDown event, app: ' .. app:name() .. ', button: ' .. button)
-            if isRepeat == 1 then
+            if isRepeat > 0 then
                 logger.i(appName .. ": Discarding repeat button 3/4")
                 return true -- ignore and discard
             end
@@ -67,25 +72,25 @@ local function onMouseBackForward(appName, onBack, onForward)
     end)
 end
 
-onMouseBackForward(
-    "Google Chrome", 
-    function(event, app)
-        app:selectMenuItem({"History", "Back"})
-    end,
-    function(event, app)
-        app:selectMenuItem({"History", "Forward"})
-    end
-)
+-- onMouseBackForward(
+--     "Google Chrome", 
+--     function(event, app)
+--         app:selectMenuItem({"History", "Back"})
+--     end,
+--     function(event, app)
+--         app:selectMenuItem({"History", "Forward"})
+--     end
+-- )
 
-onMouseBackForward(
-    "Brave Browser", 
-    function(event, app)
-        app:selectMenuItem({"History", "Back"})
-    end,
-    function(event, app)
-        app:selectMenuItem({"History", "Forward"})
-    end
-)
+-- onMouseBackForward(
+--     "Brave Browser", 
+--     function(event, app)
+--         app:selectMenuItem({"History", "Back"})
+--     end,
+--     function(event, app)
+--         app:selectMenuItem({"History", "Forward"})
+--     end
+-- )
 
 onMouseBackForward(
     "Visual Studio",

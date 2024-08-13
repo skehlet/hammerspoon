@@ -5,6 +5,9 @@ local logger = hs.logger.new('hammer.lua', 'debug')
 local eventTaps = require("lib.eventTaps")
 local util = require("lib.util")
 
+local hs = hs
+local hammerKeyCode = hs.keycodes.map['f18']
+
 -- Lua's `require()` only sources a file once. So all scripts requiring this
 -- file will get this same hammer instance.
 local hammer = hs.hotkey.modal.new()
@@ -32,7 +35,7 @@ end
 -- Capture presses and releases of F18 to activate the hammer
 eventTaps:createEventTap({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function(event)
     -- logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
-    if event:getKeyCode() == hs.keycodes.map['f18'] then
+    if event:getKeyCode() == hammerKeyCode then
         local isRepeat = event:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat)
         if isRepeat > 0 then
             return true -- ignore and discard

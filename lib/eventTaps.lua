@@ -2,7 +2,6 @@
 -- global variable so it doesn't get garbage collected
 local obj = {}
 
--- TODO: ok for this not to be global?
 obj.myEventTaps = {}
 
 function obj:createEventTap(types, handler)

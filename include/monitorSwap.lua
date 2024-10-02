@@ -1,4 +1,6 @@
--- 2024-04-24 Haven't needed this in a long time, macOS must have finally sorted out multiple external monitor placement.
+-- 2024-04-24 Haven't needed this in a long time, I've since gotten new/better
+-- monitors, and/or macOS must have finally sorted out multiple external monitor
+-- placement.
 -- -- Switch monitors
 -- -- This is a workaround to deal with macOS getting confused on which of my external monitors is left and right.
 -- -- Hit the key binding and it will swap them.

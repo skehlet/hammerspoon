@@ -61,4 +61,5 @@ Activate with `hammer`+`l`, or other hotkeys like `F15` or `Pause` (see the code
 * Hammer+mouse4 or mouse5 to move windows to left/right half of screen
 * Caffeine equivalent
 * Microphone and speaker indicators to confirm my Airpods are the active input/output
+* F13 (the button where PrintScreen is on PC keyboards) does that awkward keystroke (ctrl-shift-cmd-4) for you to take a screenshot and store it on the clipboard
 * Lots of little things added here and there, see the [include](./include/) folder for all my scripts.

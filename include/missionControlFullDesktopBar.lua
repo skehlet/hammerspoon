@@ -1,13 +1,15 @@
 --
--- 2024-08-13: I'm moving away from this because it occasionally has problems.
+-- 2024-08-13: I'm finally giving up on this because it just doesn't work very
+-- well. If you're reading this, and turning off SIP is an option for you, you
+-- should look at
+-- [forceFullDesktopBar](https://github.com/briankendall/forceFullDesktopBar).
 -- Hopefully someday Apple will restore the native ability to automatically
--- expand the desktop previews when you open Mission Control. Others may be
--- interested in https://github.com/briankendall/forceFullDesktopBar if turning
--- off SIP is possible for you.
+-- expand the desktop previews when you open Mission Control. 
 --
--- -- If missionControlFullDesktopBar installed, intercept Mission Control (F3) keypresses and launch it instead
--- -- See https://github.com/briankendall/missionControlFullDesktopBar
--- -- Using daemonize.py seems to resolve/help Hammerspoon hanging issues with os.execute
+-- -- If missionControlFullDesktopBar installed, intercept Mission Control (F3)
+-- keypresses and launch it instead -- See
+-- https://github.com/briankendall/missionControlFullDesktopBar -- Using
+-- daemonize.py seems to resolve/help Hammerspoon hanging issues with os.execute
 
 -- local logger = hs.logger.new('MissionControlFullDesktopBar', 'debug')
 -- local hammer = require("lib.hammer")

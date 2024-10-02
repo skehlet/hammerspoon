@@ -18,7 +18,7 @@ local eventTaps = require("lib.eventTaps")
 --     end
 -- end)
 
--- If using Excel, fix broken keybindings
+-- If using Excel, try to fix some very un-mac-like keybindings
 eventTaps:createEventTap({
     hs.eventtap.event.types.keyDown
 }, function(event)

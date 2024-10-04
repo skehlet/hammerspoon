@@ -1,12 +1,12 @@
 -- The Hammer key
--- Install com.stevekehlet.RemapCapsLockToF18.plist (see the README) to map Caps Lock to F18.
+-- Install com.stevekehlet.RemapCapsLockToF20.plist (see the README) to map Caps Lock to F20.
 local logger = hs.logger.new('hammer.lua', 'debug')
 
 local eventTaps = require("lib.eventTaps")
 local util = require("lib.util")
 
 local hs = hs
-local hammerKeyCode = hs.keycodes.map['f18']
+local hammerKeyCode = hs.keycodes.map['f20']
 
 -- Lua's `require()` only sources a file once. So all scripts requiring this
 -- file will get this same hammer instance.
@@ -32,7 +32,7 @@ function hammer:exited()
     end
 end
 
--- Capture presses and releases of F18 to activate the hammer
+-- Capture presses and releases of F20 to activate the hammer
 eventTaps:createEventTap({hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp}, function(event)
     -- logger.i('caught key: ' .. event:getKeyCode() .. ' of type: ' .. event:getType())
     if event:getKeyCode() == hammerKeyCode then

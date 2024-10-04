@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- Place in ~/Library/LaunchAgents/ -->
-<!-- launchctl load com.stevekehlet.RemapCapsLockToF18.plist -->
+<!-- launchctl load com.stevekehlet.RemapCapsLockToF20.plist -->
+<!-- See hidutil key remapping generator for MacOS: https://hidutil-generator.netlify.app/ -->
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>com.stevekehlet.RemapCapsLockToF18</string>
+    <string>com.stevekehlet.RemapCapsLockToF20</string>
     <key>ProgramArguments</key>
     <array>
       <string>/usr/bin/hidutil</string>
       <string>property</string>
       <string>--set</string>
-      <string>{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}</string>
+      <string>{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006F}]}</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

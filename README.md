@@ -33,12 +33,12 @@ Focus on a window and press one of the following key combinations. See [a video 
 
 ## How do I turn my Caps Lock into a Hammer key?
 
-Use macOS's `hidutil` program to remap your keys. To do this automatically at boot, copy the file `com.stevekehlet.RemapCapsLockToF18.plist` to your `~/Library/LaunchAgents`. Create that directory if it doesn't already exist, and feel free to rename the file if you don't want my name in it.
+Use macOS's `hidutil` program to remap your keys. To do this automatically at boot, copy the file `com.stevekehlet.RemapCapsLockToF20.plist` to your `~/Library/LaunchAgents`. Create that directory if it doesn't already exist, and feel free to rename the file if you don't want my name in it.
 
 Then either reboot, or simply run:
 
 ```bash
-launchctl load com.stevekehlet.RemapCapsLockToF18.plist
+launchctl load com.stevekehlet.RemapCapsLockToF20.plist
 ```
 
 Now just hold down the Hammer (`caps lock`) and hit `f`, `c`, `left`, or `right`, etc.

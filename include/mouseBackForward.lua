@@ -126,10 +126,10 @@ registerCustomMouseBackForwardHandler(
     function(event, app)
         -- hs.eventtap.keyStroke({'cmd', 'alt'}, '[')
         -- update: they added menu items, so use them instead, but leave the keyStroke code for reference
-        app:selectMenuItem({"View", "Previous Note"})
+        app:selectMenuItem({"View", "Recent Notes", "Previous Note"})
     end,
     function(event, app)
         -- hs.eventtap.keyStroke({'cmd', 'alt'}, ']')
-        app:selectMenuItem({"View", "Next Note"})
+        app:selectMenuItem({"View", "Recent Notes", "Next Note"})
     end
 )

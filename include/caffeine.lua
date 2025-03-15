@@ -18,6 +18,7 @@ end
 if caffeine then
     caffeine:setClickCallback(toggleCaffeine)
     showCaffeine(hs.caffeinate.get("displayIdle"))
+    toggleCaffeine()
 end
 
 

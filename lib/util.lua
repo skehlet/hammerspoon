@@ -48,4 +48,14 @@ function util.getCurrentMilliseconds()
     return now // 1000000 -- convert to milliseconds
 end
 
+-- Function to check if a file or directory exists
+function util.exists(path)
+    return hs.fs.attributes(path) ~= nil
+end
+
+-- Function to safely escape shell arguments
+function util.shellEscape(str)
+    return '"' .. string.gsub(str, '"', '\\"') .. '"'
+end
+
 return util

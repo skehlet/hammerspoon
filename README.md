@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Sonoma (14.6.1) and Hammerspoon 1.0.0.
+This is working on macOS Sequoia (15.2) and Hammerspoon 1.0.0.
 
 ## Window Management via keypresses
 

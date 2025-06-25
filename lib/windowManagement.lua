@@ -93,32 +93,70 @@ end
 
 function obj.openNewCenteredHalfWidthWindowOnCurrentScreen(applicationName, openNewWindowFn)
     local app = hs.application.find(applicationName)
-    if app then
-        -- go to great lengths to make sure the new window appears on the current screen
-        local currentScreen = hs.screen.mainScreen()
-        local preExistingAppWindowIds = {}
+    if not app then
+        hs.alert.show("Application not found: " .. applicationName)
+        return
+    end
+
+    local currentScreen = hs.screen.mainScreen()
+    local preExistingAppWindowIds = {}
+    for _, win in ipairs(app:visibleWindows()) do
+        preExistingAppWindowIds[win:id()] = true
+    end
+
+    openNewWindowFn(app)
+
+    -- Go to great lengths to make sure the new window appears on the current screen
+    -- Sadly, my attempts to use hs.window.filter and events don't work very well, believe it or not, this works faster
+    -- and better. So keep it for now.
+
+    -- --- Retry Logic Configuration ---
+    local maxAttempts = 10 -- How many times to check for the new window
+    local retryInterval = 0.1 -- Seconds to wait between each check
+    local attempts = 0
+
+    -- We declare the timer function variable here so it can call itself.
+    local findWindowTimer = nil
+
+    -- This is the function that will be run repeatedly.
+    local tryToFindWindow = function()
+        attempts = attempts + 1
+        local newWindow = nil
+
+        -- Look for a window that didn't exist before we called openNewWindowFn
         for _, win in ipairs(app:visibleWindows()) do
-            preExistingAppWindowIds[win:id()] = true
-        end
-
-        openNewWindowFn(app)
-
-        for i, win in ipairs(app:visibleWindows()) do
             if not preExistingAppWindowIds[win:id()] then
-                -- if it's a new window, and it's on the wrong screen...
-                if win:screen() ~= currentScreen then
-                    -- logger.i("Moving New " .. applicationName .. " window (" .. win:title() .. ") to current screen")
-                    win:moveToScreen(currentScreen)
-                end
-                -- I've noticed sometimes it still gets buried under other windows, this helps:
-                -- logger.i("Focusing on New " .. applicationName .. " window (" .. win:title() .. ")")
-                win:focus()
-                app:activate()
-                obj.makeHalfScreenCentered()
+                newWindow = win
                 break
             end
         end
+
+        if newWindow then
+            -- SUCCESS: We found the new window.
+            -- Stop the timer from running again in case it was scheduled.
+            if findWindowTimer then findWindowTimer:stop() end
+
+            -- Now, manipulate the window as intended.
+            if newWindow:screen() ~= currentScreen then
+                newWindow:moveToScreen(currentScreen)
+            end
+            newWindow:focus()
+            app:activate()
+            obj.makeHalfScreenCentered()
+
+        elseif attempts < maxAttempts then
+            -- TRY AGAIN: Window not found yet, but we have attempts left.
+            -- Schedule this same function to run again after the interval.
+            findWindowTimer = hs.timer.doAfter(retryInterval, tryToFindWindow)
+
+        else
+            -- FAILURE: We've run out of attempts.
+            hs.alert.show("Hammerspoon: Could not find new window for " .. applicationName)
+        end
     end
+
+    -- Kick off the first attempt after an initial delay.
+    findWindowTimer = hs.timer.doAfter(retryInterval, tryToFindWindow)
 end
 
 return obj

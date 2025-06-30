@@ -5,11 +5,11 @@ local util = require("lib.util")
 local braveExe = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
 local defaultProfilePath = os.getenv("HOME") .. "/Library/Application Support/BraveSoftware/Brave-Browser/Default"
 
-hammer:bind({}, 'g', function ()
-    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen("Google Chrome", function (app)
-        app:selectMenuItem({"File", "New Window"})
-    end)
-end)
+-- hammer:bind({}, 'g', function ()
+--     windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen("Google Chrome", function (app)
+--         app:selectMenuItem({"File", "New Window"})
+--     end)
+-- end)
 
 hammer:bind({}, 'b', function ()
     windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen("Brave Browser", function (app)
@@ -27,6 +27,14 @@ end)
 hammer:bind({}, 'a', function ()
     windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen("Brave Browser", function (app)
         local shellCmd = util.shellEscape(braveExe) .. ' --profile-directory=Default --new-window https://claude.ai/new'
+        hs.execute(shellCmd)
+    end)
+end)
+
+hammer:bind({}, 'g', function ()
+    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen("Brave Browser", function (app)
+        -- app:selectMenuItem({"File", "New Window"})
+        local shellCmd = util.shellEscape(braveExe) .. ' --profile-directory=Default --new-window https://gemini.google.com/app'
         hs.execute(shellCmd)
     end)
 end)

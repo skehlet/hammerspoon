@@ -40,33 +40,33 @@ eventTaps:createEventTap({
     end
 end)
 
--- If using Excel, try to fix some very un-mac-like keybindings
-eventTaps:createEventTap({
-    hs.eventtap.event.types.keyDown
-}, function(event)
-    if hs.application.frontmostApplication():name() == "Microsoft Excel" then
-        if event:getFlags().cmd then
-            local flags = {}
-            if event:getFlags().shift then
-                table.insert(flags, 'shift')
-            end
-            -- util.dumpTable(flags)
+-- -- If using Excel, try to fix some very un-mac-like keybindings
+-- eventTaps:createEventTap({
+--     hs.eventtap.event.types.keyDown
+-- }, function(event)
+--     if hs.application.frontmostApplication():name() == "Microsoft Excel" then
+--         if event:getFlags().cmd then
+--             local flags = {}
+--             if event:getFlags().shift then
+--                 table.insert(flags, 'shift')
+--             end
+--             -- util.dumpTable(flags)
 
-            if event:getKeyCode() == hs.keycodes.map['left'] then
-                hs.eventtap.keyStroke(flags, 'home', 0)
-                return true -- discard
-            elseif event:getKeyCode() == hs.keycodes.map['right'] then
-                hs.eventtap.keyStroke(flags, 'end', 0)
-                return true -- discard
-            end
-        end
+--             if event:getKeyCode() == hs.keycodes.map['left'] then
+--                 hs.eventtap.keyStroke(flags, 'home', 0)
+--                 return true -- discard
+--             elseif event:getKeyCode() == hs.keycodes.map['right'] then
+--                 hs.eventtap.keyStroke(flags, 'end', 0)
+--                 return true -- discard
+--             end
+--         end
 
-        if event:getKeyCode() == hs.keycodes.map['delete'] and event:getFlags().alt then
-            -- logger.i('Excel option-delete!')
-            hs.eventtap.keyStroke({'alt', 'shift'}, 'left', 0)
-            hs.eventtap.keyStroke({}, 'delete', 0)
-            return true -- discard
-        end
+--         if event:getKeyCode() == hs.keycodes.map['delete'] and event:getFlags().alt then
+--             -- logger.i('Excel option-delete!')
+--             hs.eventtap.keyStroke({'alt', 'shift'}, 'left', 0)
+--             hs.eventtap.keyStroke({}, 'delete', 0)
+--             return true -- discard
+--         end
 
-    end
-end)
+--     end
+-- end)

@@ -51,3 +51,13 @@ hammer:bind({}, 'g', function ()
         return openBrowserBookmark({"Bookmarks", "AI", "Gemini"})
     end)
 end)
+
+hammer:bind({}, 'u', function ()
+    local win = hs.window.focusedWindow()
+    if not win or win:application():name() ~= browserAppName then
+        hs.alert.show("Not a " .. browserAppName .. " window")
+        return
+    end
+    logger.i('Current window:', win)
+    return win:application():selectMenuItem({"Bookmarks", "Copy Link"})
+end)

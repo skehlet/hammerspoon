@@ -1,6 +1,7 @@
 -- Window management functions
 
 local hammer = require("lib.hammer")
+local logger = hs.logger.new('windowManagement.lua', 'debug')
 
 local obj = {}
 
@@ -91,72 +92,28 @@ function obj.moveDown()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end
 
-function obj.openNewCenteredHalfWidthWindowOnCurrentScreen(applicationName, openNewWindowFn)
-    local app = hs.application.find(applicationName)
-    if not app then
-        hs.alert.show("Application not found: " .. applicationName)
+function obj.openNewCenteredHalfWidthWindowOnCurrentScreen(openNewWindowFn)
+    local currentScreen = hs.screen.mainScreen()
+
+    local newWindow = openNewWindowFn()
+    if not newWindow then
+        hs.alert.show("Failed to open new " .. applicationName .. " window")
         return
     end
+    logger.i('New window:', newWindow)
 
-    local currentScreen = hs.screen.mainScreen()
-    local preExistingAppWindowIds = {}
-    for _, win in ipairs(app:visibleWindows()) do
-        preExistingAppWindowIds[win:id()] = true
-    end
+    local currentScreenFrame = currentScreen:frame()
+    local frame = newWindow:frame()
+    -- logger.d(newWindow:title()..' from '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+    frame.w = currentScreenFrame.w / 2
+    frame.h = currentScreenFrame.h
+    frame.x = currentScreenFrame.x + ((currentScreenFrame.w - frame.w) / 2)
+    frame.y = currentScreenFrame.y + ((currentScreenFrame.h - frame.h) / 2)
+    -- logger.d(newWindow:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+    newWindow:setFrame(frame)
 
-    openNewWindowFn(app)
-
-    -- Go to great lengths to make sure the new window appears on the current screen
-    -- Sadly, my attempts to use hs.window.filter and events don't work very well, believe it or not, this works faster
-    -- and better. So keep it for now.
-
-    -- --- Retry Logic Configuration ---
-    local maxAttempts = 10 -- How many times to check for the new window
-    local retryInterval = 0.1 -- Seconds to wait between each check
-    local attempts = 0
-
-    -- We declare the timer function variable here so it can call itself.
-    local findWindowTimer = nil
-
-    -- This is the function that will be run repeatedly.
-    local tryToFindWindow = function()
-        attempts = attempts + 1
-        local newWindow = nil
-
-        -- Look for a window that didn't exist before we called openNewWindowFn
-        for _, win in ipairs(app:visibleWindows()) do
-            if not preExistingAppWindowIds[win:id()] then
-                newWindow = win
-                break
-            end
-        end
-
-        if newWindow then
-            -- SUCCESS: We found the new window.
-            -- Stop the timer from running again in case it was scheduled.
-            if findWindowTimer then findWindowTimer:stop() end
-
-            -- Now, manipulate the window as intended.
-            if newWindow:screen() ~= currentScreen then
-                newWindow:moveToScreen(currentScreen)
-            end
-            newWindow:focus()
-            app:activate()
-            obj.makeHalfScreenCentered()
-
-        elseif attempts < maxAttempts then
-            -- TRY AGAIN: Window not found yet, but we have attempts left.
-            -- Schedule this same function to run again after the interval.
-            findWindowTimer = hs.timer.doAfter(retryInterval, tryToFindWindow)
-
-        else
-            -- FAILURE: We've run out of attempts.
-            hs.alert.show("Hammerspoon: Could not find new window for " .. applicationName)
-        end
-    end
-
-    -- Kick off the first attempt after an initial delay.
-    findWindowTimer = hs.timer.doAfter(retryInterval, tryToFindWindow)
+    newWindow:focus()
+    newWindow:application():activate()
 end
 
 return obj

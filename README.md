@@ -1,6 +1,6 @@
 # My [hammerspoon](http://www.hammerspoon.org/) config.
 
-This is working on macOS Sequoia (15.2) and Hammerspoon 1.0.0.
+This is working on macOS Sequoia (15.6.1) and Hammerspoon 1.0.0.
 
 ## Window Management via keypresses
 
@@ -22,7 +22,6 @@ Focus on a window and press one of the following key combinations. See [a video 
 
 ## Shortcuts
 
-* `hammer`+`g`: Open a new Google Chrome window
 * `hammer`+`b`: Open a new Brave Browser window
 * `hammer`+`t`: Launch a Terminal
 * `hammer`+`l`: Lock screen (additional lock screen bindings in Screen Lock section below)

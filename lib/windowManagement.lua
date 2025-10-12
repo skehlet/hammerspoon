@@ -24,14 +24,16 @@ function obj.makeHalfScreen()
     move(function (f, sf) return f.x, f.y, sf.w/2, sf.h end)
 end
 
+function calculateHalfScreenCenteredFrame(f, sf)
+    local w = sf.w / 2
+    local h = sf.h
+    local x = sf.x + ((sf.w - w) / 2)
+    local y = sf.y + ((sf.h - h) / 2)
+    return x, y, w, h
+end
+
 function obj.makeHalfScreenCentered()
-    move(function (f, sf)
-        local w = sf.w / 2
-        local h = sf.h
-        local x = sf.x + ((sf.w - w) / 2)
-        local y = sf.y + ((sf.h - h) / 2)
-        return x, y, w, h
-    end)
+    move(calculateHalfScreenCenteredFrame)
 end
 
 function obj.moveToCenter()
@@ -92,7 +94,7 @@ function obj.moveDown()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end
 
-function obj.openNewCenteredHalfWidthWindowOnCurrentScreen(openNewWindowFn)
+function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
     local currentScreen = hs.screen.mainScreen()
 
     local newWindow = openNewWindowFn()
@@ -105,13 +107,9 @@ function obj.openNewCenteredHalfWidthWindowOnCurrentScreen(openNewWindowFn)
     local currentScreenFrame = currentScreen:frame()
     local frame = newWindow:frame()
     -- logger.d(newWindow:title()..' from '..frame.x..','..frame.y..','..frame.w..','..frame.h)
-    frame.w = currentScreenFrame.w / 2
-    frame.h = currentScreenFrame.h
-    frame.x = currentScreenFrame.x + ((currentScreenFrame.w - frame.w) / 2)
-    frame.y = currentScreenFrame.y + ((currentScreenFrame.h - frame.h) / 2)
+    frame.x, frame.y, frame.w, frame.h = calculateHalfScreenCenteredFrame(frame, currentScreenFrame)
     -- logger.d(newWindow:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
     newWindow:setFrame(frame)
-
     newWindow:focus()
     newWindow:application():activate()
 end

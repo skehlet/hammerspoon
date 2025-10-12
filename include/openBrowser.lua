@@ -37,17 +37,17 @@ function openBrowserBookmark(bookmarkPath)
 end
 
 hammer:bind({}, 'b', function ()
-    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(openBrowser)
+    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(openBrowser)
 end)
 
 hammer:bind({}, 'a', function ()
-    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(function ()
+    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(function ()
         return openBrowserBookmark({"Bookmarks", "AI", "Claude"})
     end)
 end)
 
 hammer:bind({}, 'g', function ()
-    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(function ()
+    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(function ()
         return openBrowserBookmark({"Bookmarks", "AI", "Gemini"})
     end)
 end)

@@ -3,27 +3,25 @@ local windowManagement = require("lib.windowManagement")
 local util = require("lib.util")
 local logger = hs.logger.new('openBrowser.lua', 'debug')
 
-local braveAppName = "Brave Browser"
-local braveExe = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
-local defaultProfilePath = os.getenv("HOME") .. "/Library/Application Support/BraveSoftware/Brave-Browser/Default"
+local browserAppName = "Brave Browser"
 
-function openBrave()
-    local app = hs.application.find(braveAppName)
+function openBrowser()
+    local app = hs.application.find(browserAppName)
     if not app then
-        hs.alert.show("Application not found: " .. braveAppName)
+        hs.alert.show("Application not found: " .. browserAppName)
         return nil
     end
-    logger.i('Found ' .. braveAppName .. ":", app)
+    logger.i('Found ' .. browserAppName .. ":", app)
     local success = app:selectMenuItem({"File", "New Window"})
     if not success then
-        hs.alert.show("Failed to open new " .. braveAppName .. " window")
+        hs.alert.show("Failed to open new " .. browserAppName .. " window")
         return nil
     end
     return app:findWindow("New Tab")
 end
 
-function openBraveBookmark(bookmarkPath)
-    local newWindow = openBrave()
+function openBrowserBookmark(bookmarkPath)
+    local newWindow = openBrowser()
     if not newWindow then
         return nil
     end
@@ -31,7 +29,7 @@ function openBraveBookmark(bookmarkPath)
 
     local success = newWindow:application():selectMenuItem(bookmarkPath)
     if not success then
-        hs.alert.show("Failed to open bookmark in " .. braveAppName)
+        hs.alert.show("Failed to open bookmark in " .. browserAppName)
         return nil
     end
 
@@ -39,17 +37,17 @@ function openBraveBookmark(bookmarkPath)
 end
 
 hammer:bind({}, 'b', function ()
-    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(openBrave)
+    windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(openBrowser)
 end)
 
 hammer:bind({}, 'a', function ()
     windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(function ()
-        return openBraveBookmark({"Bookmarks", "AI", "Claude"})
+        return openBrowserBookmark({"Bookmarks", "AI", "Claude"})
     end)
 end)
 
 hammer:bind({}, 'g', function ()
     windowManagement.openNewCenteredHalfWidthWindowOnCurrentScreen(function ()
-        return openBraveBookmark({"Bookmarks", "AI", "Gemini"})
+        return openBrowserBookmark({"Bookmarks", "AI", "Gemini"})
     end)
 end)

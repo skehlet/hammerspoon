@@ -102,7 +102,6 @@ function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
         hs.alert.show("Failed to open new " .. applicationName .. " window")
         return
     end
-    logger.i('New window:', newWindow)
 
     local currentScreenFrame = currentScreen:frame()
     local frame = newWindow:frame()
@@ -110,8 +109,21 @@ function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
     frame.x, frame.y, frame.w, frame.h = calculateHalfScreenCenteredFrame(frame, currentScreenFrame)
     -- logger.d(newWindow:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
     newWindow:setFrame(frame)
+
     newWindow:focus()
     newWindow:application():activate()
+
+    -- loop a few times to ensure the move+resize is as expected
+    local tries = 0
+    while tries < 3 do
+        tries = tries + 1
+        local finalFrame = newWindow:frame()
+        if finalFrame.x ~= frame.x or finalFrame.y ~= frame.y or finalFrame.w ~= frame.w or finalFrame.h ~= frame.h then
+            logger.w(newWindow:title()..' frame not as expected after move/resize: '..finalFrame.x..','..finalFrame.y..','..finalFrame.w..','..finalFrame.h..
+                ' expected '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+            newWindow:setFrame(frame)
+        end
+    end
 end
 
 return obj

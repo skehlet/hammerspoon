@@ -133,3 +133,13 @@ registerCustomMouseBackForwardHandler(
         app:selectMenuItem({"View", "Recent Notes", "Next Note"})
     end
 )
+
+registerCustomMouseBackForwardHandler(
+    "Microsoft Teams",
+    function(event, app)
+        hs.eventtap.keyStroke({'cmd'}, '[')
+    end,
+    function(event, app)
+        hs.eventtap.keyStroke({'cmd'}, ']')
+    end
+)

@@ -122,6 +122,7 @@ function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
             logger.w(newWindow:title()..' frame not as expected after move/resize: '..finalFrame.x..','..finalFrame.y..','..finalFrame.w..','..finalFrame.h..
                 ' expected '..frame.x..','..frame.y..','..frame.w..','..frame.h)
             newWindow:setFrame(frame)
+            newWindow:focus() -- force refocus
         end
     end
 end

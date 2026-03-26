@@ -95,36 +95,39 @@ function obj.moveDown()
 end
 
 function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
-    local currentScreen = hs.screen.mainScreen()
+    -- Capture the target screen before openNewWindowFn() can shift focus
+    local targetScreenFrame = hs.screen.mainScreen():frame()
 
     local newWindow = openNewWindowFn()
-    if not newWindow then
-        hs.alert.show("Failed to open new " .. applicationName .. " window")
-        return
-    end
+    if not newWindow then return end
 
-    local currentScreenFrame = currentScreen:frame()
-    local frame = newWindow:frame()
-    -- logger.d(newWindow:title()..' from '..frame.x..','..frame.y..','..frame.w..','..frame.h)
-    frame.x, frame.y, frame.w, frame.h = calculateHalfScreenCenteredFrame(frame, currentScreenFrame)
-    -- logger.d(newWindow:title()..' to '..frame.x..','..frame.y..','..frame.w..','..frame.h)
-    newWindow:setFrame(frame)
+    -- Retry asynchronously until the frame is confirmed in place, up to maxTries.
+    -- macOS animates window placement asynchronously; a synchronous retry loop
+    -- never yields and loses the race. doAfter yields back to the event loop so
+    -- macOS can finish its own placement before we check and re-assert.
+    local maxTries = 8
+    local interval = 0.1
 
-    newWindow:focus()
-    newWindow:application():activate()
-
-    -- loop a few times to ensure the move+resize is as expected
-    local tries = 0
-    while tries < 3 do
-        tries = tries + 1
-        local finalFrame = newWindow:frame()
-        if finalFrame.x ~= frame.x or finalFrame.y ~= frame.y or finalFrame.w ~= frame.w or finalFrame.h ~= frame.h then
-            logger.w(newWindow:title()..' frame not as expected after move/resize: '..finalFrame.x..','..finalFrame.y..','..finalFrame.w..','..finalFrame.h..
-                ' expected '..frame.x..','..frame.y..','..frame.w..','..frame.h)
+    local function tryPosition(triesLeft)
+        if not newWindow:isVisible() then return end
+        local frame = newWindow:frame()
+        local tx, ty, tw, th = calculateHalfScreenCenteredFrame(frame, targetScreenFrame)
+        local inPlace = (math.abs(frame.x - tx) < 2 and math.abs(frame.y - ty) < 2 and
+                         math.abs(frame.w - tw) < 2 and math.abs(frame.h - th) < 2)
+        if not inPlace then
+            frame.x, frame.y, frame.w, frame.h = tx, ty, tw, th
             newWindow:setFrame(frame)
-            newWindow:focus() -- force refocus
+            newWindow:focus()
+            newWindow:application():activate()
+            if triesLeft > 1 then
+                hs.timer.doAfter(interval, function() tryPosition(triesLeft - 1) end)
+            else
+                logger.w(newWindow:title()..': frame still not in place after max retries')
+            end
         end
     end
+
+    tryPosition(maxTries)
 end
 
 return obj

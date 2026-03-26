@@ -94,7 +94,10 @@ function obj.moveDown()
     move(function (f, sf) return f.x, (sf.y2 - sf.h/2), f.w, sf.h/2 end)
 end
 
-function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
+-- openNewWindowFn()  -> hs.window  (opens and returns the new window)
+-- onConfirmed(win)    -> optional; called once the window is confirmed in place
+--                        and focused -- safe to fire menu actions here
+function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn, onConfirmed)
     -- Capture the target screen before openNewWindowFn() can shift focus
     local targetScreenFrame = hs.screen.mainScreen():frame()
 
@@ -117,14 +120,17 @@ function obj.openNewWindowCenteredHalfWidthOnCurrentScreen(openNewWindowFn)
         if not inPlace then
             frame.x, frame.y, frame.w, frame.h = tx, ty, tw, th
             newWindow:setFrame(frame)
-            newWindow:focus()
-            newWindow:application():activate()
             if triesLeft > 1 then
                 hs.timer.doAfter(interval, function() tryPosition(triesLeft - 1) end)
-            else
-                logger.w(newWindow:title()..': frame still not in place after max retries')
+                return
             end
+            logger.w(newWindow:title()..': frame still not in place after max retries')
         end
+        -- Window is confirmed in place (or retries exhausted): focus then notify.
+        -- onConfirmed runs here so any menu/bookmark action targets this window.
+        newWindow:focus()
+        newWindow:application():activate()
+        if onConfirmed then onConfirmed(newWindow) end
     end
 
     tryPosition(maxTries)

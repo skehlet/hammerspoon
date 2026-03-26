@@ -20,20 +20,13 @@ function openBrowser()
     return app:findWindow("New Tab")
 end
 
-function openBrowserBookmark(bookmarkPath)
-    local newWindow = openBrowser()
-    if not newWindow then
-        return nil
-    end
-    logger.i('Found new window:', newWindow)
-
-    local success = newWindow:application():selectMenuItem(bookmarkPath)
+function openBrowserBookmark(win, bookmarkPath)
+    local success = win:application():selectMenuItem(bookmarkPath)
     if not success then
         hs.alert.show("Failed to open bookmark in " .. browserAppName)
         return nil
     end
-
-    return newWindow
+    return win
 end
 
 hammer:bind({}, 'b', function ()
@@ -41,15 +34,17 @@ hammer:bind({}, 'b', function ()
 end)
 
 hammer:bind({}, 'a', function ()
-    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(function ()
-        return openBrowserBookmark({"Bookmarks", "AI", "Claude"})
-    end)
+    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(
+        openBrowser,
+        function(win) openBrowserBookmark(win, {"Bookmarks", "AI", "Claude"}) end
+    )
 end)
 
 hammer:bind({}, 'g', function ()
-    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(function ()
-        return openBrowserBookmark({"Bookmarks", "AI", "Gemini"})
-    end)
+    windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen(
+        openBrowser,
+        function(win) openBrowserBookmark(win, {"Bookmarks", "AI", "Gemini"}) end
+    )
 end)
 
 hammer:bind({}, 'u', function ()

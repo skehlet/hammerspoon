@@ -48,7 +48,7 @@ There are plenty of Hammerspoon examples of creating a "hyper" key where you pre
 
 ## Why does Hammerspoon sometimes stop working?
 
-macOS has a security feature called *Secure Input* where it prevents Hammerspoon (and applications like it, including TextExpander, Keyboard Maestro, Alfred, etc) from watching keyboard input. This can get turned on without your knowledge, for example, if a background browser window gets logged out and is sitting at a password prompt. I've added some detections for this with a menu bar indicator, and a huge alert on Hammerspoon startup to alert you. There is no way to stop this other than finding the offending window and dealing with it, either entering your password and submitting it, focusing away from that field, or closing the window.
+macOS has a security feature called *Secure Input* where it prevents Hammerspoon (and applications like it, including TextExpander, Keyboard Maestro, Alfred, etc) from watching keyboard input. This can get turned on without your knowledge, for example, if a background browser window gets logged out and is sitting at a password prompt. I've added a huge alert on Hammerspoon startup to alert you if it's on. There is no way to stop this other than finding the offending window and dealing with it, either entering your password and submitting it, focusing away from that field, or closing the window.
 
 ## Screen Lock
 
@@ -56,9 +56,8 @@ Activate with `hammer`+`l`, or other hotkeys like `F15` or `Pause` (see the code
 
 ## Other Stuff
 
-* Mouse button 4 and 5 to perform Back/Forward in Chrome, Slack, Chrome, and Visual Studio for Mac.
+* Mouse button 4 and 5 to perform Back/Forward in Notes, Microsoft Teams, and Visual Studio for Mac.
 * Hammer+mouse4 or mouse5 to move windows to left/right half of screen
 * Caffeine equivalent
-* Microphone and speaker indicators to confirm my Airpods are the active input/output
 * F13 (the button where PrintScreen is on PC keyboards) does that awkward keystroke (ctrl-shift-cmd-4) for you to take a screenshot and store it on the clipboard
 * Lots of little things added here and there, see the [include](./include/) folder for all my scripts.

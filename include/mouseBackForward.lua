@@ -113,10 +113,10 @@ end
 
 registerCustomMouseBackForwardHandler(
     "Visual Studio",
-    function()
+    function(event, app)
         app:selectMenuItem({"Search", "Navigation History", "Navigate Back"})
     end,
-    function()
+    function(event, app)
         app:selectMenuItem({"Search", "Navigation History", "Navigate Forward"})
     end
 )

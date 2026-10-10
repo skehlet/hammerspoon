@@ -2,6 +2,8 @@
 
 This is working on macOS Tahoe (26.5.1) and Hammerspoon 1.1.1.
 
+An experimental port to Hammerspoon 2 lives in [v2/](./v2/).
+
 ## Window Management via keypresses
 
 Focus on a window and press one of the following key combinations. See [a video here](https://youtu.be/OjS6LqKEPcA).

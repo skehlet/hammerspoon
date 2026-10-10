@@ -1,0 +1,13 @@
+{
+  // Editor type checking of the plain-JS config against hammerspoon.d.ts. No build step:
+  // Hammerspoon 2 loads the .js files directly.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "checkJs": true,
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["*.js", "*.d.ts", "lib/**/*.js", "include/**/*.js"]
+}

@@ -709,6 +709,15 @@ declare namespace hs {
     function collectGarbage(): void;
 
     /**
+     * Get every object that is currently active: running tasks, scheduled timers, started
+watchers and so on. An active object keeps running, and its callbacks keep being called,
+until it finishes or you stop it, whether or not you kept a reference to it. Use this to
+find something you started and lost track of.
+     * @returns The active objects
+     */
+    function activeObjects(): any[];
+
+    /**
      * Open the Hammerspoon Console window
      */
     function openConsole(): void;
@@ -1775,6 +1784,7 @@ If a service search is already active it is stopped before starting the
 new one. Domain searches are unaffected. The callback receives
 `(event, service, moreComing)` — see the type documentation for the
 complete event table.
+     * @remarks A running search, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @param type service type string, e.g. `"_http._tcp."` or `"_ssh._tcp."`
      * @param domain mDNS domain; `"local."` for the local link, `""` for all domains
      * @param callback Called for each result with event name, service object, and whether more results are expected
@@ -1838,6 +1848,7 @@ to watch for TXT record changes.
 declare class HSBonjourService {
     /**
      * Resolves the hostname, port, addresses, and TXT record of this service.
+     * @remarks A resolving or monitored service, and its callbacks, stay alive until that finishes or is stopped, even if you don't keep a reference to it
      * @param timeout seconds before giving up; pass `0` for no timeout
      * @param callback Called on status changes with event name and optional error message
      * @returns self, for chaining
@@ -2162,12 +2173,13 @@ c.show()
 declare class HSCanvas {
     /**
      * Show the canvas window
+     * @remarks A shown canvas stays on screen, with its callbacks, until it's hidden or destroyed, even if you don't keep a reference to it
      * @returns Self for chaining
      */
     show(): HSCanvas;
 
     /**
-     * Hide the canvas window (keeps it in memory; elements and window config are preserved)
+     * Hide the canvas window (elements and window config are preserved while you keep a reference to it)
      * @returns Self for chaining
      */
     hide(): HSCanvas;
@@ -2600,6 +2612,7 @@ Call after updating an external data source in an async `onQueryChange` handler.
 
     /**
      * Show the chooser.
+     * @remarks A shown chooser, and its callbacks, stay alive until it's hidden, even if you don't keep a reference to it
      * @returns Self for chaining
      */
     show(): HSChooser;
@@ -2885,11 +2898,12 @@ are always delivered to other applications. Requires Accessibility permission.
 
     /**
      * Create a keyboard event
-     * @param key A key name (e.g. "a", "space", "return", "f1") or numeric key code string
+through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code
+     * @param key A key name or character (e.g. "a", "space", "return", "f1"), resolved
      * @param isDown true for key down, false for key up
      * @returns An HSEventTapEvent, or null if the key name is unknown
      */
-    function makeKeyEvent(key: string, isDown: boolean): HSEventTapEvent | null;
+    function makeKeyEvent(key: string | number, isDown: boolean): HSEventTapEvent | null;
 
     /**
      * Create a keyboard event using a raw key code
@@ -2926,10 +2940,12 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
      * Send a key down and key up event with optional modifier keys.
 A 5 ms pause is inserted between the key-down and key-up events to improve
 compatibility with applications that miss very fast synthetic keystrokes.
+through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code,
+which always presses the same physical key
      * @param mods An array of modifier names (e.g. ["cmd", "shift"])
-     * @param key A key name or single character (e.g. "a", "space", "return")
+     * @param key A key name or character (e.g. "a", "space", "return"), resolved
      */
-    function keyStroke(mods: string[], key: string): void;
+    function keyStroke(mods: string[], key: string | number): void;
 
     /**
      * Type a string of characters as individual key events.
@@ -3038,14 +3054,23 @@ key you press will be examined by Hammerspoon to see if it matches one of the Ev
 consider this when choosing to use `hs.eventtap` for hotkeys.
 Requires Accessibility permission.
 `ctrl`, `fn`) and side-specific names (`leftCmd`, `rightCmd`, `leftAlt`, `rightAlt`,
-`leftCtrl`, `rightCtrl`, `leftShift`, `rightShift`).
+`leftCtrl`, `rightCtrl`, `leftShift`, `rightShift`). macOS reports `fn` as held on every
+press of the arrow keys, F-keys, help, home, end, page up/down, forward delete and keypad
+clear, so on those keys a hotkey with `fn` also fires without it (one without `fn` still
+works).
+current keyboard layout (see `hs.eventtap.followsKeyboardLayout`), or a numeric virtual key code,
+which always means the same physical key
+each key repeat while the whole combination stays held, or null
+repeat shows the combination is no longer held (e.g. a modifier was let go first), or null.
+After that, the key's remaining repeats and its release pass through as normal.
+     * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
      * @param mods An array of modifier key strings. Supports generic names (`cmd`, `shift`, `alt`,
-     * @param key The key name or character (e.g., "a", "space", "f1")
-     * @param onPressed Called when the key combination is pressed, or null
-     * @param onReleased Called when the key combination is released, or null
+     * @param key A key name or character (e.g., "a", "space", "f1"), resolved through the
+     * @param onPressed Called when the key combination is pressed, and again for
+     * @param onReleased Called when the key is released, or as soon as a key
      * @returns An `HSEventTapHotkey` object, or null if binding failed
      */
-    function bindHotkey(mods: string[], key: string, onPressed: (() => void) | null, onReleased: (() => void) | null): HSEventTapHotkey | null;
+    function bindHotkey(mods: string[], key: string | number, onPressed: (() => void) | null, onReleased: (() => void) | null): HSEventTapHotkey | null;
 
     /**
      * Remove a previously bound hotkey and stop it from firing
@@ -3077,6 +3102,22 @@ Includes generic names (`cmd`, `shift`, `alt`, `ctrl`) and side-specific names
      */
     const emit: boolean;
 
+    /**
+     * Whether hotkeys from `bindHotkey()` that were bound with a key name move to a
+different key when the keyboard layout changes, so that they stay on the key that types
+that character. Default is true.
+For example, a hotkey bound to `"w"` matches the key US-ANSI calls `W` while a US layout is
+active, and the key US-ANSI calls `,` after you switch to Dvorak, since that's where Dvorak
+types `w`. Hotkeys bound with a numeric key code never move.
+When false, a hotkey stays on whichever key its name resolved to when it was bound.
+Setting this back to true moves existing hotkeys to the current layout. This is separate
+from `hs.hotkey.followsKeyboardLayout`, which controls `hs.hotkey` hotkeys.
+Avoid binding some hotkeys by key name and others by numeric key code with the same
+modifiers if you switch layouts. If a hotkey moves onto a key code another hotkey already
+matches, only the one that was enabled first fires.
+     */
+    let followsKeyboardLayout: boolean;
+
 }
 
 /**
@@ -3092,6 +3133,7 @@ const tap = hs.eventtap.addWatcher([hs.eventtap.eventTypes.keyDown], (event) => 
 declare class HSEventTap {
     /**
      * Start receiving events. Requires Accessibility permission.
+     * @remarks A started tap, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This tap, for chaining
      */
     start(): HSEventTap;
@@ -3217,6 +3259,7 @@ key distinction. Obtain instances via `hs.eventtap.bindHotkey()` — do not inst
 declare class HSEventTapHotkey {
     /**
      * Enable the hotkey
+     * @remarks An enabled hotkey, and its callbacks, stay alive until it's disabled, even if you don't keep a reference to it
      * @returns True if the hotkey was enabled, otherwise False
      */
     enable(): boolean;
@@ -3231,6 +3274,17 @@ declare class HSEventTapHotkey {
      * @returns True if the hotkey is enabled, otherwise False
      */
     isEnabled(): boolean;
+
+    /**
+     * The key this hotkey was bound with, as originally passed to bindHotkey()
+     */
+    readonly key: string | number;
+
+    /**
+     * The virtual key code this hotkey currently matches. For a hotkey bound by key name
+this follows the keyboard layout (see `hs.eventtap.followsKeyboardLayout`).
+     */
+    readonly keyCode: number;
 
     /**
      * The callback function to be called when the hotkey is pressed, or null to remove it
@@ -3986,6 +4040,7 @@ then call `start()` to begin receiving events.
 declare class HSPathWatcher {
     /**
      * Starts monitoring the watched path for filesystem changes.
+     * @remarks A started watcher, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns self, for chaining
      */
     start(): HSPathWatcher;
@@ -4029,6 +4084,7 @@ call `start()` to begin receiving events.
 declare class HSVolumeWatcher {
     /**
      * Starts monitoring volume events.
+     * @remarks A started watcher, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns self, for chaining
      */
     start(): HSVolumeWatcher;
@@ -4145,18 +4201,21 @@ declare namespace hs.hotkey {
     /**
      * Bind a hotkey
 `cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
+through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which
+always means the same physical key
+     * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
      * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
-     * @param key The key name or character (e.g., "a", "space", "return", "f1")
+     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
      * @param onPressed A JavaScript function to call when the hotkey is pressed, or null for no callback
      * @param onReleased A JavaScript function to call when the hotkey is released, or null/omitted for no callback
      * @param onRepeat A JavaScript function to call repeatedly while the hotkey is held down, or null/omitted for no repeat
      * @returns A hotkey object, or null if binding failed (including when none of the callbacks is a function — at least one is required)
      */
-    function bind(mods: string[], key: string, onPressed: (() => void) | null, onReleased?: (() => void) | null, onRepeat?: (() => void) | null): HSHotkey | null;
+    function bind(mods: string[], key: string | number, onPressed: (() => void) | null, onReleased?: (() => void) | null, onRepeat?: (() => void) | null): HSHotkey | null;
 
     /**
-     * Get the system-wide mapping of key names to key codes
-     * @returns A dictionary mapping key names to numeric key codes
+     * Get the mapping of key names to key codes that hotkeys use, following the current keyboard layout
+     * @returns A dictionary mapping key names to numeric key codes (the same as `hs.keycodes.map`)
      */
     function getKeyCodeMap(): Record<string, number>;
 
@@ -4169,50 +4228,52 @@ declare namespace hs.hotkey {
     /**
      * Create a hotkey without enabling it
 `cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
+through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which
+always means the same physical key
      * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
-     * @param key The key name or character (e.g., "a", "space", "return", "f1")
+     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
      * @param onPressed A JavaScript function to call when the hotkey is pressed, or null for no callback
      * @param onReleased A JavaScript function to call when the hotkey is released, or null/omitted for no callback
      * @param onRepeat A JavaScript function to call repeatedly while the hotkey is held down, or null/omitted for no repeat
      * @returns A hotkey object, or null if creation failed. Call `.enable()` to activate it.
      */
-    function create(mods: string[], key: string, onPressed: (() => void) | null, onReleased?: (() => void) | null, onRepeat?: (() => void) | null): HSHotkey | null;
+    function create(mods: string[], key: string | number, onPressed: (() => void) | null, onReleased?: (() => void) | null, onRepeat?: (() => void) | null): HSHotkey | null;
 
     /**
      * Get a list of all currently-enabled hotkeys
-     * @returns An array of objects, each with `mods`, `key`, `message` and `enabled` fields
+     * @returns An array of objects, each with `mods`, `key`, `keyCode`, `message` and `enabled` fields
      */
     function getHotkeys(): Record<string, any>[];
 
     /**
      * Check whether macOS itself has already claimed a key combination (e.g. for Spotlight, screenshots, etc.)
      * @param mods An array of modifier key strings
-     * @param key The key name or character
+     * @param key A key name or character, or a numeric virtual key code
      * @returns An object with `keyCode`, `mods` and `enabled` fields if the combination is system-assigned, otherwise null
      */
-    function systemAssigned(mods: string[], key: string): Record<string, any> | null;
+    function systemAssigned(mods: string[], key: string | number): Record<string, any> | null;
 
     /**
      * Check whether a key combination is available to be bound (i.e. not already claimed by macOS)
      * @param mods An array of modifier key strings
-     * @param key The key name or character
+     * @param key A key name or character, or a numeric virtual key code
      * @returns True if the combination can be bound, otherwise False
      */
-    function assignable(mods: string[], key: string): boolean;
+    function assignable(mods: string[], key: string | number): boolean;
 
     /**
      * Disable and remove every hotkey currently bound to a key combination
      * @param mods An array of modifier key strings
-     * @param key The key name or character
+     * @param key A key name or character, or a numeric virtual key code
      */
-    function deleteAll(mods: string[], key: string): void;
+    function deleteAll(mods: string[], key: string | number): void;
 
     /**
      * Disable every hotkey currently bound to a key combination, without removing them
      * @param mods An array of modifier key strings
-     * @param key The key name or character
+     * @param key A key name or character, or a numeric virtual key code
      */
-    function disableAll(mods: string[], key: string): void;
+    function disableAll(mods: string[], key: string | number): void;
 
     /**
      * Bind a hotkey from a single options object. Like hs.hotkey.bind()/create(), but also
@@ -4227,25 +4288,42 @@ see hs.hotkey's message property for exactly when it is shown.
     /**
      * Create a new modal hotkey group, optionally entered via a trigger key combination
      * @param mods Modifier keys for the trigger hotkey (e.g. ["cmd", "shift"]), or an empty array for no trigger
-     * @param key Key name for the trigger hotkey (e.g. "h"), or an empty string for no trigger
+     * @param key Key name or numeric key code for the trigger hotkey (e.g. "h"), or an empty string for no trigger
      * @returns A modal object with bind(), enter(), exit(), destroy() methods, isActive property, and onEnter/onExit callbacks
      */
-    function createModal(mods: any, key: any): HSHotkeyModal;
+    function createModal(mods: any, key: string | number): HSHotkeyModal;
 
     /**
      * Create and enable a hotkey that, while held down, displays a list of all currently
 enabled hotkeys (and their messages, if any) as an on-screen toast.
      * @param mods Modifier keys for the trigger hotkey (e.g. ["cmd", "shift"])
-     * @param key Key name for the trigger hotkey (e.g. "/")
+     * @param key Key name or numeric key code for the trigger hotkey (e.g. "/")
      * @returns A hotkey object
      */
-    function showHotkeys(mods: any, key: any): any;
+    function showHotkeys(mods: any, key: string | number): any;
 
     /**
      * Duration in seconds for the on-screen toast shown when a hotkey with a
 `message` set fires. Default is 1.
      */
     let alertDuration: number;
+
+    /**
+     * Whether hotkeys bound with a key name move to a different key when the keyboard
+layout changes, so that they stay on the key that types that character. Default is true.
+For example, a hotkey bound to `"w"` is on the key US-ANSI calls `W` while a US layout is
+active, and moves to the key US-ANSI calls `,` when you switch to Dvorak, since that's where
+Dvorak types `w`. Hotkeys bound with a numeric key code never move.
+When false, a hotkey stays on whichever key its name resolved to when it was created, as in
+Hammerspoon v1. Setting this back to true moves existing hotkeys to the current layout.
+If the new layout doesn't type a hotkey's character and the character has no US-ANSI
+position either, the hotkey stays where it is and a warning is logged.
+Avoid binding some hotkeys by key name and others by numeric key code with the same
+modifiers if you switch layouts. A hotkey that moves onto a key code another hotkey already
+holds can't be registered there, so it's disabled with an error logged, and it stays
+disabled until you call its `enable()` again, even after switching back.
+     */
+    let followsKeyboardLayout: boolean;
 
 }
 
@@ -4255,6 +4333,7 @@ enabled hotkeys (and their messages, if any) as an on-screen toast.
 declare class HSHotkey {
     /**
      * Enable the hotkey
+     * @remarks An enabled hotkey, and its callbacks, stay alive until it's disabled, even if you don't keep a reference to it
      * @returns True if the hotkey was enabled, otherwise False
      */
     enable(): boolean;
@@ -4283,7 +4362,13 @@ declare class HSHotkey {
     /**
      * The key this hotkey was bound with, as originally passed to bind()/create()
      */
-    readonly key: string;
+    readonly key: string | number;
+
+    /**
+     * The virtual key code this hotkey is currently registered on. For a hotkey bound by
+key name this follows the keyboard layout (see `hs.hotkey.followsKeyboardLayout`).
+     */
+    readonly keyCode: number;
 
     /**
      * An optional description of what this hotkey does, or null if none was set.
@@ -4332,13 +4417,13 @@ declare class HSHotkeyModal {
     /**
      * Bind a hotkey to this modal. The hotkey is only enabled while the modal is active.
      * @param mods - Modifier keys for the hotkey (e.g. ["cmd", "shift"])
-     * @param key - Key name for the hotkey (e.g. "h")
+     * @param key - Key name or numeric key code for the hotkey (e.g. "h")
      * @param onPressed - Called when the hotkey is pressed, or null
      * @param onReleased - Called when the hotkey is released, or null/omitted
      * @param onRepeat - Called repeatedly while the hotkey is held down, or null/omitted
      * @returns This modal, for chaining
      */
-    bind(mods: string[], key: string, onPressed: Function|null, onReleased?: Function|null, onRepeat?: Function|null): HSHotkeyModal;
+    bind(mods: string[], key: string | number, onPressed: Function|null, onReleased?: Function|null, onRepeat?: Function|null): HSHotkeyModal;
 
     /**
      * Enter the modal: its trigger (if any) is disabled and its bound hotkeys are enabled.
@@ -4441,8 +4526,9 @@ Handles named entities (e.g. `&amp;`, `&lt;`, `&copy;`), decimal numeric referen
     /**
      * Open a WebSocket connection to the given URL.
 The connection begins immediately. Use the returned object's chainable setter methods to
-register event callbacks. The connection is automatically closed when `hs.reload()` is
-called or the engine shuts down.
+register event callbacks. The connection stays open, with its callbacks, until either end
+closes it, even if you don't keep a reference to it. It is automatically closed when
+`hs.reload()` is called or the engine shuts down.
      * @param url The WebSocket URL (`ws://` or `wss://`).
      * @returns An `HSWebSocket` object, or `null` if the URL is invalid.
      */
@@ -4675,6 +4761,7 @@ contain both the certificate and the private key.
      * Start the server and begin accepting connections.
 The server must be configured before calling `start()`. To restart the server with new
 settings, call `stop()` followed by `start()`.
+     * @remarks A running server, and its callbacks, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This server, for chaining.
      */
     start(): HSHTTPServer;
@@ -4933,11 +5020,14 @@ console.log("Layout: " + hs.keycodes.currentLayout())
 console.log("Source ID: " + hs.keycodes.currentSourceID())
 ```
 ## Key code mapping
+Key codes identify physical keys, while characters depend on the keyboard layout. `map` and
+`names` follow the current layout, so on Dvorak `map["w"]` is the key code of the key that
+types `w` there.
 ```js
 // Look up a keycode by name
 const code = hs.keycodes.map["a"]    // e.g. 0 on ANSI US
 // Look up a name by keycode
-const name = hs.keycodes.map["0"]   // e.g. "a"
+const name = hs.keycodes.names[0]    // e.g. "a"
 ```
 ## Switching layouts
 ```js
@@ -5036,12 +5126,23 @@ state.
     function once(event: "change", listener: () => void): void;
 
     /**
-     * A bidirectional mapping between key names and their macOS virtual key codes.
-Entries exist for both directions: look up a name to get its integer keycode, or look
-up a keycode (as a string) to get the key name. The map is rebuilt automatically
-whenever the keyboard input source changes.
+     * A mapping from key names to macOS virtual key codes, following the current keyboard layout.
+This is the same mapping `hs.hotkey` and `hs.eventtap` use to turn a key name into a key
+code. For the reverse direction, use `names`. The map is rebuilt automatically whenever
+the keyboard input source changes.
+the layout doesn't type (e.g. `1` on AZERTY) map to their US-ANSI key position.
+`semicolon`, `quote`, `comma`, `period`, `slash`, `grave`. Each is the key that types that
+character in the current layout, so `comma` and `,` are always the same key.
      */
-    const map: Record<string, any>;
+    const map: Record<string, number>;
+
+    /**
+     * A mapping from macOS virtual key codes to key names, following the current keyboard layout.
+The reverse of `map`. Each key code maps to its fixed name if it has one (e.g. `return`,
+`f1`), otherwise to the character the current layout types on it. Key codes with neither
+are absent. JavaScript object keys are strings, so `names[36]` and `names["36"]` are the same.
+     */
+    const names: Record<string, string>;
 
 }
 
@@ -5240,6 +5341,7 @@ updates, and set a callback to handle them.
 declare class HSLocationWatcher {
     /**
      * Starts location updates. The callback must be set first.
+     * @remarks A started watcher, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns self, for chaining
      */
     start(): HSLocationWatcher;
@@ -5311,6 +5413,7 @@ item.setMenu(() => [
 declare namespace hs.menubar {
     /**
      * Create a new menu bar item
+     * @remarks A visible item stays in the menu bar, with its callbacks, until it's hidden or destroyed, even if you don't keep a reference to it
      * @param hidden Pass true to create the item hidden (not shown in the menu bar). Defaults to false (immediately visible).
      * @returns A new HSMenuBarItem
      */
@@ -5336,25 +5439,42 @@ declare class HSMenuBarItem {
     setTooltip(tooltip: string | null): void;
 
     /**
-     * Set a callback invoked when the item is clicked (only fires when no menu is set)
+     * Set a callback invoked when the item is clicked with any mouse button (only fires when no menu is set).
+from 1 (so a mouse's fourth and fifth buttons are `"button4"` and `"button5"`). A Ctrl-click, the
+standard macOS secondary click, is reported as `"right"` (and `modifiers` still includes `"ctrl"`).
+`hs.eventtap.currentModifiers()` (e.g. `["cmd", "leftCmd"]`).
+To offer a menu alongside a click action, leave the menu unset and call `popUpMenu()` from this callback.
      * @param fn A function to call on click, or null to remove the callback
      */
-    setClickCallback(fn: (() => void) | null): void;
+    setClickCallback(fn: ((button: string, modifiers: string[]) => void) | null): void;
 
     /**
      * Set the menu for this item. Pass an array of menu item objects for a static menu,
 or a function that returns an array for a dynamic menu populated each time it opens.
+The function receives one argument: the modifier keys held when the menu opened, in the same form as
+`hs.eventtap.currentModifiers()`.
+While a menu is set, clicking the item opens the menu and the click callback is not called.
      * @param menuOrFn Array of menu item objects, a function returning such an array, or null to remove the menu
      */
-    setMenu(menuOrFn: Array<Record<string, any>> | (() => Array<Record<string, any>>) | null): void;
+    setMenu(menuOrFn: Array<Record<string, any>> | ((modifiers: string[]) => Array<Record<string, any>>) | null): void;
 
     /**
-     * Remove this item from the menu bar. The item is retained and can be shown again with show().
+     * Immediately open a menu below this item, independently of any menu set with `setMenu()`.
+This is intended to be called from a click callback, so that a single item can perform an action on one
+kind of click and offer a menu on another. The menu item objects are the same as for `setMenu()`.
+If the item is hidden, the menu opens at the mouse pointer instead.
+     * @param entries Array of menu item objects
+     */
+    popUpMenu(entries: Array<Record<string, any>>): void;
+
+    /**
+     * Remove this item from the menu bar. It can be shown again with show() while you keep a reference to it.
      */
     hide(): void;
 
     /**
      * Show this item in the menu bar.
+     * @remarks A visible item, and its callbacks, stay in the menu bar until it's hidden or destroyed, even if you don't keep a reference to it
      */
     show(): void;
 
@@ -5445,6 +5565,7 @@ the command type as a string (e.g. `"noteOn"`, `"controlChange"`,
 `"systemExclusive"` — see `hs.midi.commandTypes` for the full set), a
 human-readable description, and a metadata table of command-specific fields.
 when released, but some send `noteOn` with `velocity` 0 instead of `noteOff`.
+     * @remarks A device with a callback, and the callback, stay alive until the callback is removed or the device is destroyed, even if you don't keep a reference to it
      * @param fn The function to call on each received message, or `null` to remove it
      * @returns This device object, for chaining
      */
@@ -5748,7 +5869,8 @@ destroys all watchers on `hs.reload()`.
     /**
      * Sends ICMP Echo Requests to `server` and reports results via a callback.
 DNS resolution and the first ping begin immediately. The returned object can be used to
-pause, resume, or cancel the ping, and to read statistics.
+pause, resume, or cancel the ping, and to read statistics. The ping runs to completion,
+with its callback, even if you don't keep a reference to it.
 `timeout` (seconds per packet, default 2.0), `family` (`"any"` | `"ipv4"` | `"ipv6"`, default `"any"`),
 and `callback` (function).
      * @param server A hostname or IP address to ping.
@@ -5798,6 +5920,7 @@ inside the callback to read the updated values.
 The callback registered with `setCallback()` will be invoked whenever a key matching the
 patterns registered with `setKeys()` changes. Call `setKeys()` and `setCallback()` before
 calling `start()`.
+     * @remarks A started watcher, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This watcher for chaining.
      */
     start(): HSNetworkConfigurationWatcher;
@@ -5932,6 +6055,7 @@ monitoring.
      * Starts monitoring for reachability changes.
 After calling `start()`, the callback registered with `setCallback()` is invoked
 whenever the reachability status changes.
+     * @remarks A started object, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This reachability object for chaining.
      */
     start(): HSNetworkReachability;
@@ -7210,6 +7334,7 @@ Received data, and lifecycle events, are delivered via the callback registered w
 declare class HSSerialPort {
     /**
      * Opens the port using its current configuration.
+     * @remarks An open port, and its callback, stay alive until it's closed, even if you don't keep a reference to it
      * @returns self, for chaining
      */
     open(): HSSerialPort;
@@ -7403,7 +7528,7 @@ path if they start with `/` or `~` and the file exists, otherwise plain text) or
 If the service cannot handle the items, this logs a warning and returns `false`
 without doing anything further. Otherwise the share is started; it is asynchronous
 — use `setCallback()` to find out when it completes.
-     * @remarks Unsupported items will be ignored
+     * @remarks Unsupported items will be ignored. A share that has started, and its callback, stay alive until it succeeds or fails, even if you don't keep a reference to it
      * @param items The items to share
      * @returns true if the share was started
      */
@@ -7564,6 +7689,7 @@ Create instances using `hs.sound.fromFile()` or `hs.sound.named()`.
 declare class HSSound {
     /**
      * Starts playback from the current position.
+     * @remarks A playing sound plays to the end, and its callback fires, even if you don't keep a reference to it
      * @returns This sound object, for chaining.
      */
     play(): HSSound;
@@ -7924,6 +8050,7 @@ of `HSSpotlightItem` objects describing what changed in this update cycle
      * Starts the query.
 The query must have a predicate set (via `setQuery()`) before calling `start()`.
 Calling `start()` on an already-running query is a no-op.
+     * @remarks A started query, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns this query, for chaining
      */
     start(): HSSpotlightQuery;
@@ -8241,6 +8368,7 @@ declare namespace hs.task {
 declare class HSTask {
     /**
      * Start the task
+     * @remarks A running task, and its callbacks, stay alive until it terminates, even if you don't keep a reference to it. Use `terminate()` to stop it early.
      * @returns The task object for chaining
      */
     start(): HSTask;
@@ -8385,6 +8513,7 @@ declare namespace hs.timer {
 
     /**
      * Create and start a one-shot timer
+     * @remarks The timer fires even if you don't keep a reference to it. Keep one if you might want to stop it.
      * @param seconds Number of seconds to wait before firing
      * @param callback A JavaScript function to call when the timer fires
      * @returns A timer object (already started)
@@ -8393,6 +8522,7 @@ declare namespace hs.timer {
 
     /**
      * Create and start a repeating timer
+     * @remarks The timer keeps firing until `stop()` is called, even if you don't keep a reference to it.
      * @param interval The interval in seconds at which the timer should fire
      * @param callback A JavaScript function to call when the timer fires
      * @returns A timer object (already started)
@@ -8506,6 +8636,7 @@ declare namespace hs.timer {
 declare class HSTimer {
     /**
      * Start the timer
+     * @remarks A running timer keeps firing until it is stopped, even if you don't keep a reference to it
      * @returns The HSTimer object, for chaining
      */
     start(): HSTimer;
@@ -8925,11 +9056,13 @@ Keep a reference to call navigation methods after the window is shown.
 **A custom window with declarative UI building**
 `HSUIWindow` allows you to create custom windows with a SwiftUI-like
 declarative syntax. Build interfaces using shapes, text, images, and layout containers.
-** Note: ** Clicking the macOS close button only **hides** the window (firing the `onHide()`
-callback, if you have one configured) — it does not destroy the window while you hold a reference to it in
-JavaScript. Call `destroy()` explicitly (for example from within an `onHide()` handler)
-if you want to release it. See `onShow()`, `onHide()`, and `onDestroy()` below for the
-full set of lifecycle callbacks.
+** Note: ** A shown window stays on screen, with its callbacks, until it's hidden or destroyed,
+even if you don't keep a reference to it. Clicking the macOS close button only **hides** the
+window (firing the `onHide()` callback, if you have one configured) — it does not destroy the
+window while you hold a reference to it in JavaScript, so you can show it again. Call
+`destroy()` explicitly (for example from within an `onHide()` handler) if you want to release
+it sooner. See `onShow()`, `onHide()`, and `onDestroy()` below for the full set of lifecycle
+callbacks.
 ## Building UI Elements
 ## Modifying Elements
 ## Examples
@@ -8967,6 +9100,7 @@ hs.ui.window({x: 100, y: 100, w: 400, h: 300})
 declare class HSUIWindow {
     /**
      * Show the window
+     * @remarks A shown window, and its callbacks, stay alive until it's hidden, closed or destroyed, even if you don't keep a reference to it
      * @returns Self for chaining
      */
     show(): HSUIWindow;
@@ -9364,6 +9498,7 @@ declare class HSUIDialog {
 
     /**
      * Show the dialog
+     * @remarks A showing dialog, and its callback, stay alive until it's closed, even if you don't keep a reference to it
      * @returns Self for chaining
      */
     show(): HSUIDialog;
@@ -10207,6 +10342,15 @@ Note that this type uses private macOS APIs
  */
 declare class HSWindow {
     /**
+     * Move and resize the window, reporting whether it succeeded
+The same as setting `frame`, except that the result tells you whether the window accepted
+the change.
+     * @param frame The window's new frame
+     * @returns true if the window was moved and resized, otherwise false
+     */
+    moveAndResize(frame: HSRect): boolean;
+
+    /**
      * Focus this window
 The window becomes its application's main window, and the application is brought to the front
 with only this window raised. The application's other windows keep their place in the stacking order.
@@ -10317,17 +10461,20 @@ A value of 0 or -1 likely means no window ID could be determined.
     readonly isStandard: boolean;
 
     /**
-     * The window's position on screen {x: Int, y: Int}
+     * The window's position on screen, as an HSPoint
      */
     position: HSPoint | null;
 
     /**
-     * The window's size {w: Int, h: Int}
+     * The window's size, as an HSSize
      */
     size: HSSize | null;
 
     /**
-     * The window's frame {x: Int, y: Int, w: Int, h: Int}
+     * The window's frame, as an HSRect
+Setting `frame`, `position` or `size` briefly turns off the owning application's
+`AXEnhancedUserInterface`, and restores it afterwards. Some applications (Chromium and Electron
+ones in particular) otherwise animate the change, or end up at the wrong size.
      */
     frame: HSRect | null;
 

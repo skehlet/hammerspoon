@@ -17,9 +17,9 @@ const INCLUDES = [
     'screenShot',
 ]
 
-// Hammerspoon 2 garbage-collects hotkeys, timers, menubar items, etc. once nothing references them.
-// Each include exports the objects it creates, and holding all the exports here keeps them alive
-// for the life of the config.
+// Each include exports the objects it creates. Since Hammerspoon 2 0.0.14, running objects (enabled
+// hotkeys, started watchers, shown menubar items, etc.) stay alive without a reference, so this is
+// no longer what keeps them alive; it's a handle for inspecting or stopping them later.
 const includes = {}
 for (const name of INCLUDES) {
     try {

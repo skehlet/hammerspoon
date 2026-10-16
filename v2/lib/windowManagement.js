@@ -50,9 +50,6 @@ windowManagement.moveEast = () => moveOneScreen(screen => screen.toEast())
 windowManagement.moveUp = () => move((f, sf) => [f.x, sf.y, f.w, sf.h / 2])
 windowManagement.moveDown = () => move((f, sf) => [f.x, sf.y + sf.h / 2, f.w, sf.h / 2])
 
-// The pending retry timer must stay referenced until it fires, or it gets garbage-collected.
-let retryTimer = null
-
 // openNewWindowFn() opens a window and returns it. Once the new window is in place and focused,
 // onConfirmed(newWindow) is called.
 windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen = (openNewWindowFn, onConfirmed) => {
@@ -66,7 +63,6 @@ windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen = (openNewWindowF
     const INTERVAL = 0.1
 
     function tryPosition(triesLeft) {
-        retryTimer = null
         if (!newWindow.isVisible) return
         const frame = newWindow.frame
         const [tx, ty, tw, th] = calculateHalfScreenCenteredFrame(frame, targetScreenFrame)
@@ -75,13 +71,13 @@ windowManagement.openNewWindowCenteredHalfWidthOnCurrentScreen = (openNewWindowF
         if (!inPlace) {
             newWindow.frame = new HSRect(tx, ty, tw, th)
             if (triesLeft > 1) {
-                retryTimer = hs.timer.doAfter(INTERVAL, () => tryPosition(triesLeft - 1))
+                hs.timer.doAfter(INTERVAL, () => tryPosition(triesLeft - 1))
                 return
             }
             console.warn(`${newWindow.title}: frame still not in place after max retries`)
         }
         newWindow.focus()
-        newWindow.application?.activate()
+        // newWindow.application?.activate() // 2026-10-16 testing if this is no longer needed
         if (onConfirmed) onConfirmed(newWindow)
     }
 

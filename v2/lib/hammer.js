@@ -52,7 +52,8 @@ for (let i = 0; i < 16; i++) {
     triggers.push(trigger)
 }
 
-// Referenced from the exported object so neither gets garbage-collected.
+// Hammerspoon 2 only keeps *enabled* hotkeys alive on its own, and the modal's hotkeys are disabled
+// whenever the Hammer key is up. The modal holds them, so it must stay referenced from here.
 hammer._modal = modal
 hammer._triggers = triggers
 

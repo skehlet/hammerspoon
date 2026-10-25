@@ -6,7 +6,7 @@ const BROWSER_APP_NAME = 'Brave Browser'
 function openBrowser() {
     const app = hs.application.matchingName(BROWSER_APP_NAME)
     if (!app) {
-        hs.ui.alert(`Application not found: ${BROWSER_APP_NAME}`).show()
+        hs.ui.alert(`Application not running: ${BROWSER_APP_NAME}`).show()
         return null
     }
     console.info(`Found ${BROWSER_APP_NAME}: ${app}`)

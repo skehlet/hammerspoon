@@ -7,7 +7,7 @@ const HAMMER_KEY = 'f20'
 // So all scripts requiring this file will get this same hammer instance.
 
 // A modal with no trigger key: the F20 down/up hotkeys below enter and exit it.
-const modal = hs.hotkey.createModal([], '')
+const modal = hs.hotkey.createModal()
 
 const hammer = {
     isDown: false,

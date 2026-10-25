@@ -45,7 +45,7 @@ hammer.bind([], 'g', () => {
 
 hammer.bind([], 'u', () => {
     const win = hs.window.focusedWindow()
-    if (!win || win.application?.title !== BROWSER_APP_NAME) {
+    if (!win || win.application?.name !== BROWSER_APP_NAME) {
         hs.ui.alert(`Not a ${BROWSER_APP_NAME} window`).show()
         return
     }

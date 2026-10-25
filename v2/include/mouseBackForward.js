@@ -37,7 +37,7 @@ function onOtherMouseDownWithHammer(event) {
 
 function onOtherMouseDownCheckCustomHandlers(event) {
     const app = hs.application.frontmost()
-    const appName = app?.title
+    const appName = app?.name
     console.info(`onOtherMouseDownCheckCustomHandlers event, app: ${appName}`)
     const handler = otherMouseDownCustomHandlers[appName]
     if (!handler) {

@@ -16,13 +16,13 @@ To go back to v1, quit Hammerspoon 2 and launch Hammerspoon.
 * **Object lifetime:** since Hammerspoon 2 0.0.14, running objects (enabled hotkeys, started watchers and timers, shown menubar items) stay alive without a reference. Anything not running, like the Hammer modal's hotkeys while the Hammer key is up, still needs one: `lib/hammer.js` keeps it. Each include also exports what it creates, and `init.js` holds every include's exports.
 * **Event taps:** return `hs.eventtap.consume` to discard an event and `hs.eventtap.emit` to pass it on. This is inverted from v1's `return true -- discard`.
 * **Includes are listed explicitly** in `init.js`, not discovered from `include/`. A failing include is logged and skipped.
-* **Secure Input** has no API in Hammerspoon 2, so `macosSanityChecks.js` asks `ioreg`. It now also names the app holding Secure Input.
-* **Moving windows between screens** (`hammer`+`cmd`+`left`/`right`) is reimplemented, since `moveOneScreenWest/East` are gone.
+* **Secure Input:** `macosSanityChecks.js` also names the app holding Secure Input, via `hs.eventtap.secureInputPID()` (Hammerspoon 2 0.0.15+).
+* **Moving windows between screens** (`hammer`+`cmd`+`left`/`right`) is reimplemented, since `moveOneScreenWest/East` are gone. (An `hs.spaces` module may arrive upstream.)
 * **Not ported:** `hs.window.animationDuration` (doesn't exist in v2) and `lib/screen.lua` (the includes call `hs.power` directly).
 
 ## Editor support
 
-`hammerspoon.d.ts` (currently for 0.0.14, from the [Hammerspoon 2 docs](https://cmsj.github.io/Hammerspoon2/0.0.14/js/typescript-guide.html)), `globals.d.ts` and `jsconfig.json` give VS Code autocomplete and type checking for the plain-JS config, with no build step. When you update Hammerspoon 2, replace it with the matching version's file:
+`hammerspoon.d.ts` (currently for 0.0.16, from the [Hammerspoon 2 docs](https://cmsj.github.io/Hammerspoon2/0.0.16/js/typescript-guide.html)), `globals.d.ts` (declares `require`, `module` and `__dirname`, which v2 provides but its `.d.ts` doesn't yet) and `jsconfig.json` give VS Code autocomplete and type checking for the plain-JS config, with no build step. When you update Hammerspoon 2, replace it with the matching version's file:
 
 ```bash
 curl -fL https://cmsj.github.io/Hammerspoon2/<version>/hammerspoon.d.ts -o v2/hammerspoon.d.ts

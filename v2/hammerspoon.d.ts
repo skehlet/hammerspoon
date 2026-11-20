@@ -754,31 +754,6 @@ find something you started and lost track of.
     function clearConsole(): void;
 
     /**
-     * Load a Spoon - a packaged, reusable piece of configuration - by name, from the
-`Spoons` directory inside your config directory. A Spoon must contain a well-formed
-`spoon.json` (with non-empty `name`, `author`, `version`, and `description` fields)
-and an `init.js`, or loading fails with an exception. `init.js` is loaded through the
-same `require()` used for the rest of your config, so it can itself `require()`
-further files from within the Spoon's own directory using relative paths. On success,
-the Spoon's `module.exports` is also stored on `hs.spoons` under its name, so other
-code can reach an already-loaded Spoon without needing to call `loadSpoon()` again.
-`init.js` must set `module.exports` to an object (or a function, since functions are
-objects too) - loading fails with an exception otherwise. Its `author`, `description`,
-and `version` properties are then set from `spoon.json`, overwriting any of the same
-name the Spoon's own `init.js` set, so that information is always present and always
-reflects what's on disk. If the resulting object has an `init()` method, it's called
-automatically (with `this` bound to the object) before `loadSpoon()` returns - matching
-Hammerspoon 1's behavior. An exception thrown from `init()` fails the load: nothing is
-stored on `hs.spoons`, and `loadSpoon()` throws. Unlike `init.js` itself (which
-`require()` only ever evaluates once), `init()` runs again on every `loadSpoon()` call
-for the same Spoon, since the same cached object is returned each time - write it to be
-safe to call more than once, or do one-time setup at `init.js`'s top level instead.
-     * @param name The Spoon's name, matching its directory name under `Spoons/`
-     * @returns Whatever the Spoon's `init.js` assigned to `module.exports`
-     */
-    function loadSpoon(name: string): Object;
-
-    /**
      * Called when Hammerspoon 2 is launched again while it's already
 running (e.g. from Finder, Spotlight or `open -a`), or when its Dock icon is clicked, or null
 to remove it. It's only called when Settings → Advanced → "When launched while running" is
@@ -791,18 +766,12 @@ your config failed to load), the Console is shown instead, so you can always get
      * Called when a file or folder is opened with Hammerspoon 2,
 e.g. by dropping it on the Dock icon, choosing Hammerspoon 2 from Finder's "Open With" menu,
 or `open -a "Hammerspoon 2" file.txt`, or null to remove it. It's called once for each item,
-with its path. Spoons (`.spoon2` files) are installed as usual rather than passed to it.
+with its path. Spoons (`.spoon2` files) are installed rather than passed to it, unless
+"Install Spoons when opened" is turned off in the Advanced tab of Settings.
 Items opened before your config has loaded (for example, the one that launched
 Hammerspoon 2) are passed to it once your config has loaded.
      */
     let onOpenFile: ((path: string) => void) | null;
-
-    /**
-     * A namespace holding every Spoon loaded so far via `loadSpoon()`,
-keyed by name - e.g. a Spoon loaded with `hs.loadSpoon("MySpoon")` is also reachable as
-`hs.spoons.MySpoon`. Empty until at least one Spoon has been loaded.
-     */
-    const spoons: Record<string, Object>;
 
 }
 
@@ -1775,6 +1744,440 @@ which actions an element supports.
 }
 
 /**
+ * Inspect, connect to and scan for Bluetooth devices, and watch them connect and disconnect.
+keyboard or a mouse paired with this Mac. These have battery levels and system-wide
+connect/disconnect events.
+Hammerspoon can connect to itself to read and write its GATT characteristics. macOS gives
+these a UUID `identifier` instead of revealing their address.
+```javascript
+hs.bluetooth.pairedDevices().forEach(d => console.log(d.name + " " + d.address))
+
+hs.bluetooth.connectedDevices()
+    .filter(d => d.batteryLevel !== null)
+    .forEach(d => console.log(d.name + ": " + d.batteryLevel + "%"))
+
+hs.bluetooth.on('connected', d => console.log(d.name + " connected"))
+hs.bluetooth.on('powerChanged', on => console.log("Bluetooth is " + (on ? "on" : "off")))
+
+const nearby = await hs.bluetooth.scan({ seconds: 5 })
+nearby.forEach(p => console.log((p.name ?? p.identifier) + " " + p.rssi + " dBm"))
+```
+macOS asks the user for Bluetooth permission the first time this module talks to Bluetooth.
+Use `hs.permissions.checkBluetooth()` to see whether it has been granted.
+ */
+declare namespace hs.bluetooth {
+    /**
+     * All devices paired with this Mac, connected or not.
+     * @returns An array of `HSBluetoothDevice` objects
+     */
+    function pairedDevices(): HSBluetoothDevice[];
+
+    /**
+     * The paired devices macOS currently has connected.
+     * @returns An array of `HSBluetoothDevice` objects
+     */
+    function connectedDevices(): HSBluetoothDevice[];
+
+    /**
+     * Looks up a device macOS knows by its Bluetooth address.
+     * @param address The device's address, as `"a4-83-e7-12-34-56"` or `"A4:83:E7:12:34:56"`
+     * @returns The `HSBluetoothDevice`, or `null` if macOS doesn't know a device with that address
+     */
+    function device(address: string): HSBluetoothDevice | null;
+
+    /**
+     * The BLE peripherals Hammerspoon is connected to, with `HSBluetoothPeripheral.connect()`.
+     * @returns An array of `HSBluetoothPeripheral` objects
+     */
+    function connectedPeripherals(): HSBluetoothPeripheral[];
+
+    /**
+     * Looks up a BLE peripheral by its identifier.
+Hammerspoon must have seen the peripheral in a scan, or Bluetooth must already be in use, for it to be found. This lookup doesn't start Bluetooth itself, so it never shows the permission prompt.
+     * @param identifier The peripheral's `identifier`, a UUID
+     * @returns The `HSBluetoothPeripheral`, or `null` if it isn't known
+     */
+    function peripheral(identifier: string): HSBluetoothPeripheral | null;
+
+    /**
+     * Scans for BLE peripherals nearby. Only one scan can run at a time.
+Each peripheral found is also delivered to `'discovered'` listeners (see `on()`) as soon as it's seen.
+     * @param options An object with any of:
+     * @returns A Promise resolving to the peripherals found when the scan ends, or when `stopScan()` is called. Rejects if a scan is already running, the options are invalid, or Bluetooth is unavailable
+     */
+    function scan(options?: Record<string, any> | null): Promise<HSBluetoothPeripheral[]>;
+
+    /**
+     * Ends a scan started by `scan()` early. Its Promise resolves with the peripherals found so far.
+     */
+    function stopScan(): void;
+
+    /**
+     * Searches for discoverable classic Bluetooth devices nearby, such as headphones in pairing mode. Only one search can run at a time.
+This interrupts the audio of connected Bluetooth headphones while it runs.
+     * @param options An object with `seconds` (number, default `10`, at most `255`): how long to search for
+     * @returns A Promise resolving to the devices found when the search ends, or when `stopInquiry()` is called. Rejects if a search is already running, the options are invalid, or the search fails
+     */
+    function inquiry(options?: Record<string, any> | null): Promise<HSBluetoothDevice[]>;
+
+    /**
+     * Ends a search started by `inquiry()` early. Its Promise resolves with the devices found so far.
+     */
+    function stopInquiry(): void;
+
+    /**
+     * Register a listener for Bluetooth events.
+     * @param event The event to listen for
+     * @param listener Called with the event's device or peripheral, or for `"powerChanged"` the new power state
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function on(event: "connected" | "disconnected" | "powerChanged" | "discovered", listener: (arg: HSBluetoothDevice | HSBluetoothPeripheral | boolean) => void): void;
+
+    /**
+     * Remove a previously registered Bluetooth event listener.
+     * @param event The event the listener was registered for
+     * @param listener The function originally passed to `on`
+     */
+    function off(event: "connected" | "disconnected" | "powerChanged" | "discovered", listener: (arg: HSBluetoothDevice | HSBluetoothPeripheral | boolean) => void): void;
+
+    /**
+     * Register a listener that fires at most once for a Bluetooth event.
+     * @param event The event to listen for
+     * @param listener Called the next time the event occurs, then automatically removed
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function once(event: "connected" | "disconnected" | "powerChanged" | "discovered", listener: (arg: HSBluetoothDevice | HSBluetoothPeripheral | boolean) => void): void;
+
+    /**
+     * Whether the Mac's Bluetooth is turned on.
+     */
+    const powered: boolean;
+
+    /**
+     * Whether a BLE scan started by `scan()` is running.
+     */
+    const isScanning: boolean;
+
+    /**
+     * Whether a search for classic devices started by `inquiry()` is running.
+     */
+    const isInquiring: boolean;
+
+}
+
+/**
+ * A Bluetooth device macOS knows: one paired with this Mac, or one found by `hs.bluetooth.inquiry()`.
+Obtain devices from the ``hs.bluetooth`` module; do not instantiate them directly. A device is
+identified by its `address`, and the same device is returned as the same object for as long as
+you hold on to it.
+Bluetooth Low Energy (BLE) peripherals found by `hs.bluetooth.scan()` are `HSBluetoothPeripheral`
+objects instead. A paired device that also speaks BLE can give you its peripheral with
+`lowEnergyPeripheral()`, e.g. to read its GATT characteristics.
+## Battery levels
+```javascript
+hs.bluetooth.connectedDevices().forEach(d => {
+    if (d.batteryLevel !== null) console.log(d.name + ": " + d.batteryLevel + "%")
+})
+```
+ */
+declare class HSBluetoothDevice {
+    /**
+     * Connects the device to the Mac, the same way macOS would, e.g. so headphones become available as an audio device.
+     * @returns A Promise resolving to this device once it's connected, or rejecting if the connection fails or takes longer than 20 seconds
+     */
+    connect(): Promise<HSBluetoothDevice>;
+
+    /**
+     * Disconnects the device from the Mac. This ends macOS's own connection, not just Hammerspoon's, as if you had disconnected it in System Settings.
+     * @returns A Promise resolving to this device once it's disconnected
+     */
+    disconnect(): Promise<HSBluetoothDevice>;
+
+    /**
+     * Reads the current signal strength of a connected device.
+     * @returns A Promise resolving to the signal strength in dBm, or rejecting if the device isn't connected
+     */
+    readRSSI(): Promise<number>;
+
+    /**
+     * Finds the BLE peripheral of a connected device that also speaks Bluetooth Low Energy, such as a Magic Keyboard or a heart-rate strap, so you can use its GATT services.
+macOS doesn't link a paired device to its BLE side, so this looks for the BLE peripheral connected to the Mac with the same name. It rejects rather than guess if several have that name, and resolves to `null` if none does (e.g. the device doesn't use BLE, or it was renamed after pairing). The peripheral still needs `connect()` before its GATT methods can be used.
+     * @returns A Promise resolving to the device's peripheral, or `null` if it has none. Rejects if the device isn't connected, several peripherals match, or Bluetooth is unavailable
+     */
+    lowEnergyPeripheral(): Promise<HSBluetoothPeripheral | null>;
+
+    /**
+     * Register a listener for this device's events.
+Listeners for `"connected"` and `"disconnected"` are called with no arguments whenever macOS connects or disconnects the device. A device with listeners keeps working after you drop your reference to it.
+     * @param event The event to listen for
+     * @param listener Called when the event occurs
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    on(event: "connected" | "disconnected", listener: () => void): void;
+
+    /**
+     * Remove a previously registered listener for this device's events.
+     * @param event The event the listener was registered for
+     * @param listener The function originally passed to `on`
+     */
+    off(event: "connected" | "disconnected", listener: (...args: any[]) => any): void;
+
+    /**
+     * Register a listener that fires at most once for one of this device's events.
+     * @param event The event to listen for
+     * @param listener Called once, then automatically removed
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    once(event: "connected" | "disconnected", listener: () => void): void;
+
+    /**
+     * Returns a plain object describing this device, for JSON serialisation
+`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     * @returns An object with the device's `name`, `address`, `isPaired`, `isConnected`, `rssi`, `batteryLevel`, `batteryLevels`, `majorClass` and `minorClass`
+     */
+    toJSON(): Record<string, any>;
+
+    /**
+     * The type name for JavaScript introspection. Always `"HSBluetoothDevice"`.
+     */
+    readonly typeName: string;
+
+    /**
+     * The device's name, or `null` if it hasn't reported one.
+     */
+    readonly name: string | null;
+
+    /**
+     * The device's Bluetooth address, in the form `xx-xx-xx-xx-xx-xx`.
+     */
+    readonly address: string;
+
+    /**
+     * Whether the device is paired with this Mac.
+     */
+    readonly isPaired: boolean;
+
+    /**
+     * Whether macOS currently has the device connected.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * Whether the device is marked as a favorite in macOS.
+     */
+    readonly isFavorite: boolean;
+
+    /**
+     * The device's raw Bluetooth Class of Device value.
+     */
+    readonly classOfDevice: number;
+
+    /**
+     * The major device class, e.g. `4` for audio devices or `5` for peripherals such as keyboards and mice.
+     */
+    readonly majorClass: number;
+
+    /**
+     * The minor device class, whose meaning depends on `majorClass`.
+     */
+    readonly minorClass: number;
+
+    /**
+     * The major service classes the device advertises, as a bitmask.
+     */
+    readonly serviceClasses: number;
+
+    /**
+     * The names of the device's classic Bluetooth (SDP) services, e.g. `["Audio Sink", "AVRCP Controller"]`.
+     */
+    readonly serviceNames: string[];
+
+    /**
+     * The signal strength in dBm that macOS last measured for the device, or `null` if there is none. Call `readRSSI()` for a fresh reading from a connected device.
+     */
+    readonly rssi: number | null;
+
+    /**
+     * When the device was last used or found by an inquiry, in Unix seconds, or `null` if unknown.
+     */
+    readonly lastSeen: number | null;
+
+    /**
+     * The device's battery level as a percentage, or `null` if macOS doesn't know it.
+This is what macOS itself reports: for Apple's Magic accessories from the system, and for AirPods and Beats from what macOS last heard from them. For earbuds it is the lower of the two buds; see `batteryLevels` for each one. For a device that reports its battery over BLE instead, read it with `lowEnergyPeripheral()` and `readBatteryLevel()`.
+     */
+    readonly batteryLevel: number | null;
+
+    /**
+     * The individual battery levels of a device with several batteries, such as earbuds and their case, or `null` if it has only one (or none is known).
+The object has any of `left`, `right` and `case`, each a percentage.
+     */
+    readonly batteryLevels: Record<string, number> | null;
+
+}
+
+/**
+ * A Bluetooth Low Energy (BLE) peripheral, found by `hs.bluetooth.scan()` or through a paired device's `lowEnergyPeripheral()`.
+Obtain peripherals from the ``hs.bluetooth`` module; do not instantiate them directly. A
+peripheral is identified by its `identifier`, and the same peripheral is returned as the same
+object for as long as you hold on to it.
+Call `connect()` before using its GATT services. A connected peripheral stays connected, and
+keeps delivering its events, until you call `disconnect()`, even if you drop your reference to it.
+```javascript
+const [sensor] = await hs.bluetooth.scan({ seconds: 5, services: ["181A"] })
+await sensor.connect()
+const bytes = await sensor.readValue("181A", "2A6E")
+sensor.on("value", (service, characteristic, value) => console.log(characteristic + ": " + value))
+await sensor.subscribe("181A", "2A6E")
+```
+ */
+declare class HSBluetoothPeripheral {
+    /**
+     * Reads the peripheral's battery level from its standard GATT Battery service. The peripheral must be connected.
+     * @returns A Promise resolving to the battery percentage, or `null` if the peripheral has no Battery service
+     */
+    readBatteryLevel(): Promise<number | null>;
+
+    /**
+     * Connects Hammerspoon to the peripheral, so its GATT services can be used. It stays connected until `disconnect()` is called, even if you drop your reference to it.
+     * @returns A Promise resolving to this peripheral once it's connected, or rejecting if the connection fails or takes longer than 20 seconds
+     */
+    connect(): Promise<HSBluetoothPeripheral>;
+
+    /**
+     * Disconnects Hammerspoon from the peripheral. If macOS has its own connection to it (e.g. a paired keyboard), that connection stays.
+     * @returns A Promise resolving to this peripheral once it's disconnected
+     */
+    disconnect(): Promise<HSBluetoothPeripheral>;
+
+    /**
+     * Reads the current signal strength of a connected peripheral.
+     * @returns A Promise resolving to the signal strength in dBm, or rejecting if the peripheral isn't connected
+     */
+    readRSSI(): Promise<number>;
+
+    /**
+     * Discovers the GATT services of a connected peripheral.
+     * @returns A Promise resolving to the UUIDs of the peripheral's services, e.g. `["180A", "180F"]`
+     */
+    discoverServices(): Promise<string[]>;
+
+    /**
+     * Discovers the characteristics of one of a connected peripheral's GATT services.
+     * @param service The service UUID: 16-bit (`"180F"`), 32-bit, or 128-bit
+     * @returns A Promise resolving to the service's characteristics. `properties` lists what each supports: `"read"`, `"write"`, `"writeWithoutResponse"`, `"notify"`, `"indicate"`, `"broadcast"`, `"authenticatedSignedWrites"` and `"extendedProperties"`
+     */
+    discoverCharacteristics(service: string): Promise<{uuid: string, properties: string[], isNotifying: boolean}[]>;
+
+    /**
+     * Reads the value of a GATT characteristic of a connected peripheral. The service and characteristic are discovered first if needed.
+     * @param service The service UUID, e.g. `"180F"`
+     * @param characteristic The characteristic UUID, e.g. `"2A19"`
+     * @returns A Promise resolving to the characteristic's value
+     */
+    readValue(service: string, characteristic: string): Promise<Uint8Array>;
+
+    /**
+     * Writes the value of a GATT characteristic of a connected peripheral. Writes to one characteristic are sent in the order they're made.
+     * @param service The service UUID
+     * @param characteristic The characteristic UUID
+     * @param value The bytes to write. A string is written as UTF-8
+     * @param options With `withoutResponse: true`, write without asking the peripheral to confirm it, which is faster but can't tell whether it arrived. Defaults to `false`
+     * @returns A Promise resolving once the peripheral has accepted the write (or, without a response, once it has been sent)
+     */
+    writeValue(service: string, characteristic: string, value: Uint8Array | ArrayBuffer | number[] | string, options?: {withoutResponse?: boolean}): Promise<void>;
+
+    /**
+     * Subscribes to a GATT characteristic of a connected peripheral, so each new value is delivered as a `"value"` event (see `on()`).
+     * @param service The service UUID
+     * @param characteristic The characteristic UUID, which must support `"notify"` or `"indicate"`
+     * @returns A Promise resolving once the peripheral has started sending values
+     */
+    subscribe(service: string, characteristic: string): Promise<void>;
+
+    /**
+     * Stops a subscription started by `subscribe()`.
+     * @param service The service UUID
+     * @param characteristic The characteristic UUID
+     * @returns A Promise resolving once the peripheral has stopped sending values
+     */
+    unsubscribe(service: string, characteristic: string): Promise<void>;
+
+    /**
+     * Register a listener for this peripheral's events.
+A peripheral with listeners keeps working after you drop your reference to it.
+     * @param event The event to listen for
+     * @param listener Called when the event occurs
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    on(event: "connected" | "disconnected" | "value", listener: (service?: string, characteristic?: string, value?: Uint8Array) => void): void;
+
+    /**
+     * Remove a previously registered listener for this peripheral's events.
+     * @param event The event the listener was registered for
+     * @param listener The function originally passed to `on`
+     */
+    off(event: "connected" | "disconnected" | "value", listener: (...args: any[]) => any): void;
+
+    /**
+     * Register a listener that fires at most once for one of this peripheral's events.
+     * @param event The event to listen for
+     * @param listener Called once, then automatically removed
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    once(event: "connected" | "disconnected" | "value", listener: (service?: string, characteristic?: string, value?: Uint8Array) => void): void;
+
+    /**
+     * Returns a plain object describing this peripheral, for JSON serialisation
+`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     * @returns An object with the peripheral's `identifier`, `name`, `isConnected`, `rssi`, `lastSeen` and `batteryLevel`
+     */
+    toJSON(): Record<string, any>;
+
+    /**
+     * The type name for JavaScript introspection. Always `"HSBluetoothPeripheral"`.
+     */
+    readonly typeName: string;
+
+    /**
+     * The peripheral's identifier, a UUID that macOS assigns in place of its Bluetooth address, which it doesn't reveal. It is stable on this Mac, but differs between Macs.
+     */
+    readonly identifier: string;
+
+    /**
+     * The peripheral's name, or `null` if it hasn't reported one.
+     */
+    readonly name: string | null;
+
+    /**
+     * Whether Hammerspoon is connected to the peripheral.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * The last known signal strength in dBm, or `null` if there is none. It is updated by `hs.bluetooth.scan()` and `readRSSI()`.
+     */
+    readonly rssi: number | null;
+
+    /**
+     * When the peripheral was last seen, in Unix seconds: in a scan, or while connected. `null` if unknown.
+     */
+    readonly lastSeen: number | null;
+
+    /**
+     * The peripheral's last advertisement, if a scan has seen one, otherwise `null`.
+The object has `localName` (string or `null`), `isConnectable` (boolean or `null`), `txPower` (number or `null`), `serviceUUIDs` (string[]), `manufacturerData` (Uint8Array or `null`) and `serviceData` (an object mapping service UUIDs to Uint8Array).
+     */
+    readonly advertisement: Record<string, any> | null;
+
+    /**
+     * The battery level last read by `readBatteryLevel()`, as a percentage, or `null` if it hasn't been read.
+     */
+    readonly batteryLevel: number | null;
+
+}
+
+/**
  * Discover and publish Bonjour (mDNS / Zeroconf) network services.
 Use `createSearch()` to search the network for services advertised by other
 devices, and `advertise()` to advertise your own. The `networkServices()`
@@ -2421,15 +2824,22 @@ strings) so scripts can do arithmetic on them, matching v1 behavior.
 
     /**
      * Set the window's Spaces/Exposé collection behavior to a combination of named behaviors
+Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
+`canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
+Unknown names are logged and ignored.
      * @param names Behavior names from `hs.canvas.windowBehaviors`, combined together
      * @returns Self for chaining
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
     behaviorList(names: string[]): HSCanvas;
 
     /**
      * Set the window's Spaces/Exposé collection behavior to a raw bitmask
+Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
+`canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
      * @param value A raw `NSWindow.CollectionBehavior` bitmask
      * @returns Self for chaining
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
     behaviorValue(value: number): HSCanvas;
 
@@ -2736,16 +3146,25 @@ Create via `hs.chooser.create()`. Configure choices, set callbacks, then call `.
 ## Choice format
 Each choice is a plain object with required `text` and optional `subText`, `image`, `valid`,
 and `contextMenu` fields. All other fields are passed through to the `onSelect` callback unchanged.
-The `contextMenu` array defines per-row right-click menu entries. Each entry is either
+Set `contextMenu: false` on a choice to show no context menu on its row.
 ```javascript
 {
   text: "Open Safari", subText: "com.apple.Safari",
-  image: HSImage.fromAppBundle("com.apple.Safari"), valid: true, myData: 42,
-  contextMenu: [
-    { title: "Open", action: () => hs.urlevent.openURL("https://apple.com") },
-    { type: "divider" },
-    { title: "Copy bundle ID", action: () => hs.pasteboard.writeString("com.apple.Safari") }
-  ]
+  image: HSImage.fromAppBundle("com.apple.Safari"), valid: true, myData: 42
+}
+```
+## Context menu
+A single right-click menu, set with `contextMenu`, is shared by every row (except choices with
+`contextMenu: false`). When the user picks one of its entries, `onContextMenuSelect` is called
+with the row's choice and the menu entry.
+```javascript
+chooser.contextMenu = [
+  { title: "Open", id: "open" },
+  { type: "divider" },
+  { title: "Copy bundle ID", id: "copy" }
+]
+chooser.onContextMenuSelect = (choice, menuItem) => {
+  if (menuItem.id === "copy") hs.pasteboard.writeString(choice.subText)
 }
 ```
 ## Keyboard shortcuts
@@ -2955,6 +3374,23 @@ The chooser stays open; the argument is the row dict (same shape as `onSelect`).
 If unset, activating an invalid row is silently ignored.
      */
     onInvalid: ((item: Record<string, any>) => void) | null;
+
+    /**
+     * The right-click menu shown for every row (default: `[]`, no menu).
+Each entry is either `{ title: "..." }` for a menu item, or `{ type: "divider" }` for a
+separator. Any other fields on an entry (e.g. an `id`) are passed back to
+`onContextMenuSelect` unchanged, so one handler can tell the entries apart.
+Rows whose choice has `contextMenu: false` show no menu, e.g. for a "Clear history" row.
+     */
+    contextMenu: Array<Record<string, any>>;
+
+    /**
+     * Called when the user picks an entry from the `contextMenu`, or null to remove the handler.
+`choice` is the row that was right-clicked (same shape as `onSelect`'s argument) and
+`menuItem` is the `contextMenu` entry that was picked, with any custom fields intact.
+The chooser stays open.
+     */
+    onContextMenuSelect: ((choice: Record<string, any>, menuItem: Record<string, any>) => void) | null;
 
 }
 
@@ -5798,6 +6234,11 @@ if you only want to temporarily remove the item without freeing it.
      */
     title: string | null;
 
+    /**
+     * Get or set the colour of the menu item's title text, or null to use the menu bar's standard text colour.
+     */
+    titleColor: HSColor | null;
+
 }
 
 /**
@@ -6053,6 +6494,141 @@ has the keyboard focus, the visible system cursor may differ.
      * @returns A string such as `"arrow"`, `"iBeam"`, `"crosshair"`, `"pointingHand"`,
      */
     function currentCursorType(): string;
+
+}
+
+/**
+ * Connect to MQTT brokers to publish messages and subscribe to topics.
+MQTT is a lightweight publish/subscribe protocol, widely used for home automation (e.g. Home
+Assistant, Zigbee2MQTT, Tasmota) and IoT devices. Create a client with `create()`, then
+`connect()` it, and listen for messages with its `on()` method.
+Both MQTT 3.1.1 and MQTT 5 brokers are supported, over plain TCP, TLS, and WebSockets.
+**Note:** this module is new and has not yet been well tested. It has only been tested against a
+simple MQTT 3.1.1 test broker, not against real brokers, MQTT 5, TLS or WebSockets. Please report
+any problems you find.
+ */
+declare namespace hs.mqtt {
+    /**
+     * Creates an MQTT client. The client doesn't connect until you call its `connect()` method.
+`mqtt://` (TCP, port 1883), `mqtts://` (TLS, port 8883), `ws://` (WebSocket, port 80) or
+`wss://` (WebSocket over TLS, port 443). A URL may include a port, a username and password
+(`mqtt://user:pass@host`), and for WebSockets a path (defaults to `/mqtt`).
+     * @param server The broker's host name or URL
+     * @param options Connection options
+     * @returns A new `HSMQTTClient`, or `null` if the server or options are invalid (the reason is logged to the Console)
+     */
+    function create(server: string, options?: {port?: number, clientID?: string, username?: string, password?: string, tls?: boolean, websocket?: boolean, websocketPath?: string, version?: "3.1.1" | "5", keepAlive?: number, connectTimeout?: number, timeout?: number, cleanSession?: boolean, will?: {topic: string, payload?: string, qos?: 0 | 1 | 2, retain?: boolean}, reconnectInterval?: number, caCertificate?: string, clientCertificate?: string, clientCertificatePassword?: string, allowUntrustedCertificates?: boolean}): HSMQTTClient | null;
+
+}
+
+/**
+ * A connection to an MQTT broker, created by `hs.mqtt.create()`.
+The client does nothing until you call `connect()`. Messages for the topics you `subscribe()`
+to arrive as `"message"` events (see `on()`).
+A connected client keeps working after you drop your reference to it, until you call
+`disconnect()` or `destroy()`, or Hammerspoon reloads its configuration. So does a client
+with listeners registered by `on()`.
+ */
+declare class HSMQTTClient {
+    /**
+     * Connects to the broker.
+     * @returns A Promise resolving once the broker has accepted the connection, to `true` if the broker resumed a previous session for this client (see the `cleanSession` option), or `false` if it started a new one
+     */
+    connect(): Promise<boolean>;
+
+    /**
+     * Disconnects from the broker. This also stops a client that is reconnecting from trying again.
+     * @returns A Promise resolving once the client has disconnected
+     */
+    disconnect(): Promise<void>;
+
+    /**
+     * Publishes a message.
+     * @param topic The topic to publish to
+     * @param payload The message, sent as UTF-8. Use `JSON.stringify()` to send an object
+     * @param options The QoS level to send the message with (default `0`), and whether the broker should keep it as the topic's retained message (default `false`)
+     * @returns A Promise resolving once the message has been sent (QoS 0) or the broker has acknowledged it (QoS 1 and 2)
+     */
+    publish(topic: string, payload: string, options?: {qos?: 0 | 1 | 2, retain?: boolean}): Promise<void>;
+
+    /**
+     * Subscribes to a topic filter, so messages published to matching topics arrive as `"message"` events.
+     * @param topicFilter The topic, which may contain the wildcards `+` (one level) and `#` (all remaining levels)
+     * @param qos The highest QoS level to receive messages with. Defaults to `0`
+     * @returns A Promise resolving to the QoS level the broker granted, which may be lower than requested. It rejects if the broker refuses the subscription
+     */
+    subscribe(topicFilter: string, qos?: 0 | 1 | 2): Promise<number>;
+
+    /**
+     * Unsubscribes from a topic filter.
+     * @param topicFilter The topic filter originally passed to `subscribe()`
+     * @returns A Promise resolving once the broker has acknowledged the request
+     */
+    unsubscribe(topicFilter: string): Promise<void>;
+
+    /**
+     * Register a listener for this client's events.
+A client with listeners stays alive until you remove them or call `destroy()`.
+     * @param event The event to listen for
+     * @param listener Called when the event occurs
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    on(event: "connected" | "disconnected" | "message", listener: (arg?: string | null | {topic: string, payload: string, bytes: Uint8Array, qos: number, retain: boolean, duplicate: boolean}) => void): void;
+
+    /**
+     * Remove a previously registered listener for this client's events.
+     * @param event The event the listener was registered for
+     * @param listener The function originally passed to `on`
+     */
+    off(event: "connected" | "disconnected" | "message", listener: (...args: any[]) => any): void;
+
+    /**
+     * Register a listener that fires at most once for one of this client's events.
+     * @param event The event to listen for
+     * @param listener Called once, then automatically removed
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    once(event: "connected" | "disconnected" | "message", listener: (arg?: string | null | {topic: string, payload: string, bytes: Uint8Array, qos: number, retain: boolean, duplicate: boolean}) => void): void;
+
+    /**
+     * Disconnects from the broker, removes all listeners and releases the client. It can't be used again afterwards. Called automatically when Hammerspoon reloads its configuration.
+     */
+    destroy(): void;
+
+    /**
+     * The unique identifier of this client object.
+     */
+    readonly identifier: string;
+
+    /**
+     * The MQTT client identifier sent to the broker. Unless you chose one with the `clientID` option, it is `"hammerspoon-"` followed by eight random characters.
+     */
+    readonly clientID: string;
+
+    /**
+     * The host name of the broker.
+     */
+    readonly host: string;
+
+    /**
+     * The port of the broker.
+     */
+    readonly port: number;
+
+    /**
+     * The client's connection state: `"disconnected"`, `"connecting"`, `"connected"`, `"reconnecting"` (the connection was lost and the client is trying to restore it, see the `reconnectInterval` option) or `"disconnecting"`.
+     */
+    readonly state: string;
+
+    /**
+     * Whether the client is connected to the broker.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * The topic filters this client has subscribed to, and the QoS level requested for each. These are restored automatically when the client reconnects.
+     */
+    readonly subscriptions: Record<string, number>;
 
 }
 
@@ -7160,6 +7736,18 @@ per-keyboard basis.
      */
     function requestInputMonitoring(): void;
 
+    /**
+     * Check if the app has Bluetooth permission, which `hs.bluetooth` needs.
+     * @returns true if permission is granted, false otherwise
+     */
+    function checkBluetooth(): boolean;
+
+    /**
+     * Request Bluetooth permission (shows the system dialog if the user has not yet decided)
+     * @returns A Promise that resolves to true if granted, false if denied
+     */
+    function requestBluetooth(): Promise<boolean>;
+
 }
 
 /**
@@ -8028,6 +8616,469 @@ the foreground and navigate directly to the named shortcut.
 }
 
 /**
+ * Module for communicating over raw TCP, UDP and Unix domain sockets.
+`hs.socket.create()` makes a stream socket, which can connect to a TCP server or Unix domain
+socket (optionally over TLS), or listen for incoming connections. `hs.socket.createUDP()`
+makes a UDP socket, which can send and receive datagrams, including broadcasts.
+Sockets report everything through a single callback, set with `setCallback()`. Received data
+is delivered as a `Uint8Array`; `hs.socket.decodeText()` turns it into a string.
+## TCP client
+```js
+hs.socket.create().setCallback((event, sock, data) => {
+    if (event === "connected") sock.write("GET / HTTP/1.0\r\nHost: example.com\r\n\r\n").readUntil("\r\n\r\n")
+    if (event === "data") console.log(hs.socket.decodeText(data))
+    if (event === "error") console.error(data)
+}).connect("example.com", 80)
+```
+## TCP server
+Each connection a listening socket accepts arrives as a new socket, with the same callback.
+```js
+const server = hs.socket.create().setCallback((event, sock, data) => {
+    if (event === "connection") data.readUntil("\n")
+    if (event === "data") sock.write("You said: " + hs.socket.decodeText(data)).readUntil("\n")
+}).listen(9000)
+```
+## UDP
+```js
+const udp = hs.socket.createUDP().setCallback((event, sock, data, address) => {
+    if (event === "data") console.log(address.host + ": " + hs.socket.decodeText(data))
+}).bind(9999).receive()
+udp.send("hello", "127.0.0.1", 9999)
+```
+ */
+declare namespace hs.socket {
+    /**
+     * Creates a TCP or Unix domain stream socket. It does nothing until you connect it or make
+it listen.
+     * @returns A new `HSSocket`.
+     */
+    function create(): HSSocket;
+
+    /**
+     * Creates a UDP socket.
+     * @returns A new `HSUDPSocket`.
+     */
+    function createUDP(): HSUDPSocket;
+
+    /**
+     * Decodes bytes as UTF-8 text.
+Data from `readBytes()` or `readAvailable()` can end part-way through a multi-byte
+character, whose remaining bytes arrive in the next read. Such bytes aren't valid UTF-8 on
+their own, so join the reads' bytes before decoding them, or use `readUntil()` with a
+delimiter, whose data always ends with a complete character.
+     * @param bytes The bytes to decode, e.g. the data from a `"data"` event.
+     * @param lossy `true` to replace invalid or incomplete UTF-8 with the replacement character (U+FFFD) instead of returning `null`. Defaults to `false`.
+     * @returns The text, or `null` if the bytes aren't valid UTF-8 (including when they end part-way through a character) and `lossy` isn't `true`.
+     */
+    function decodeText(bytes: Uint8Array | ArrayBuffer, lossy?: boolean): string | null;
+
+    /**
+     * The connect timeout, in seconds, that new stream sockets start with (see
+`HSSocket.connectTimeout`). 0 means no timeout, which is the default.
+     */
+    let connectTimeout: number;
+
+    /**
+     * The read timeout, in seconds, that new stream sockets start with (see
+`HSSocket.readTimeout`). 0 means no timeout, which is the default.
+     */
+    let readTimeout: number;
+
+}
+
+/**
+ * A TCP or Unix domain stream socket, created by `hs.socket.create()`.
+A socket can either connect to a server (`connect()`/`connectUnix()`) or listen for incoming
+connections (`listen()`/`listenUnix()`). Each connection a listening socket accepts is handed
+to its callback as a new `HSSocket`, which inherits the listening socket's callback.
+Reading is request-driven: queue a read with `readUntil()`, `readBytes()` or
+`readAvailable()`, and the callback receives a `"data"` event once that read can be
+satisfied. Data that arrives before you ask for it is buffered. Reads can be queued before
+the socket connects, and each one carries an optional numeric tag that is passed back to the
+callback, so a single callback can tell a protocol's reads apart (e.g. a header and a body).
+Received data is delivered as a `Uint8Array`. Use `hs.socket.decodeText()` to turn it into a
+string.
+Do not instantiate `HSSocket` directly - use `hs.socket.create()`.
+ */
+declare class HSSocket {
+    /**
+     * Sets the callback that receives this socket's events.
+`HSSocket`, which has the same callback. Queue a read on it to start receiving.
+read's tag.
+connection, a `"disconnected"` event follows.
+reason, including calling `disconnect()`. Data received that no read had asked for yet
+is discarded.
+An `"error"` event on its own never changes the socket's state: errors such as calling
+`connect()` on a socket that is already connecting, or writing to an idle socket, leave it
+as it was. Every connection that ends, and every listening socket that stops, gets a
+`"disconnected"` event, after the `"error"` that caused it, if any. So reconnecting belongs
+in the `"disconnected"` handler, not the `"error"` one.
+When the peer closes the connection, data already received for the first queued read is
+delivered to it in a last `"data"` event, before `"disconnected"`, even though the read
+isn't satisfied: it may be missing its delimiter, or be shorter than asked for. This is
+how to receive the end of a stream that the peer ends by closing, such as an HTTP/1.0
+response body.
+     * @param callback The event handler, or `null` to remove it.
+     * @returns The socket, for chaining.
+     */
+    setCallback(callback: ((event: "connected" | "listening" | "connection" | "data" | "error" | "disconnected", socket: HSSocket, data?: Uint8Array | HSSocket | string, tag?: number) => void) | null): HSSocket;
+
+    /**
+     * Connects to a TCP server. The callback receives `"connected"` once the connection is
+ready, or `"error"` if it fails.
+     * @remarks A connected socket, and its callback, stay alive until it disconnects, even if you don't keep a reference to it
+     * @param host The host name or IP address to connect to.
+     * @param port The TCP port to connect to.
+     * @returns The socket, for chaining.
+     */
+    connect(host: string, port: number): HSSocket;
+
+    /**
+     * Connects to a Unix domain socket. The callback receives `"connected"` once the connection
+is ready, or `"error"` if it fails.
+     * @remarks A connected socket, and its callback, stay alive until it disconnects, even if you don't keep a reference to it
+     * @param path The path of the Unix domain socket.
+     * @returns The socket, for chaining.
+     */
+    connectUnix(path: string): HSSocket;
+
+    /**
+     * Listens for incoming TCP connections. The callback receives `"listening"` once the socket
+is ready, then `"connection"` for each client that connects.
+By default the socket listens on all network interfaces. Pass one of this Mac's IP
+addresses to accept connections only on that address (and so only on the interface that
+has it), e.g. `"127.0.0.1"` to accept connections only from this Mac. Use
+`hs.network.addresses()` to find an interface's addresses.
+If the interface's address can change (e.g. it comes from DHCP), watch
+`State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and listen again
+when it does.
+     * @remarks A listening socket, and its callback, stay alive until it stops listening, even if you don't keep a reference to it
+     * @param port The TCP port to listen on, or 0 to let the system choose one (see `localPort`).
+     * @param address A local IPv4 or IPv6 address to listen on. Defaults to all addresses.
+     * @returns The socket, for chaining.
+     */
+    listen(port: number, address?: string | null): HSSocket;
+
+    /**
+     * Listens for incoming connections on a Unix domain socket. A stale socket file left at
+`path` is replaced, and the file is removed when the socket stops listening.
+     * @remarks A listening socket, and its callback, stay alive until it stops listening, even if you don't keep a reference to it
+     * @param path The path to create the Unix domain socket at.
+     * @returns The socket, for chaining.
+     */
+    listenUnix(path: string): HSSocket;
+
+    /**
+     * Makes the next `connect()` use TLS. The server's certificate is checked against the
+system's trusted certificates and against `peerName`, or the host passed to `connect()`.
+     * @param peerName The name the server's certificate must match, if it differs from the host you connect to.
+     * @param allowUntrusted `true` to accept any certificate, e.g. a self-signed one. This makes the connection vulnerable to interception, so only use it for testing.
+     * @returns The socket, for chaining.
+     */
+    enableTLS(peerName?: string | null, allowUntrusted?: boolean): HSSocket;
+
+    /**
+     * Makes the next `listen()` use TLS, presenting the certificate and private key stored in a
+PKCS#12 (`.p12`) file. If the file can't be loaded, `listen()` reports an error instead of
+listening without encryption.
+A PKCS#12 file can be exported from Keychain Access, or made from a certificate and key
+with `openssl pkcs12 -export -in cert.pem -inkey key.pem -out server.p12`.
+     * @remarks TLS isn't supported on Unix domain sockets, so `listenUnix()` reports an error if this has been called
+     * @param path The path to the PKCS#12 file.
+     * @param passphrase The passphrase protecting the file. Defaults to an empty passphrase.
+     * @returns The socket, for chaining.
+     */
+    enableServerTLS(path: string, passphrase?: string | null): HSSocket;
+
+    /**
+     * Makes the next `listen()` use TLS, presenting a certificate and private key (an identity)
+from the keychain. The identity is found by its certificate's name, as Keychain Access
+shows it (usually the certificate's common name). If no identity has that name, `listen()`
+reports an error instead of listening without encryption.
+     * @remarks macOS may ask for permission to use the private key the first time a client connects TLS isn't supported on Unix domain sockets, so `listenUnix()` reports an error if this has been called
+     * @param name The name of the certificate, e.g. `"myhost.local"`.
+     * @returns The socket, for chaining.
+     */
+    enableServerTLSFromKeychain(name: string): HSSocket;
+
+    /**
+     * Queues a read that completes once `delimiter` arrives. The callback receives the data up
+to and including the delimiter.
+     * @param delimiter The text that ends the read, e.g. `"\n"`. It is matched as UTF-8 bytes.
+     * @param tag A number passed back to the callback with the data. Defaults to 0.
+     * @returns The socket, for chaining.
+     */
+    readUntil(delimiter: string, tag?: number): HSSocket;
+
+    /**
+     * Queues a read that completes once exactly `length` bytes have arrived.
+     * @param length The number of bytes to read.
+     * @param tag A number passed back to the callback with the data. Defaults to 0.
+     * @returns The socket, for chaining.
+     */
+    readBytes(length: number, tag?: number): HSSocket;
+
+    /**
+     * Queues a read that completes with whatever data is available, as soon as there is any.
+     * @param tag A number passed back to the callback with the data. Defaults to 0.
+     * @returns The socket, for chaining.
+     */
+    readAvailable(tag?: number): HSSocket;
+
+    /**
+     * Sends text over the connection, encoded as UTF-8. Writes are sent in order, and can be
+made before the connection is ready.
+     * @param text The text to send.
+     * @returns The socket, for chaining.
+     */
+    write(text: string): HSSocket;
+
+    /**
+     * Sends raw bytes over the connection.
+     * @param bytes The bytes to send. Any typed array is accepted.
+     * @returns The socket, for chaining.
+     */
+    writeBytes(bytes: Uint8Array | ArrayBuffer): HSSocket;
+
+    /**
+     * Closes the connection after sending any data already written, or stops listening. A
+listening socket also disconnects every client it accepted. Queued reads, and data received
+that no read has asked for yet, are discarded.
+The socket can be connected or listen again afterwards.
+     * @remarks The callback receives `"disconnected"` (for this socket, and for each client of a listening socket) before `disconnect()` returns, so update any state the handler relies on before calling it
+     * @returns The socket, for chaining.
+     */
+    disconnect(): HSSocket;
+
+    /**
+     * Disconnects the socket and releases its callback. Unlike `disconnect()`, the callback isn't
+called.
+     */
+    destroy(): void;
+
+    /**
+     * A unique identifier for this socket (UUID string).
+     */
+    readonly identifier: string;
+
+    /**
+     * Whether the socket is currently connected to a peer.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * What the socket is doing.
+     */
+    readonly state: "idle" | "connecting" | "connected" | "listening";
+
+    /**
+     * Whether the socket is currently listening for incoming connections.
+     */
+    readonly isListening: boolean;
+
+    /**
+     * Whether the socket's connection is encrypted with TLS.
+     */
+    readonly isSecure: boolean;
+
+    /**
+     * The host of the connected peer, or `null` if the socket isn't connected over TCP.
+     */
+    readonly remoteHost: string | null;
+
+    /**
+     * The port of the connected peer, or 0 if the socket isn't connected over TCP.
+     */
+    readonly remotePort: number;
+
+    /**
+     * The local address of the connection, or `null` if the socket isn't connected over TCP.
+     */
+    readonly localHost: string | null;
+
+    /**
+     * The local port of the connection, or the port a listening socket is listening on. 0 if
+neither applies, including while a listener is still starting up.
+     */
+    readonly localPort: number;
+
+    /**
+     * The path of the Unix domain socket this socket is connected to or listening on, or
+`null` if it isn't using a Unix domain socket.
+     */
+    readonly unixPath: string | null;
+
+    /**
+     * The connections a listening socket has accepted that are still connected.
+     */
+    readonly clients: HSSocket[];
+
+    /**
+     * How long, in seconds, connecting may take, including any TLS handshake. When it expires,
+the callback receives an `"error"` event and the socket disconnects. 0 (or any negative
+number) means no timeout. Defaults to `hs.socket.connectTimeout`.
+     */
+    connectTimeout: number;
+
+    /**
+     * How long, in seconds, a queued read may wait with no data arriving. The timer runs only
+while a read is queued, and restarts whenever data arrives, so a slow but steady transfer
+doesn't time out, and nor does a connection that's quiet while no read is queued. When it
+expires, the callback receives an `"error"` event and the socket disconnects. 0 (or any
+negative number) means no timeout. Defaults to `hs.socket.readTimeout`.
+     * @remarks Protocols where the peer can stay quiet for a long time while a read is queued (e.g. waiting for the next line of a notification stream) usually want no read timeout
+     */
+    readTimeout: number;
+
+}
+
+/**
+ * A UDP socket, created by `hs.socket.createUDP()`.
+A UDP socket can send datagrams to any host, or be connected to a single peer, and can
+receive datagrams once it has a local port: either one chosen with `bind()`, or one the system
+assigns when it first connects or sends.
+IPv4 and IPv6 are both supported, using a separate system socket for each.
+Do not instantiate `HSUDPSocket` directly - use `hs.socket.createUDP()`.
+ */
+declare class HSUDPSocket {
+    /**
+     * Sets the callback that receives this socket's events.
+sender's address, as `{host, port, family}`, where family is `"ipv4"` or `"ipv6"`.
+     * @param callback The event handler, or `null` to remove it.
+     * @returns The socket, for chaining.
+     */
+    setCallback(callback: ((event: "data" | "connected" | "error", socket: HSUDPSocket, data?: Uint8Array | string | null, address?: {host: string, port: number, family: string}) => void) | null): HSUDPSocket;
+
+    /**
+     * Binds the socket to a local port, so it can receive datagrams sent to that port. Call it
+before `connect()` or sending.
+By default the socket binds on all network interfaces. Pass one of this Mac's IP addresses
+to bind only to that address (and so only to the interface that has it). Use
+`hs.network.addresses()` to find an interface's addresses.
+If the interface's address can change (e.g. it comes from DHCP), watch
+`State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and bind again
+when it does.
+     * @remarks A socket bound to an address only uses that address's family (IPv4 or IPv6), and doesn't receive broadcasts
+     * @param port The UDP port to bind to, or 0 to let the system choose one (see `localPort`).
+     * @param address A local IPv4 or IPv6 address to bind to, e.g. `"127.0.0.1"` or `"192.168.1.20"`. Defaults to all addresses.
+     * @returns The socket, for chaining.
+     */
+    bind(port: number, address?: string | null): HSUDPSocket;
+
+    /**
+     * Connects the socket to a single peer. Afterwards, `send()` needs no host and port, and only
+datagrams from that peer are received. The callback receives `"connected"` once the host
+has been looked up.
+     * @param host The host name or IP address of the peer.
+     * @param port The peer's UDP port.
+     * @returns The socket, for chaining.
+     */
+    connect(host: string, port: number): HSUDPSocket;
+
+    /**
+     * Sends text, encoded as UTF-8, as one datagram.
+     * @param text The text to send.
+     * @param host The host name or IP address to send to. Omit it if the socket is connected.
+     * @param port The UDP port to send to. Omit it if the socket is connected.
+     * @returns The socket, for chaining.
+     */
+    send(text: string, host?: string | null, port?: number): HSUDPSocket;
+
+    /**
+     * Sends raw bytes as one datagram.
+     * @param bytes The bytes to send. Any typed array is accepted.
+     * @param host The host name or IP address to send to. Omit it if the socket is connected.
+     * @param port The UDP port to send to. Omit it if the socket is connected.
+     * @returns The socket, for chaining.
+     */
+    sendBytes(bytes: Uint8Array | ArrayBuffer, host?: string | null, port?: number): HSUDPSocket;
+
+    /**
+     * Starts delivering every datagram that arrives to the callback, until `pause()` or
+`close()`. The socket must have a local port first (see `bind()`).
+     * @remarks A receiving socket, and its callback, stay alive until it stops receiving, even if you don't keep a reference to it
+     * @returns The socket, for chaining.
+     */
+    receive(): HSUDPSocket;
+
+    /**
+     * Delivers the next datagram that arrives to the callback, then stops receiving.
+     * @remarks A receiving socket, and its callback, stay alive until it stops receiving, even if you don't keep a reference to it
+     * @returns The socket, for chaining.
+     */
+    receiveOne(): HSUDPSocket;
+
+    /**
+     * Stops receiving datagrams. Datagrams that arrive meanwhile are queued by the system (up to
+its buffer size) and delivered once you receive again.
+     * @returns The socket, for chaining.
+     */
+    pause(): HSUDPSocket;
+
+    /**
+     * Closes the socket immediately, discarding any sends still waiting for a host lookup. The
+socket can be bound, connected or used to send again afterwards.
+     * @returns The socket, for chaining.
+     */
+    close(): HSUDPSocket;
+
+    /**
+     * Closes the socket and releases its callback.
+     */
+    destroy(): void;
+
+    /**
+     * A unique identifier for this socket (UUID string).
+     */
+    readonly identifier: string;
+
+    /**
+     * Whether the socket has been bound to a local port with `bind()`.
+     */
+    readonly isBound: boolean;
+
+    /**
+     * Whether the socket is connected to a single peer with `connect()`.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * Whether the socket is currently receiving datagrams.
+     */
+    readonly isReceiving: boolean;
+
+    /**
+     * The local port the socket is using, or 0 if it doesn't have one yet.
+     */
+    readonly localPort: number;
+
+    /**
+     * Whether the socket may send to broadcast addresses (e.g. `255.255.255.255`). Defaults to
+`false`. Broadcasts are IPv4 only.
+     */
+    broadcast: boolean;
+
+    /**
+     * Whether other sockets may bind to the same port, e.g. so several programs can receive the
+same broadcasts. Defaults to `false`. Set it before calling `bind()`.
+     */
+    reusePort: boolean;
+
+    /**
+     * Whether the socket uses IPv4. Defaults to `true`. Set it before the socket binds,
+connects or sends.
+     */
+    ipv4Enabled: boolean;
+
+    /**
+     * Whether the socket uses IPv6. Defaults to `true`. Set it before the socket binds,
+connects or sends.
+     */
+    ipv6Enabled: boolean;
+
+}
+
+/**
  * Play audio from files on disk or from the system's built-in sound library.
  */
 declare namespace hs.sound {
@@ -8143,6 +9194,130 @@ After calling `destroy()` the sound object should not be used.
      * Whether the sound is currently playing.
      */
     readonly isPlaying: boolean;
+
+}
+
+/**
+ * Load, install and update Spoons - packaged, reusable pieces of configuration.
+Spoons live in the `Spoons` directory inside your config directory. Every Spoon you load is
+also available on `hs.spoons` under its name, so `hs.spoons.load("Greeter")` makes
+`hs.spoons.Greeter` available to the rest of your config. That's why a Spoon can't be named
+after one of this module's own methods or properties.
+Spoons can be installed from any GitHub repository (`"owner/repo"`), or from a zip file at any
+`https://` URL. There's no central list of Spoons: you choose where each one comes from, so
+only install Spoons from sources you trust. Pin the version you install with `ref` (a GitHub
+tag or commit) or `sha256` (for a zip URL), and nothing changes until you choose to.
+## Quick start
+```js
+// Installs Greeter the first time this runs, then loads it, configures it and starts it
+hs.spoons.use("Greeter", {
+    source: "jane/hs2-spoons",
+    ref: "v1.2.0",
+    config: { message: "Time for a break!" },
+    start: true
+})
+```
+ */
+declare namespace hs.spoons {
+    /**
+     * Load an installed Spoon by name. A Spoon must contain a well-formed `spoon.json` (with
+non-empty `name`, `author`, `version`, and `description` fields) and an `init.js`, or
+loading fails with an exception. `init.js` is loaded through the same `require()` used for
+the rest of your config, so it can itself `require()` further files from within the
+Spoon's own directory using relative paths. On success, the Spoon is also stored on
+`hs.spoons` under its name, so other code can reach it without loading it again.
+`init.js` must set `module.exports` to an object (or a function, since functions are
+objects too) - loading fails with an exception otherwise. Its `author`, `description`,
+and `version` properties are then set from `spoon.json`, overwriting any of the same
+name the Spoon's own `init.js` set, so that information is always present and always
+reflects what's on disk. If the resulting object has an `init()` method, it's called
+automatically (with `this` bound to the object) before `load()` returns - matching
+Hammerspoon 1's behavior. An exception thrown from `init()` fails the load: nothing is
+stored on `hs.spoons`, and `load()` throws. Unlike `init.js` itself (which `require()`
+only ever evaluates once), `init()` runs again on every `load()` call for the same Spoon,
+since the same cached object is returned each time - write it to be safe to call more
+than once, or do one-time setup at `init.js`'s top level instead.
+The exception's `code` is `ENOTINSTALLED` if there's no such Spoon, `EINVALIDARG` if the name
+can't be a Spoon's, or `EINVALIDSPOON` if the Spoon is malformed. An exception thrown by the
+Spoon's own code is passed on as it is.
+     * @param name The Spoon's name, matching its directory name under `Spoons/`
+     * @returns Whatever the Spoon's `init.js` assigned to `module.exports`
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function load(name: string): Object;
+
+    /**
+     * Download a Spoon and install it into the `Spoons` directory. It isn't loaded: call
+`hs.spoons.load()` (or use `hs.spoons.use()`, which does both) once it's installed.
+The source is downloaded as a zip file. Its Spoons are every `*.spoon2` directory at its top
+level or in a `Spoons` directory, or, if there are none, the whole archive, if it's a single
+Spoon. An archive that holds a single directory, as a repository's does, is looked inside.
+The Promise rejects with an `Error` whose `code` says what went wrong: `EINVALIDARG`,
+`ENOTFOUND` (no such repository, ref, URL, or Spoon in the archive), `ENETWORK`,
+`EINTEGRITY` (the download didn't match `sha256`), `EINVALIDSPOON`, `EEXISTS`, or `EIO` (for
+anything else, such as failing to write the Spoon to disk).
+     * @param name The name of the Spoon to install
+     * @param options `source` is a GitHub repository (`"owner/repo"` or its `https://github.com/...` URL) or the `https://` URL of a zip file. `ref` is a branch, tag or commit to install from (GitHub only; the default branch if omitted). `sha256` is the expected SHA-256 of the download. `force: true` replaces a Spoon that's already installed, rather than failing.
+     * @returns Resolves with the installed Spoon's details
+     */
+    function install(name: string, options: {source: string, ref?: string, sha256?: string, force?: boolean}): Promise<{name: string, version: string, author: string, description: string, source: string, ref: string | null, commit: string | null}>;
+
+    /**
+     * List the Spoons that can be installed from a source, without installing anything.
+     * @param source A GitHub repository (`"owner/repo"` or its `https://github.com/...` URL) or the `https://` URL of a zip file
+     * @param options As for `install()`
+     * @returns Resolves with the Spoons found
+     */
+    function available(source: string, options?: {ref?: string, sha256?: string}): Promise<{name: string, version: string, author: string, description: string}[]>;
+
+    /**
+     * Update an installed Spoon: download it again from where it was installed from (the same
+source, ref and URL), and reinstall it if its version has changed. A Spoon installed from
+a pinned tag, commit or versioned URL doesn't change; install the newer one with
+`install(name, { ..., force: true })` instead.
+Besides the codes `install()` uses, the Promise rejects with `ENOTINSTALLED`, `ENOSOURCE`
+for a Spoon that wasn't installed by `install()` (or was since replaced some other way, such
+as by opening a `.spoon2` file), or `ECANCELED` if the Spoon was reinstalled while the
+update was downloading.
+     * @param name The name of the installed Spoon
+     * @returns Resolves with true if the Spoon was updated, or false if it was already up to date
+     */
+    function update(name: string): Promise<boolean>;
+
+    /**
+     * Remove an installed Spoon. If it's already loaded, it keeps running until your config is
+reloaded, so stop it first if it has a `stop()` method.
+     * @param name The name of the installed Spoon
+     * @returns true if the Spoon was removed, or false if it wasn't installed
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function uninstall(name: string): boolean;
+
+    /**
+     * List the installed Spoons. Those installed by `install()` also say where they came from.
+     * @returns The installed Spoons, sorted by name
+     */
+    function installed(): {name: string, version: string, author: string, description: string, source?: string, ref?: string | null, commit?: string | null}[];
+
+    /**
+     * Load and configure a Spoon in one step, installing it first if it isn't installed yet - the
+built-in equivalent of Hammerspoon 1's SpoonInstall:andUse().
+If the Spoon is already installed, it's loaded and configured before `use()` returns, so
+`hs.spoons.<name>` can be used on the very next line, and nothing is downloaded. If it isn't
+installed and `source` is given, it's installed in the background (see `hs.spoons.install()`),
+then loaded and configured, and a notification says so; put anything that needs the Spoon in
+call `hs.spoons.update()` for that.
+each property of `config` is set on the Spoon's object, exactly as if you'd assigned it
+yourself, `hotkeys` is passed to its `bindHotkeys()` method, `fn` is called with the Spoon,
+and finally `start()` is called if `start` is true.
+The Promise rejects with an `Error` with a `code`, as `hs.spoons.install()`'s does, plus
+`ENOTINSTALLED` if the Spoon isn't installed and no `source` was given, or the error thrown by
+loading or configuring the Spoon.
+     * @param name The name of the Spoon
+     * @param options `source`, `ref` and `sha256` say where to install the Spoon from, as for `hs.spoons.install()`. `config` holds properties to set on the Spoon's object; which ones it reads is up to the Spoon. `hotkeys` is passed to the Spoon's `bindHotkeys()`, or `"default"` passes its `defaultHotkeys`. `fn` is called with the Spoon after it's configured. `start: true` calls its `start()`. `disable: true` does nothing at all, which is easier than commenting the call out.
+     * @returns Resolves with the Spoon once it's loaded and configured, or null if `disable` is true
+     */
+    function use(name: string, options: {source?: string, ref?: string, sha256?: string, config?: Record<string, any>, hotkeys?: Record<string, any> | "default", fn?: (spoon: Object) => void, start?: boolean, disable?: boolean}): Promise<Object | null>;
 
 }
 
@@ -9559,7 +10734,7 @@ Enabled by default. Only has a visual effect when `.titled(true)` is also set.
 
     /**
      * Set the text shown in the window's title bar
-Only visible when `.titled(true)` is set (the default).
+Only visible when `.titled(true)` is set (the default). Can be called before or after `show()`.
      * @param text The title bar text
      * @returns Self for chaining
      */
@@ -9568,10 +10743,33 @@ Only visible when `.titled(true)` is set (the default).
     /**
      * Set the window stacking level
 Controls where this window sits in the macOS window hierarchy.
+Can be called before or after `show()`.
      * @param name The level name
      * @returns Self for chaining
      */
     level(name: '"normal"' | '"floating"' | '"screenSaver"' | '"dock"' | '"status"' | '"popUpMenu"'): HSUIWindow;
+
+    /**
+     * Set how the window behaves with Spaces, fullscreen apps and window cycling, from a single behavior name
+`"fullScreenAuxiliary"` lets it appear over another app's fullscreen Space
+Use `behaviorList()` to combine several. An unknown name is logged and leaves the behavior unchanged.
+Can be called before or after `show()`.
+     * @param name The behavior name
+     * @returns Self for chaining
+     */
+    behavior(name: "default" | "canJoinAllSpaces" | "moveToActiveSpace" | "managed" | "transient" | "stationary" | "participatesInCycle" | "ignoresCycle" | "fullScreenPrimary" | "fullScreenAuxiliary" | "fullScreenNone" | "fullScreenAllowsTiling" | "fullScreenDisallowsTiling"): HSUIWindow;
+
+    /**
+     * Set how the window behaves with Spaces, fullscreen apps and window cycling, from a combination of behavior names
+`"canJoinAllSpaces"` with `"moveToActiveSpace"`; any two of `"managed"`, `"transient"` and `"stationary"`;
+`"participatesInCycle"` with `"ignoresCycle"`; any two of the `"fullScreen…"` Primary/Auxiliary/None names;
+and `"fullScreenAllowsTiling"` with `"fullScreenDisallowsTiling"`. Combining them throws, leaving the
+behavior unchanged. Unknown names are logged and ignored. Can be called before or after `show()`.
+     * @param names The behavior names to combine, or an empty array for the system default
+     * @returns Self for chaining
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    behaviorList(names: string[]): HSUIWindow;
 
     /**
      * Set the window's background color
@@ -10590,10 +11788,34 @@ declare namespace hs.wifi {
 
     /**
      * Returns detailed information about a Wi-Fi interface.
+This is safe to call frequently. The interface's cached scan results and its configuration are
+available from `cachedScanResults()` and `configuration()`, which are kept separate because
+fetching them can leak memory inside macOS.
+`active` reports whether the interface is in use, and does not need Location Services
+authorization, so it's a way to check that Wi-Fi is connected without that permission.
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
-     * @returns a table with keys `interface, active, power, ssid, bssid, security, interfaceMode, activePHYMode, rssi, noise, transmitRate, transmitPower, countryCode, hardwareAddress, wlanChannel, supportedChannels, cachedScanResults, configuration`; or null if the interface doesn't exist. `ssid`/`bssid`/`countryCode`/`wlanChannel` may be absent without Location Services authorization.
+     * @returns a table with keys `interface, active, power, ssid, bssid, security, interfaceMode, activePHYMode, rssi, noise, transmitRate, transmitPower, countryCode, hardwareAddress, wlanChannel, supportedChannels`; or null if the interface doesn't exist. `ssid`/`bssid`/`countryCode`/`wlanChannel` may be absent without Location Services authorization.
      */
     function interfaceDetails(interface?: string | null): Record<string, any> | null;
+
+    /**
+     * Returns the networks an interface found in its most recent scan, without starting a new scan.
+Avoid calling this frequently: it has been seen to leak memory each time macOS refreshes the
+scan cache, so polling it in a long-running configuration can grow Hammerspoon's memory use. Use
+`scanNetworks()` for a fresh scan, or `on('scanCacheUpdated', ...)` to learn when the cache changes.
+     * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
+     * @returns an array of network tables, with the same keys as `scanNetworks()`; or null if the interface doesn't exist
+     */
+    function cachedScanResults(interface?: string | null): Record<string, any>[] | null;
+
+    /**
+     * Returns an interface's configuration: its remembered network profiles and administrator settings.
+Avoid calling this frequently: macOS leaks memory on every call, so polling this function in a
+long-running configuration grows Hammerspoon's memory use.
+     * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
+     * @returns a table with keys `rememberJoinedNetworks, requireAdministratorForAssociation, requireAdministratorForIBSSMode, requireAdministratorForPower, networkProfiles`, where `networkProfiles` is an array of tables with keys `ssid, security`; or null if the interface doesn't exist. Profile `ssid`s may be absent without Location Services authorization.
+     */
+    function configuration(interface?: string | null): Record<string, any> | null;
 
     /**
      * Returns the SSID of the network currently joined on an interface.
@@ -10788,7 +12010,10 @@ the change.
      * Focus this window
 The window becomes its application's main window, and the application is brought to the front
 with only this window raised. The application's other windows keep their place in the stacking order.
-     * @returns true if successful
+The application finishes coming to the front after this returns, and some applications then bring
+a different window forward, so this makes the window main again 0.3 seconds later. That is skipped
+if another of the application's windows has been chosen in the meantime, or if `focus()` is called again.
+     * @returns true if the window was made main and its application was brought to the front. The window
      */
     focus(): boolean;
 

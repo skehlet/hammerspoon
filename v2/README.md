@@ -22,7 +22,7 @@ To go back to v1, quit Hammerspoon 2 and launch Hammerspoon.
 
 ## Editor support
 
-`hammerspoon.d.ts` (currently for 0.0.16, from the [Hammerspoon 2 docs](https://cmsj.github.io/Hammerspoon2/0.0.16/js/typescript-guide.html)), `globals.d.ts` (declares `require`, `module` and `__dirname`, which v2 provides but its `.d.ts` doesn't yet) and `jsconfig.json` give VS Code autocomplete and type checking for the plain-JS config, with no build step. When you update Hammerspoon 2, replace it with the matching version's file:
+`hammerspoon.d.ts` (currently for 0.0.17, from the [Hammerspoon 2 docs](https://cmsj.github.io/Hammerspoon2/0.0.17/js/typescript-guide.html)), `globals.d.ts` (declares `require`, `module` and `__dirname`, which v2 provides but its `.d.ts` doesn't yet) and `jsconfig.json` give VS Code autocomplete and type checking for the plain-JS config, with no build step. When you update Hammerspoon 2, replace it with the matching version's file:
 
 ```bash
 curl -fL https://cmsj.github.io/Hammerspoon2/<version>/hammerspoon.d.ts -o v2/hammerspoon.d.ts

@@ -36,14 +36,16 @@ declare class HSColor {
 
     /**
      * Update this color's value.
-If this color is bound to a UI element, the canvas re-renders automatically.
+     *
+     * If this color is bound to a UI element, the canvas re-renders automatically.
      * @param value A hex color string (e.g. "#FF0000") or another HSColor object
      */
     set(value: string | HSColor): void;
 
     /**
      * Returns a plain object containing this color's sRGB components, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with `red`, `green`, `blue` and `alpha` properties, each between 0.0 and 1.0, matching the arguments of `HSColor.rgb()`
      */
     toJSON(): Record<string, any>;
@@ -140,43 +142,51 @@ declare class HSFont {
 
 /**
  * Bridge type for working with images in JavaScript
-HSImage provides a comprehensive API for loading, manipulating, and saving images.
-It supports various image sources including files, system icons, app bundles, and URLs.
-## Loading Images
-```javascript
-// Load from file
-const img = HSImage.fromPath("/path/to/image.png")
-
-// Load system image
-const icon = HSImage.fromName("NSComputer")
-
-// Load app icon
-const appIcon = HSImage.fromAppBundle("com.apple.Safari")
-
-// Load from URL (asynchronous with Promise)
-HSImage.fromURL("https://example.com/image.png")
-    .then(image => console.log("Image loaded:", image.size))
-    .catch(err => console.error("Failed to load image:", err))
-
-// Or with async/await
-const image = await HSImage.fromURL("https://example.com/image.png")
-```
-## Image Manipulation
-```javascript
-const img = HSImage.fromPath("/path/to/image.png")
-
-// Get size
-const size = img.size  // Returns HSSize
-
-// Resize image (mutates in place)
-img.size = new HSSize(100, 100)
-
-// Crop image
-const cropped = img.croppedCopy(new HSRect(10, 10, 50, 50))
-
-// Save to file
-img.saveToFile("/path/to/output.png")
-```
+ *
+ * HSImage provides a comprehensive API for loading, manipulating, and saving images.
+ * It supports various image sources including files, system icons, app bundles, and URLs.
+ *
+ * ## Loading Images
+ *
+ * ```javascript
+ * // Load from file
+ * const img = HSImage.fromPath("/path/to/image.png")
+ *
+ * // Load system image
+ * const icon = HSImage.fromName("NSComputer")
+ *
+ * // Load app icon
+ * const appIcon = HSImage.fromAppBundle("com.apple.Safari")
+ *
+ * // Load from URL (asynchronous with Promise)
+ * HSImage.fromURL("https://example.com/image.png")
+ *     .then(image => console.log("Image loaded:", image.size))
+ *     .catch(err => console.error("Failed to load image:", err))
+ *
+ * // Or with async/await
+ * async function loadImage() {
+ *     const image = await HSImage.fromURL("https://example.com/image.png")
+ *     console.log("Image loaded:", image.size)
+ * }
+ * ```
+ *
+ * ## Image Manipulation
+ *
+ * ```javascript
+ * const img = HSImage.fromPath("/path/to/image.png")
+ *
+ * // Get size
+ * const size = img.size  // Returns HSSize
+ *
+ * // Resize image (mutates in place)
+ * img.size = new HSSize(100, 100)
+ *
+ * // Crop image
+ * const cropped = img.croppedCopy(new HSRect(10, 10, 50, 50))
+ *
+ * // Save to file
+ * img.saveToFile("/path/to/output.png")
+ * ```
  */
 declare class HSImage {
     /**
@@ -251,7 +261,8 @@ declare class HSImage {
 
     /**
      * Replace this image's content.
-If this image is bound to a UI element, the canvas re-renders automatically.
+     *
+     * If this image is bound to a UI element, the canvas re-renders automatically.
      * @param value A file path string (`~` is expanded) or another HSImage object
      */
     set(value: string | HSImage): void;
@@ -268,7 +279,8 @@ If this image is bound to a UI element, the canvas re-renders automatically.
 
     /**
      * Whether the image is a template image.
-Template images are tinted by the system to match the appearance context (e.g. menu bar icons).
+     *
+     * Template images are tinted by the system to match the appearance context (e.g. menu bar icons).
      */
     template: boolean;
 
@@ -362,7 +374,8 @@ declare class HSPoint {
 
     /**
      * Returns a plain object containing this point's coordinates, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with `x` and `y` properties
      */
     toJSON(): Record<string, any>;
@@ -484,7 +497,8 @@ declare class HSRect {
 
     /**
      * Returns a plain object containing this rect's origin and size, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with `x`, `y`, `w` and `h` properties
      */
     toJSON(): Record<string, any>;
@@ -560,7 +574,8 @@ declare class HSSize {
 
     /**
      * Returns a plain object containing this size's dimensions, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with `w` and `h` properties
      */
     toJSON(): Record<string, any>;
@@ -579,7 +594,7 @@ declare class HSSize {
 
 /**
  * A reactive string container. Pass to `.text()` to get automatic
-re-renders when `.set()` is called from JavaScript.
+ * re-renders when `.set()` is called from JavaScript.
  */
 declare class HSString {
     /**
@@ -597,32 +612,40 @@ declare class HSString {
 
 /**
  * Bridge type for working with video playback in JavaScript
-HSVideo wraps an `AVQueuePlayer` and can be embedded in an `hs.ui.window` via `.video()`,
-or driven entirely from JavaScript with `play()`, `pause()`, `seek()`, `loop()`, and `volume`.
-## Loading Video
-Each entry may be a local file path (`~` is expanded) or a remote URL string. Multiple
-entries are queued and play back to back, in order.
-```javascript
-// A single local file
-const clip = HSVideo.fromURLs(["~/Movies/clip.mp4"])
-
-// A playlist mixing a local file and a remote stream
-const playlist = HSVideo.fromURLs(["~/Movies/intro.mp4", "https://example.com/video.mp4"])
-```
-## Playback Control
-```javascript
-const clip = HSVideo.fromURLs(["~/Movies/clip.mp4"])
-clip.volume = 0.5
-clip.loop(true)
-clip.play()
-// ... later ...
-clip.seek(30)
-clip.pause()
-```
-## Looping
-Gapless looping (via `AVPlayerLooper`) is only supported when the playlist contains a
-single URL. Calling `loop(true)` on a multi-URL playlist has no effect (the playlist just
-plays through once) and logs a warning.
+ *
+ * HSVideo wraps an `AVQueuePlayer` and can be embedded in an `hs.ui.window` via `.video()`,
+ * or driven entirely from JavaScript with `play()`, `pause()`, `seek()`, `loop()`, and `volume`.
+ *
+ * ## Loading Video
+ *
+ * Each entry may be a local file path (`~` is expanded) or a remote URL string. Multiple
+ * entries are queued and play back to back, in order.
+ *
+ * ```javascript
+ * // A single local file
+ * const clip = HSVideo.fromURLs(["~/Movies/clip.mp4"])
+ *
+ * // A playlist mixing a local file and a remote stream
+ * const playlist = HSVideo.fromURLs(["~/Movies/intro.mp4", "https://example.com/video.mp4"])
+ * ```
+ *
+ * ## Playback Control
+ *
+ * ```javascript
+ * const clip = HSVideo.fromURLs(["~/Movies/clip.mp4"])
+ * clip.volume = 0.5
+ * clip.loop(true)
+ * clip.play()
+ * // ... later ...
+ * clip.seek(30)
+ * clip.pause()
+ * ```
+ *
+ * ## Looping
+ *
+ * Gapless looping (via `AVPlayerLooper`) is only supported when the playlist contains a
+ * single URL. Calling `loop(true)` on a multi-URL playlist has no effect (the playlist just
+ * plays through once) and logs a warning.
  */
 declare class HSVideo {
     /**
@@ -653,8 +676,9 @@ declare class HSVideo {
 
     /**
      * Enable or disable gapless looping
-Only supported when this HSVideo was created from a single-URL playlist. Enabling
-loop on a multi-URL playlist has no effect and logs a warning.
+     *
+     * Only supported when this HSVideo was created from a single-URL playlist. Enabling
+     * loop on a multi-URL playlist has no effect and logs a warning.
      * @param enabled Pass `true` to loop playback indefinitely
      * @returns Self for chaining
      */
@@ -677,37 +701,42 @@ loop on a multi-URL playlist has no effect and logs a warning.
 declare namespace console {
     /**
      * Log a value to the Hammerspoon Log Window
-Accepts any number of values, which are space-separated in the log output. Non-string
-values (objects, arrays, errors, etc.) are formatted the way Node's `util.inspect` would
-render them.
+     *
+     * Accepts any number of values, which are space-separated in the log output. Non-string
+     * values (objects, arrays, errors, etc.) are formatted the way Node's `util.inspect` would
+     * render them.
      * @param values A value to log
      */
     function log(...values: any[]): void;
 
     /**
      * Log an error to the Hammerspoon Log Window
-Accepts any number of values; see ``log(_:)`` for formatting details.
+     *
+     * Accepts any number of values; see ``log(_:)`` for formatting details.
      * @param values A value to log
      */
     function error(...values: any[]): void;
 
     /**
      * Log a warning to the Hammerspoon Log WIndow
-Accepts any number of values; see ``log(_:)`` for formatting details.
+     *
+     * Accepts any number of values; see ``log(_:)`` for formatting details.
      * @param values A value to log
      */
     function warn(...values: any[]): void;
 
     /**
      * Log an informational message to the Hammerspoon Log Window
-Accepts any number of values; see ``log(_:)`` for formatting details.
+     *
+     * Accepts any number of values; see ``log(_:)`` for formatting details.
      * @param values A value to log
      */
     function info(...values: any[]): void;
 
     /**
      * Log a debug message to the Hammerspoon Log Window
-Accepts any number of values; see ``log(_:)`` for formatting details.
+     *
+     * Accepts any number of values; see ``log(_:)`` for formatting details.
      * @param values A value to log
      */
     function debug(...values: any[]): void;
@@ -731,9 +760,9 @@ declare namespace hs {
 
     /**
      * Get every object that is currently active: running tasks, scheduled timers, started
-watchers and so on. An active object keeps running, and its callbacks keep being called,
-until it finishes or you stop it, whether or not you kept a reference to it. Use this to
-find something you started and lost track of.
+     * watchers and so on. An active object keeps running, and its callbacks keep being called,
+     * until it finishes or you stop it, whether or not you kept a reference to it. Use this to
+     * find something you started and lost track of.
      * @returns The active objects
      */
     function activeObjects(): any[];
@@ -754,22 +783,48 @@ find something you started and lost track of.
     function clearConsole(): void;
 
     /**
+     * Get the messages currently in the Hammerspoon Console, oldest first. This is the same history
+     * the Console window shows, so it's limited by the "Console history length" setting (which
+     * applies to each level separately), and `hs.clearConsole()` empties it.
+     *
+     * Each message is an object with:
+     *  - `sequence`: a number that's higher for each newer message. Pass the last one you've seen
+     *    as `since` to get only the messages logged after it
+     *  - `date`: a `Date` for when the message was logged
+     *  - `level`: `"garbage"`, `"debug"`, `"info"`, `"warning"`, `"error"` or `"javascript"`
+     *    (for `console.log()` and friends)
+     *  - `message`: the message's text
+     *
+     * Options (all optional):
+     *  - `minimumLevel`: only get messages at this level or above, e.g. `"warning"` for warnings
+     *    and errors (and `"javascript"` messages, which count as the highest level). Defaults to
+     *    every level
+     *  - `search`: only get messages that contain this text, ignoring case
+     *  - `since`: only get messages whose `sequence` is higher than this
+     * @remarks Messages reach the Console asynchronously, so one logged moments ago, including
+     * @param options Which messages to get
+     * @returns The matching messages, oldest first
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function consoleHistory(options?: {minimumLevel?: "garbage" | "debug" | "info" | "warning" | "error" | "javascript", search?: string, since?: number}): {sequence: number, date: Date, level: "garbage" | "debug" | "info" | "warning" | "error" | "javascript", message: string}[];
+
+    /**
      * Called when Hammerspoon 2 is launched again while it's already
-running (e.g. from Finder, Spotlight or `open -a`), or when its Dock icon is clicked, or null
-to remove it. It's only called when Settings → Advanced → "When launched while running" is
-set to "Call hs.onRelaunch". If it's set to that and no callback is set (for example because
-your config failed to load), the Console is shown instead, so you can always get back to it.
+     * running (e.g. from Finder, Spotlight or `open -a`), or when its Dock icon is clicked, or null
+     * to remove it. It's only called when Settings → Advanced → "When launched while running" is
+     * set to "Call hs.onRelaunch". If it's set to that and no callback is set (for example because
+     * your config failed to load), the Console is shown instead, so you can always get back to it.
      */
     let onRelaunch: (() => void) | null;
 
     /**
      * Called when a file or folder is opened with Hammerspoon 2,
-e.g. by dropping it on the Dock icon, choosing Hammerspoon 2 from Finder's "Open With" menu,
-or `open -a "Hammerspoon 2" file.txt`, or null to remove it. It's called once for each item,
-with its path. Spoons (`.spoon2` files) are installed rather than passed to it, unless
-"Install Spoons when opened" is turned off in the Advanced tab of Settings.
-Items opened before your config has loaded (for example, the one that launched
-Hammerspoon 2) are passed to it once your config has loaded.
+     * e.g. by dropping it on the Dock icon, choosing Hammerspoon 2 from Finder's "Open With" menu,
+     * or `open -a "Hammerspoon 2" file.txt`, or null to remove it. It's called once for each item,
+     * with its path. Spoons (`.spoon2` files) are installed rather than passed to it, unless
+     * "Install Spoons when opened" is turned off in the Advanced tab of Settings.
+     * Items opened before your config has loaded (for example, the one that launched
+     * Hammerspoon 2) are passed to it once your config has loaded.
      */
     let onOpenFile: ((path: string) => void) | null;
 
@@ -861,7 +916,8 @@ declare namespace hs.appinfo {
 
     /**
      * The version of macOS Hammerspoon 2 is currently running on, broken into its numeric components
-Keys: `major`, `minor`, `patch`.
+     *
+     * Keys: `major`, `minor`, `patch`.
      */
     const osVersionParts: Record<string, number>;
 
@@ -1004,9 +1060,10 @@ declare class HSApplication {
 
     /**
      * Bring this application to the foreground
-If the application has a focused window, that window is made the main window and only it is
-brought forward (unless `allWindows` is true). This works even when Hammerspoon is not the
-active application, e.g. from a hotkey callback.
+     *
+     * If the application has a focused window, that window is made the main window and only it is
+     * brought forward (unless `allWindows` is true). This works even when Hammerspoon is not the
+     * active application, e.g. from a hotkey callback.
      * @param allWindows Pass true to raise all application windows. Defaults to false.
      * @returns true if the application was activated, false if macOS refused
      */
@@ -1014,8 +1071,9 @@ active application, e.g. from a hotkey callback.
 
     /**
      * Make this application the frontmost application
-Unlike `activate()`, this does not change which of the application's windows is the main
-window; whichever window is currently the application's main window is the one that comes forward.
+     *
+     * Unlike `activate()`, this does not change which of the application's windows is the main
+     * window; whichever window is currently the application's main window is the one that comes forward.
      * @param allWindows Pass true to raise all application windows, rather than just the main window. Defaults to false.
      * @returns true if the application was made frontmost, false if macOS refused
      */
@@ -1082,7 +1140,8 @@ window; whichever window is currently the application's main window is the one t
 
     /**
      * Returns a plain object describing this application, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the application's `pid`, `bundleID`, `name`, `bundlePath`, `kind`, `isRunning`, `isActive` and `isHidden`. Values that can't be read are `null`
      */
     toJSON(): Record<string, any>;
@@ -1129,7 +1188,7 @@ window; whichever window is currently the application's main window is the one t
 
     /**
      * All windows of this application, including windows in native fullscreen and on other Spaces
-(with the limitation described in `hs.window.allWindows()`)
+     * (with the limitation described in `hs.window.allWindows()`)
      */
     readonly allWindows: HSWindow[];
 
@@ -1152,30 +1211,37 @@ window; whichever window is currently the application's main window is the one t
 
 /**
  * Module for discovering and controlling audio devices.
-## Finding devices
-```javascript
-const all = hs.audiodevice.all();
-const out = hs.audiodevice.defaultOutputDevice();
-const mic = hs.audiodevice.defaultInputDevice();
-```
-## Selecting a device
-```javascript
-const usb = hs.audiodevice.findDeviceByName("USB Audio CODEC");
-if (usb) usb.setDefaultOutputDevice();
-```
-## Watching for system-level changes
-Available events: `"dOut"` (default output changed), `"dIn"` (default input changed),
-`"dSErr"` (default alert sound device changed), `"dev+"` (a device was added), `"dev-"`
-(a device was removed). `"dOut"`, `"dIn"` and `"dSErr"` listeners receive the new default
-device (or `null` if there is none), `"dev+"` listeners the added device, and `"dev-"`
-listeners an `{id, uid, name}` object describing the removed device, which can no longer
-be used.
-```javascript
-var fn = function(device) { console.log("Default output is now " + (device ? device.name : "none")) };
-hs.audiodevice.on("dOut", fn);
-// later…
-hs.audiodevice.off("dOut", fn);
-```
+ *
+ * ## Finding devices
+ *
+ * ```javascript
+ * const all = hs.audiodevice.all();
+ * const out = hs.audiodevice.defaultOutputDevice();
+ * const mic = hs.audiodevice.defaultInputDevice();
+ * ```
+ *
+ * ## Selecting a device
+ *
+ * ```javascript
+ * const usb = hs.audiodevice.findDeviceByName("USB Audio CODEC");
+ * if (usb) usb.setDefaultOutputDevice();
+ * ```
+ *
+ * ## Watching for system-level changes
+ *
+ * Available events: `"dOut"` (default output changed), `"dIn"` (default input changed),
+ * `"dSErr"` (default alert sound device changed), `"dev+"` (a device was added), `"dev-"`
+ * (a device was removed). `"dOut"`, `"dIn"` and `"dSErr"` listeners receive the new default
+ * device (or `null` if there is none), `"dev+"` listeners the added device, and `"dev-"`
+ * listeners an `{id, uid, name}` object describing the removed device, which can no longer
+ * be used.
+ *
+ * ```javascript
+ * var fn = function(device) { console.log("Default output is now " + (device ? device.name : "none")) };
+ * hs.audiodevice.on("dOut", fn);
+ * // later…
+ * hs.audiodevice.off("dOut", fn);
+ * ```
  */
 declare namespace hs.audiodevice {
     /**
@@ -1255,25 +1321,30 @@ declare namespace hs.audiodevice {
 
 /**
  * An audio device attached to the system.
-Obtain instances via ``hs.audiodevice`` module methods — do not instantiate directly.
-## Getting and setting volume
-```javascript
-const dev = hs.audiodevice.defaultOutputDevice();
-if (dev) {
-    console.log(dev.volume);    // 0.0 – 1.0, or null
-    dev.volume = 0.5;
-}
-```
-## Watching for changes
-```javascript
-const dev = hs.audiodevice.defaultOutputDevice();
-if (dev) {
-    var fn = function(volume) { console.log("Output volume changed to " + volume); };
-    dev.on('vmout', fn);
-    // later…
-    dev.off('vmout', fn);
-}
-```
+ *
+ * Obtain instances via ``hs.audiodevice`` module methods — do not instantiate directly.
+ *
+ * ## Getting and setting volume
+ *
+ * ```javascript
+ * const dev = hs.audiodevice.defaultOutputDevice();
+ * if (dev) {
+ *     console.log(dev.volume);    // 0.0 – 1.0, or null
+ *     dev.volume = 0.5;
+ * }
+ * ```
+ *
+ * ## Watching for changes
+ *
+ * ```javascript
+ * const dev = hs.audiodevice.defaultOutputDevice();
+ * if (dev) {
+ *     var fn = function(volume) { console.log("Output volume changed to " + volume); };
+ *     dev.on('vmout', fn);
+ *     // later…
+ *     dev.off('vmout', fn);
+ * }
+ * ```
  */
 declare class HSAudioDevice {
     /**
@@ -1334,14 +1405,28 @@ declare class HSAudioDevice {
 
     /**
      * Register a listener for a named per-device property-change event.
-``currentOutputDataSource()``.
-``currentInputDataSource()``.
-receives the new ``isInUse`` value.
-receives the new ``jackConnected`` value.
-any properties you have cached for it may be stale. The listener receives nothing.
-The value is read when the listener is called, and is `null` if the device can't
-report it. `"inUse"` and `"jack"` always pass a boolean, `false` if the device can't
-report it, as ``isInUse`` and ``jackConnected`` do.
+     *
+     * Available events:
+     * - `"vmout"` — output volume changed. The listener receives the new ``volume``.
+     * - `"vmin"` — input volume changed. The listener receives the new ``inputVolume``.
+     * - `"mout"` — output mute state changed. The listener receives the new ``muted`` value.
+     * - `"min"` — input mute state changed. The listener receives the new ``inputMuted`` value.
+     * - `"rate"` — sample rate changed. The listener receives the new ``sampleRate``.
+     * - `"dsout"` — output data source changed. The listener receives the new
+     *   ``currentOutputDataSource()``.
+     * - `"dsin"` — input data source changed. The listener receives the new
+     *   ``currentInputDataSource()``.
+     * - `"balance"` — output stereo balance changed. The listener receives the new ``balance``.
+     * - `"inUse"` — the device started or stopped being used by any process. The listener
+     *   receives the new ``isInUse`` value.
+     * - `"jack"` — a jack (e.g. headphones) was connected or disconnected. The listener
+     *   receives the new ``jackConnected`` value.
+     * - `"config"` — the device's configuration changed (e.g. its streams or channel layout);
+     *   any properties you have cached for it may be stale. The listener receives nothing.
+     *
+     * The value is read when the listener is called, and is `null` if the device can't
+     * report it. `"inUse"` and `"jack"` always pass a boolean, `false` if the device can't
+     * report it, as ``isInUse`` and ``jackConnected`` do.
      * @param event The event to listen for
      * @param listener Called when the event occurs, with the new value of the property that changed (see above); for `"config"` it is passed nothing
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -1365,7 +1450,8 @@ report it, as ``isInUse`` and ``jackConnected`` do.
 
     /**
      * Returns a plain object describing this device, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the device's `id`, `name`, `uid`, `isInput`, `isOutput`, `transportType`, `isInUse`, `jackConnected`, `inputChannels`, `outputChannels`, `volume`, `muted`, `balance`, `inputVolume`, `inputMuted` and `sampleRate`. Values the device doesn't support are `null`
      */
     toJSON(): Record<string, any>;
@@ -1397,22 +1483,22 @@ report it, as ``isInUse`` and ``jackConnected`` do.
 
     /**
      * The transport mechanism: `"built-in"`, `"usb"`, `"bluetooth"`, `"bluetooth-le"`,
-`"hdmi"`, `"display-port"`, `"firewire"`, `"airplay"`, `"avb"`,
-`"thunderbolt"`, `"virtual"`, `"aggregate"`, `"pci"`, or `"unknown"`.
+     * `"hdmi"`, `"display-port"`, `"firewire"`, `"airplay"`, `"avb"`,
+     * `"thunderbolt"`, `"virtual"`, `"aggregate"`, `"pci"`, or `"unknown"`.
      */
     readonly transportType: string;
 
     /**
      * Whether any process (not just Hammerspoon) is currently using this device for input
-or output - e.g. a call or dictation app has opened the microphone, or music is playing.
-Listen for the `"inUse"` event to be told when this changes.
+     * or output - e.g. a call or dictation app has opened the microphone, or music is playing.
+     * Listen for the `"inUse"` event to be told when this changes.
      */
     readonly isInUse: boolean;
 
     /**
      * Whether a jack (e.g. headphones) is connected to this device. Always `false` if the device
-does not support jack sensing. Output jack state is reported for devices with output,
-otherwise input jack state. Listen for the `"jack"` event to be told when this changes.
+     * does not support jack sensing. Output jack state is reported for devices with output,
+     * otherwise input jack state. Listen for the `"jack"` event to be told when this changes.
      */
     readonly jackConnected: boolean;
 
@@ -1428,8 +1514,8 @@ otherwise input jack state. Listen for the `"jack"` event to be told when this c
 
     /**
      * Output volume scalar in the range `0.0`–`1.0`, or `null` if the device has
-no controllable output volume. Setting `null` is a no-op, and setting a value outside
-`0.0`–`1.0` logs an error and leaves the volume unchanged (Hammerspoon v1 used `0`–`100`).
+     * no controllable output volume. Setting `null` is a no-op, and setting a value outside
+     * `0.0`–`1.0` logs an error and leaves the volume unchanged (Hammerspoon v1 used `0`–`100`).
      */
     volume: number | null;
 
@@ -1440,15 +1526,15 @@ no controllable output volume. Setting `null` is a no-op, and setting a value ou
 
     /**
      * Output stereo balance in the range `0.0` (full left)–`1.0` (full right),
-or `null` if balance control is not available. Setting a value outside `0.0`–`1.0`
-logs an error and leaves the balance unchanged.
+     * or `null` if balance control is not available. Setting a value outside `0.0`–`1.0`
+     * logs an error and leaves the balance unchanged.
      */
     balance: number | null;
 
     /**
      * Input (microphone) volume scalar in the range `0.0`–`1.0`, or `null` if
-the device has no controllable input volume. Setting a value outside `0.0`–`1.0` logs
-an error and leaves the volume unchanged (Hammerspoon v1 used `0`–`100`).
+     * the device has no controllable input volume. Setting a value outside `0.0`–`1.0` logs
+     * an error and leaves the volume unchanged (Hammerspoon v1 used `0`–`100`).
      */
     inputVolume: number | null;
 
@@ -1464,7 +1550,7 @@ an error and leaves the volume unchanged (Hammerspoon v1 used `0`–`100`).
 
     /**
      * All sample rates (in Hz) that this device supports.
-For devices that support a range, both the minimum and maximum are included.
+     * For devices that support a range, both the minimum and maximum are included.
      */
     readonly availableSampleRates: number[];
 
@@ -1472,29 +1558,37 @@ For devices that support a range, both the minimum and maximum are included.
 
 /**
  * # Accessibility API Module
-## Basic Usage
-```js
-// Get the focused UI element
-const element = hs.ax.focusedElement();
-console.log(element.role, element.title);
-
-// Watch an application's element for window creation events. Notifications bubble up
-// from anywhere in the application's hierarchy, so this fires for every new window,
-// not just one specific window.
-const app = hs.application.frontmost();
-hs.ax.on(app.axElement(), hs.ax.notificationTypes.windowCreated, (notification, element) => {
-    console.log("New window:", element.title);
-});
-
-// Watch a specific element (e.g. a text field found via findByRole) for value changes.
-// Watching a specific element scopes the notification to just that element, rather
-// than the whole application's hierarchy.
-const field = hs.ax.findByRole(hs.ax.roles.textField, app.axElement())[0];
-hs.ax.on(field, hs.ax.notificationTypes.valueChanged, (notification, element) => {
-    console.log("Field changed:", element.value);
-});
-```
-**Note:** Requires accessibility permissions in System Preferences.
+ *
+ * This module provides access to macOS's powerful **Accessibility API**, allowing you to:
+ * - Inspect UI elements in any application
+ * - Monitor window and element changes
+ * - Programmatically interact with UI elements
+ *
+ * ## Basic Usage
+ *
+ * ```js
+ * // Get the focused UI element
+ * const element = hs.ax.focusedElement();
+ * console.log(element.role, element.title);
+ *
+ * // Watch an application's element for window creation events. Notifications bubble up
+ * // from anywhere in the application's hierarchy, so this fires for every new window,
+ * // not just one specific window.
+ * const app = hs.application.frontmost();
+ * hs.ax.on(app.axElement(), hs.ax.notificationTypes.windowCreated, (notification, element) => {
+ *     console.log("New window:", element.title);
+ * });
+ *
+ * // Watch a specific element (e.g. a text field found via findByRole) for value changes.
+ * // Watching a specific element scopes the notification to just that element, rather
+ * // than the whole application's hierarchy.
+ * const field = hs.ax.findByRole(hs.ax.roles.textField, app.axElement())[0];
+ * hs.ax.on(field, hs.ax.notificationTypes.valueChanged, (notification, element) => {
+ *     console.log("Field changed:", element.value);
+ * });
+ * ```
+ *
+ * **Note:** Requires accessibility permissions in System Preferences.
  */
 declare namespace hs.ax {
     /**
@@ -1526,7 +1620,7 @@ declare namespace hs.ax {
 
     /**
      * Register a listener for AX events on a specific element
-     * @remarks When `notification` is an array, registration is all-or-nothing: if any one of them fails, none are left registered. Listeners are removed automatically when the watched element is destroyed, or when its application quits, so there is no need to call `off` in either case (doing so is harmless). A listener registered for `uIElementDestroyed` is still called for the element's destruction before it is removed.
+     * @remarks If a watcher can't be started, the `Error` says why, and when the Accessibility API reported an error its `code` property is that error's name: e.g. `"kAXErrorAPIDisabled"` (the application has turned the Accessibility API off, as Firefox in kiosk mode does, so retrying won't help), `"kAXErrorNotificationUnsupported"` (the element doesn't send that notification) or `"kAXErrorCannotComplete"` (the application didn't respond, e.g. because it is still starting up). When `notification` is an array, registration is all-or-nothing: if any one of them fails, none are left registered. Listeners are removed automatically when the watched element is destroyed, or when its application quits, so there is no need to call `off` in either case (doing so is harmless). A listener registered for `uIElementDestroyed` is still called for the element's destruction before it is removed.
      * @param element An HSAXElement to watch. Passing an application's element causes matching notifications to bubble up from anywhere in that application's hierarchy (e.g. AXWindowCreated for any window in the app, not just one); passing a specific descendant element scopes the notification to just that element
      * @param notification An event name, or an array of event names, to watch for with the same listener
      * @param listener A function called with the notification name and the accessibility element it applies to
@@ -1536,7 +1630,8 @@ declare namespace hs.ax {
 
     /**
      * Remove a previously registered listener for AX events on a specific element
-Listeners for an element that has been destroyed, or whose application has quit, are removed automatically, so this is only needed to stop watching an element that still exists.
+     *
+     * Listeners for an element that has been destroyed, or whose application has quit, are removed automatically, so this is only needed to stop watching an element that still exists.
      * @param element The HSAXElement that was passed to `on`
      * @param notification The event name, or array of event names, to stop watching
      * @param listener The function/lambda provided when adding the watcher
@@ -1545,6 +1640,7 @@ Listeners for an element that has been destroyed, or whose application has quit,
 
     /**
      * Register a listener that fires at most once for AX events on a specific element
+     * @remarks A failure to start the watcher throws an `Error` with a `code`, as for `on`.
      * @param element An HSAXElement to watch - see `on` for the application-vs-descendant bubbling behavior
      * @param notification An event name, or an array of event names, to watch for with the same listener
      * @param listener Called once (per registered notification name), then automatically removed
@@ -1625,22 +1721,26 @@ declare class HSAXElement {
 
     /**
      * Set the value of a specific attribute
-The value must be of the type the Accessibility API expects for the attribute. For the
-well-known attributes below the type is checked first, and a value of the wrong type throws
-an error naming the expected type.
-| Attribute | Expected value |
-|---|---|
-| `AXPosition` | an `HSPoint` |
-| `AXSize` | an `HSSize` |
-| `AXFrame` | an `HSRect` |
-| `AXFocused`, `AXMain`, `AXMinimized`, `AXHidden`, `AXFrontmost`, `AXFullScreen`, `AXSelected`, `AXExpanded`, `AXDisclosing`, `AXEnhancedUserInterface` | a boolean |
-| `AXSelectedText` | a string |
-Plain objects such as `{x: 1, y: 2}` are not accepted for geometry attributes; use `new HSPoint(1, 2)`.
-If the Accessibility API refuses the change, this throws an `Error` whose message says why, and whose
-`code` property is the Accessibility error's name, e.g. `"kAXErrorAttributeUnsupported"` (the element
-doesn't have the attribute), `"kAXErrorIllegalArgument"` (the value isn't valid for it) or
-`"kAXErrorCannotComplete"` (the application didn't respond). A value of the wrong type for one of
-the attributes above throws an `Error` with no `code`.
+     *
+     * The value must be of the type the Accessibility API expects for the attribute. For the
+     * well-known attributes below the type is checked first, and a value of the wrong type throws
+     * an error naming the expected type.
+     *
+     * | Attribute | Expected value |
+     * |---|---|
+     * | `AXPosition` | an `HSPoint` |
+     * | `AXSize` | an `HSSize` |
+     * | `AXFrame` | an `HSRect` |
+     * | `AXFocused`, `AXMain`, `AXMinimized`, `AXHidden`, `AXFrontmost`, `AXFullScreen`, `AXSelected`, `AXExpanded`, `AXDisclosing`, `AXEnhancedUserInterface` | a boolean |
+     * | `AXSelectedText` | a string |
+     *
+     * Plain objects such as `{x: 1, y: 2}` are not accepted for geometry attributes; use `new HSPoint(1, 2)`.
+     *
+     * If the Accessibility API refuses the change, this throws an `Error` whose message says why, and whose
+     * `code` property is the Accessibility error's name, e.g. `"kAXErrorAttributeUnsupported"` (the element
+     * doesn't have the attribute), `"kAXErrorIllegalArgument"` (the value isn't valid for it) or
+     * `"kAXErrorCannotComplete"` (the application didn't respond). A value of the wrong type for one of
+     * the attributes above throws an `Error` with no `code`.
      * @param attribute The attribute name to set
      * @param value The value to set
      * @returns `true` if the attribute was set. Failures throw rather than returning `false`.
@@ -1663,11 +1763,12 @@ the attributes above throws an `Error` with no `code`.
 
     /**
      * Perform a specific action
-If the Accessibility API refuses the action, this throws an `Error` whose message says why, and whose
-`code` property is the Accessibility error's name, e.g. `"kAXErrorActionUnsupported"` or
-`"kAXErrorAttributeUnsupported"` (the element doesn't have the action; AppKit applications report the
-latter) or `"kAXErrorCannotComplete"` (the application didn't respond). Use `actionNames()` to see
-which actions an element supports.
+     *
+     * If the Accessibility API refuses the action, this throws an `Error` whose message says why, and whose
+     * `code` property is the Accessibility error's name, e.g. `"kAXErrorActionUnsupported"` or
+     * `"kAXErrorAttributeUnsupported"` (the element doesn't have the action; AppKit applications report the
+     * latter) or `"kAXErrorCannotComplete"` (the application didn't respond). Use `actionNames()` to see
+     * which actions an element supports.
      * @param action The action to perform
      * @returns `true` if the action was performed. Failures throw rather than returning `false`.
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -1745,25 +1846,31 @@ which actions an element supports.
 
 /**
  * Inspect, connect to and scan for Bluetooth devices, and watch them connect and disconnect.
-keyboard or a mouse paired with this Mac. These have battery levels and system-wide
-connect/disconnect events.
-Hammerspoon can connect to itself to read and write its GATT characteristics. macOS gives
-these a UUID `identifier` instead of revealing their address.
-```javascript
-hs.bluetooth.pairedDevices().forEach(d => console.log(d.name + " " + d.address))
-
-hs.bluetooth.connectedDevices()
-    .filter(d => d.batteryLevel !== null)
-    .forEach(d => console.log(d.name + ": " + d.batteryLevel + "%"))
-
-hs.bluetooth.on('connected', d => console.log(d.name + " connected"))
-hs.bluetooth.on('powerChanged', on => console.log("Bluetooth is " + (on ? "on" : "off")))
-
-const nearby = await hs.bluetooth.scan({ seconds: 5 })
-nearby.forEach(p => console.log((p.name ?? p.identifier) + " " + p.rssi + " dBm"))
-```
-macOS asks the user for Bluetooth permission the first time this module talks to Bluetooth.
-Use `hs.permissions.checkBluetooth()` to see whether it has been granted.
+ *
+ * The module offers two kinds of object, because macOS identifies them in two different ways:
+ *  - `HSBluetoothDevice`: a device macOS knows by its Bluetooth address, such as headphones, a
+ *    keyboard or a mouse paired with this Mac. These have battery levels and system-wide
+ *    connect/disconnect events.
+ *  - `HSBluetoothPeripheral`: a Bluetooth Low Energy (BLE) peripheral, found by `scan()`, which
+ *    Hammerspoon can connect to itself to read and write its GATT characteristics. macOS gives
+ *    these a UUID `identifier` instead of revealing their address.
+ *
+ * ```javascript
+ * hs.bluetooth.pairedDevices().forEach(d => console.log(d.name + " " + d.address))
+ *
+ * hs.bluetooth.connectedDevices()
+ *     .filter(d => d.batteryLevel !== null)
+ *     .forEach(d => console.log(d.name + ": " + d.batteryLevel + "%"))
+ *
+ * hs.bluetooth.on('connected', d => console.log(d.name + " connected"))
+ * hs.bluetooth.on('powerChanged', on => console.log("Bluetooth is " + (on ? "on" : "off")))
+ *
+ * hs.bluetooth.scan({ seconds: 5 })
+ *     .then(nearby => nearby.forEach(p => console.log((p.name ?? p.identifier) + " " + p.rssi + " dBm")))
+ * ```
+ *
+ * macOS asks the user for Bluetooth permission the first time this module talks to Bluetooth.
+ * Use `hs.permissions.checkBluetooth()` to see whether it has been granted.
  */
 declare namespace hs.bluetooth {
     /**
@@ -1793,7 +1900,8 @@ declare namespace hs.bluetooth {
 
     /**
      * Looks up a BLE peripheral by its identifier.
-Hammerspoon must have seen the peripheral in a scan, or Bluetooth must already be in use, for it to be found. This lookup doesn't start Bluetooth itself, so it never shows the permission prompt.
+     *
+     * Hammerspoon must have seen the peripheral in a scan, or Bluetooth must already be in use, for it to be found. This lookup doesn't start Bluetooth itself, so it never shows the permission prompt.
      * @param identifier The peripheral's `identifier`, a UUID
      * @returns The `HSBluetoothPeripheral`, or `null` if it isn't known
      */
@@ -1801,7 +1909,8 @@ Hammerspoon must have seen the peripheral in a scan, or Bluetooth must already b
 
     /**
      * Scans for BLE peripherals nearby. Only one scan can run at a time.
-Each peripheral found is also delivered to `'discovered'` listeners (see `on()`) as soon as it's seen.
+     *
+     * Each peripheral found is also delivered to `'discovered'` listeners (see `on()`) as soon as it's seen.
      * @param options An object with any of:
      * @returns A Promise resolving to the peripherals found when the scan ends, or when `stopScan()` is called. Rejects if a scan is already running, the options are invalid, or Bluetooth is unavailable
      */
@@ -1814,7 +1923,8 @@ Each peripheral found is also delivered to `'discovered'` listeners (see `on()`)
 
     /**
      * Searches for discoverable classic Bluetooth devices nearby, such as headphones in pairing mode. Only one search can run at a time.
-This interrupts the audio of connected Bluetooth headphones while it runs.
+     *
+     * This interrupts the audio of connected Bluetooth headphones while it runs.
      * @param options An object with `seconds` (number, default `10`, at most `255`): how long to search for
      * @returns A Promise resolving to the devices found when the search ends, or when `stopInquiry()` is called. Rejects if a search is already running, the options are invalid, or the search fails
      */
@@ -1827,6 +1937,11 @@ This interrupts the audio of connected Bluetooth headphones while it runs.
 
     /**
      * Register a listener for Bluetooth events.
+     *
+     * Listeners receive:
+     *  - `"connected"`, `"disconnected"`: the `HSBluetoothDevice` that macOS connected or disconnected. For Hammerspoon's own connections to BLE peripherals, listen on the `HSBluetoothPeripheral` instead.
+     *  - `"powerChanged"`: `true` when Bluetooth is turned on, `false` when it's turned off
+     *  - `"discovered"`: each `HSBluetoothPeripheral` found while `hs.bluetooth.scan()` runs
      * @param event The event to listen for
      * @param listener Called with the event's device or peripheral, or for `"powerChanged"` the new power state
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -1867,18 +1982,22 @@ This interrupts the audio of connected Bluetooth headphones while it runs.
 
 /**
  * A Bluetooth device macOS knows: one paired with this Mac, or one found by `hs.bluetooth.inquiry()`.
-Obtain devices from the ``hs.bluetooth`` module; do not instantiate them directly. A device is
-identified by its `address`, and the same device is returned as the same object for as long as
-you hold on to it.
-Bluetooth Low Energy (BLE) peripherals found by `hs.bluetooth.scan()` are `HSBluetoothPeripheral`
-objects instead. A paired device that also speaks BLE can give you its peripheral with
-`lowEnergyPeripheral()`, e.g. to read its GATT characteristics.
-## Battery levels
-```javascript
-hs.bluetooth.connectedDevices().forEach(d => {
-    if (d.batteryLevel !== null) console.log(d.name + ": " + d.batteryLevel + "%")
-})
-```
+ *
+ * Obtain devices from the ``hs.bluetooth`` module; do not instantiate them directly. A device is
+ * identified by its `address`, and the same device is returned as the same object for as long as
+ * you hold on to it.
+ *
+ * Bluetooth Low Energy (BLE) peripherals found by `hs.bluetooth.scan()` are `HSBluetoothPeripheral`
+ * objects instead. A paired device that also speaks BLE can give you its peripheral with
+ * `lowEnergyPeripheral()`, e.g. to read its GATT characteristics.
+ *
+ * ## Battery levels
+ *
+ * ```javascript
+ * hs.bluetooth.connectedDevices().forEach(d => {
+ *     if (d.batteryLevel !== null) console.log(d.name + ": " + d.batteryLevel + "%")
+ * })
+ * ```
  */
 declare class HSBluetoothDevice {
     /**
@@ -1901,14 +2020,16 @@ declare class HSBluetoothDevice {
 
     /**
      * Finds the BLE peripheral of a connected device that also speaks Bluetooth Low Energy, such as a Magic Keyboard or a heart-rate strap, so you can use its GATT services.
-macOS doesn't link a paired device to its BLE side, so this looks for the BLE peripheral connected to the Mac with the same name. It rejects rather than guess if several have that name, and resolves to `null` if none does (e.g. the device doesn't use BLE, or it was renamed after pairing). The peripheral still needs `connect()` before its GATT methods can be used.
+     *
+     * macOS doesn't link a paired device to its BLE side, so this looks for the BLE peripheral connected to the Mac with the same name. It rejects rather than guess if several have that name, and resolves to `null` if none does (e.g. the device doesn't use BLE, or it was renamed after pairing). The peripheral still needs `connect()` before its GATT methods can be used.
      * @returns A Promise resolving to the device's peripheral, or `null` if it has none. Rejects if the device isn't connected, several peripherals match, or Bluetooth is unavailable
      */
     lowEnergyPeripheral(): Promise<HSBluetoothPeripheral | null>;
 
     /**
      * Register a listener for this device's events.
-Listeners for `"connected"` and `"disconnected"` are called with no arguments whenever macOS connects or disconnects the device. A device with listeners keeps working after you drop your reference to it.
+     *
+     * Listeners for `"connected"` and `"disconnected"` are called with no arguments whenever macOS connects or disconnects the device. A device with listeners keeps working after you drop your reference to it.
      * @param event The event to listen for
      * @param listener Called when the event occurs
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -1932,7 +2053,8 @@ Listeners for `"connected"` and `"disconnected"` are called with no arguments wh
 
     /**
      * Returns a plain object describing this device, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the device's `name`, `address`, `isPaired`, `isConnected`, `rssi`, `batteryLevel`, `batteryLevels`, `majorClass` and `minorClass`
      */
     toJSON(): Record<string, any>;
@@ -2004,13 +2126,15 @@ Listeners for `"connected"` and `"disconnected"` are called with no arguments wh
 
     /**
      * The device's battery level as a percentage, or `null` if macOS doesn't know it.
-This is what macOS itself reports: for Apple's Magic accessories from the system, and for AirPods and Beats from what macOS last heard from them. For earbuds it is the lower of the two buds; see `batteryLevels` for each one. For a device that reports its battery over BLE instead, read it with `lowEnergyPeripheral()` and `readBatteryLevel()`.
+     *
+     * This is what macOS itself reports: for Apple's Magic accessories from the system, and for AirPods and Beats from what macOS last heard from them. For earbuds it is the lower of the two buds; see `batteryLevels` for each one. For a device that reports its battery over BLE instead, read it with `lowEnergyPeripheral()` and `readBatteryLevel()`.
      */
     readonly batteryLevel: number | null;
 
     /**
      * The individual battery levels of a device with several batteries, such as earbuds and their case, or `null` if it has only one (or none is known).
-The object has any of `left`, `right` and `case`, each a percentage.
+     *
+     * The object has any of `left`, `right` and `case`, each a percentage.
      */
     readonly batteryLevels: Record<string, number> | null;
 
@@ -2018,18 +2142,24 @@ The object has any of `left`, `right` and `case`, each a percentage.
 
 /**
  * A Bluetooth Low Energy (BLE) peripheral, found by `hs.bluetooth.scan()` or through a paired device's `lowEnergyPeripheral()`.
-Obtain peripherals from the ``hs.bluetooth`` module; do not instantiate them directly. A
-peripheral is identified by its `identifier`, and the same peripheral is returned as the same
-object for as long as you hold on to it.
-Call `connect()` before using its GATT services. A connected peripheral stays connected, and
-keeps delivering its events, until you call `disconnect()`, even if you drop your reference to it.
-```javascript
-const [sensor] = await hs.bluetooth.scan({ seconds: 5, services: ["181A"] })
-await sensor.connect()
-const bytes = await sensor.readValue("181A", "2A6E")
-sensor.on("value", (service, characteristic, value) => console.log(characteristic + ": " + value))
-await sensor.subscribe("181A", "2A6E")
-```
+ *
+ * Obtain peripherals from the ``hs.bluetooth`` module; do not instantiate them directly. A
+ * peripheral is identified by its `identifier`, and the same peripheral is returned as the same
+ * object for as long as you hold on to it.
+ *
+ * Call `connect()` before using its GATT services. A connected peripheral stays connected, and
+ * keeps delivering its events, until you call `disconnect()`, even if you drop your reference to it.
+ *
+ * ```javascript
+ * async function watchSensor() {
+ *     const [sensor] = await hs.bluetooth.scan({ seconds: 5, services: ["181A"] })
+ *     await sensor.connect()
+ *     const bytes = await sensor.readValue("181A", "2A6E")
+ *     sensor.on("value", (service, characteristic, value) => console.log(characteristic + ": " + value))
+ *     await sensor.subscribe("181A", "2A6E")
+ * }
+ * watchSensor()
+ * ```
  */
 declare class HSBluetoothPeripheral {
     /**
@@ -2105,7 +2235,12 @@ declare class HSBluetoothPeripheral {
 
     /**
      * Register a listener for this peripheral's events.
-A peripheral with listeners keeps working after you drop your reference to it.
+     *
+     * Listeners receive:
+     *  - `"connected"`, `"disconnected"`: no arguments, when Hammerspoon's connection to the peripheral opens or closes
+     *  - `"value"`: `(service, characteristic, value)`, the UUIDs and the new value (a Uint8Array) of a characteristic you subscribed to. While subscribed, values fetched by `readValue()` arrive here too, since the peripheral sends both the same way
+     *
+     * A peripheral with listeners keeps working after you drop your reference to it.
      * @param event The event to listen for
      * @param listener Called when the event occurs
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -2129,7 +2264,8 @@ A peripheral with listeners keeps working after you drop your reference to it.
 
     /**
      * Returns a plain object describing this peripheral, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the peripheral's `identifier`, `name`, `isConnected`, `rssi`, `lastSeen` and `batteryLevel`
      */
     toJSON(): Record<string, any>;
@@ -2166,7 +2302,8 @@ A peripheral with listeners keeps working after you drop your reference to it.
 
     /**
      * The peripheral's last advertisement, if a scan has seen one, otherwise `null`.
-The object has `localName` (string or `null`), `isConnectable` (boolean or `null`), `txPower` (number or `null`), `serviceUUIDs` (string[]), `manufacturerData` (Uint8Array or `null`) and `serviceData` (an object mapping service UUIDs to Uint8Array).
+     *
+     * The object has `localName` (string or `null`), `isConnectable` (boolean or `null`), `txPower` (number or `null`), `serviceUUIDs` (string[]), `manufacturerData` (Uint8Array or `null`) and `serviceData` (an object mapping service UUIDs to Uint8Array).
      */
     readonly advertisement: Record<string, any> | null;
 
@@ -2179,46 +2316,56 @@ The object has `localName` (string or `null`), `isConnectable` (boolean or `null
 
 /**
  * Discover and publish Bonjour (mDNS / Zeroconf) network services.
-Use `createSearch()` to search the network for services advertised by other
-devices, and `advertise()` to advertise your own. The `networkServices()`
-convenience function returns a snapshot of all service types currently
-active on the local network.
-## Common service type strings
-The `hs.bonjour.serviceTypes` object maps short names to their mDNS strings,
-e.g. `hs.bonjour.serviceTypes.ssh` → `"_ssh._tcp."`.
-## Searching for a service
-```js
-// Find all SSH services on the local network and resolve each one
-const search = hs.bonjour.createSearch()
-search.findServices('_ssh._tcp.', 'local.', (event, svc, moreComing) => {
-    if (event === 'serviceFound') {
-        svc.resolve(5, ev => {
-            if (ev === 'resolved') console.log(svc.hostname + ':' + svc.port)
-        })
-    }
-})
-```
-## Advertising a service
-```js
-hs.bonjour.advertise('My Web Server', '_http._tcp.', 8080, ev => {
-    if (ev === 'published') console.log('Now advertising!')
-    else if (ev === 'error') console.error('Advertising failed')
-})
-// Later, to stop:
-hs.bonjour.stopAdvertising('My Web Server', '_http._tcp.')
-```
-## Listing all active service types
-```js
-hs.bonjour.networkServices(5).then(types => {
-    console.log('Active service types: ' + types.join(', '))
-})
-```
+ *
+ * Use `createSearch()` to search the network for services advertised by other
+ * devices, and `advertise()` to advertise your own. The `networkServices()`
+ * convenience function returns a snapshot of all service types currently
+ * active on the local network.
+ *
+ * ## Common service type strings
+ *
+ * The `hs.bonjour.serviceTypes` object maps short names to their mDNS strings,
+ * e.g. `hs.bonjour.serviceTypes.ssh` → `"_ssh._tcp."`.
+ *
+ * ## Searching for a service
+ *
+ * ```js
+ * // Find all SSH services on the local network and resolve each one
+ * const search = hs.bonjour.createSearch()
+ * search.findServices('_ssh._tcp.', 'local.', (event, svc, moreComing) => {
+ *     if (event === 'serviceFound') {
+ *         svc.resolve(5, ev => {
+ *             if (ev === 'resolved') console.log(svc.hostname + ':' + svc.port)
+ *         })
+ *     }
+ * })
+ * ```
+ *
+ * ## Advertising a service
+ *
+ * ```js
+ * hs.bonjour.advertise('My Web Server', '_http._tcp.', 8080, ev => {
+ *     if (ev === 'published') console.log('Now advertising!')
+ *     else if (ev === 'error') console.error('Advertising failed')
+ * })
+ * // Later, to stop:
+ * hs.bonjour.stopAdvertising('My Web Server', '_http._tcp.')
+ * ```
+ *
+ * ## Listing all active service types
+ *
+ * ```js
+ * hs.bonjour.networkServices(5).then(types => {
+ *     console.log('Active service types: ' + types.join(', '))
+ * })
+ * ```
  */
 declare namespace hs.bonjour {
     /**
      * Creates a new Bonjour search for discovering services or domains.
-Call one of the `find…` methods on the returned search to start
-discovering. Remove it with `removeSearch()` when finished.
+     *
+     * Call one of the `find…` methods on the returned search to start
+     * discovering. Remove it with `removeSearch()` when finished.
      * @returns a new `HSBonjourSearch`
      */
     function createSearch(): HSBonjourSearch;
@@ -2231,9 +2378,15 @@ discovering. Remove it with `removeSearch()` when finished.
 
     /**
      * Starts advertising a local service on the network.
-If `domain` is omitted or not a string, it defaults to `"local."`.
-If the 4th argument is a function, it is used as the callback and domain
-defaults to `"local."`.
+     *
+     * The optional callback receives `(event)` or `(event, errorMessage)`:
+     * - `"published"` — now advertising
+     * - `"stopped"` — advertisement stopped
+     * - `"error"` — publication failed; error message in second argument
+     *
+     * If `domain` is omitted or not a string, it defaults to `"local."`.
+     * If the 4th argument is a function, it is used as the callback and domain
+     * defaults to `"local."`.
      * @param name human-readable name shown to browsers (e.g. `"My Web Server"`)
      * @param type service type in `"_proto._tcp."` or `"_proto._udp."` form
      * @param port port number the service listens on
@@ -2251,10 +2404,11 @@ defaults to `"local."`.
 
     /**
      * Returns a Promise that resolves to an array of service-type strings
-currently advertised on the local network.
-Internally searches for `_services._dns-sd._udp.` services, collects
-results for up to `timeout` seconds (or until the browser signals no more
-results), then resolves.
+     * currently advertised on the local network.
+     *
+     * Internally searches for `_services._dns-sd._udp.` services, collects
+     * results for up to `timeout` seconds (or until the browser signals no more
+     * results), then resolves.
      * @param timeout maximum seconds to wait (pass `0` to use the default 5 s)
      * @returns a Promise resolving to an array of service-type strings such as `"_http._tcp."`
      */
@@ -2262,7 +2416,8 @@ results), then resolves.
 
     /**
      * A frozen object mapping short service-type names to their mDNS strings.
-Populated by the JavaScript enhancement layer.
+     *
+     * Populated by the JavaScript enhancement layer.
      */
     const serviceTypes: Record<string, string>;
 
@@ -2270,30 +2425,36 @@ Populated by the JavaScript enhancement layer.
 
 /**
  * Discovers Bonjour services and domains advertised on the local network.
-Create via `hs.bonjour.newSearch()`, then call one of the `find…` methods.
-Each search type uses its own underlying `NetServiceBrowser`, so service and
-domain searches can run concurrently. Restarting any single search type stops
-only that browser before beginning the new one.
-## Service search callback events
-| Event | Data | Description |
-|-------|------|-------------|
-| `"serviceFound"` | `HSBonjourService` | A matching service appeared |
-| `"serviceRemoved"` | `HSBonjourService` | A previously found service disappeared |
-| `"error"` | error string | The search failed |
-## Domain search callback events
-| Event | Data | Description |
-|-------|------|-------------|
-| `"domainFound"` | domain string | A domain was discovered |
-| `"domainRemoved"` | domain string | A domain disappeared |
-| `"error"` | error string | The search failed |
+ *
+ * Create via `hs.bonjour.newSearch()`, then call one of the `find…` methods.
+ * Each search type uses its own underlying `NetServiceBrowser`, so service and
+ * domain searches can run concurrently. Restarting any single search type stops
+ * only that browser before beginning the new one.
+ *
+ * ## Service search callback events
+ *
+ * | Event | Data | Description |
+ * |-------|------|-------------|
+ * | `"serviceFound"` | `HSBonjourService` | A matching service appeared |
+ * | `"serviceRemoved"` | `HSBonjourService` | A previously found service disappeared |
+ * | `"error"` | error string | The search failed |
+ *
+ * ## Domain search callback events
+ *
+ * | Event | Data | Description |
+ * |-------|------|-------------|
+ * | `"domainFound"` | domain string | A domain was discovered |
+ * | `"domainRemoved"` | domain string | A domain disappeared |
+ * | `"error"` | error string | The search failed |
  */
 declare class HSBonjourSearch {
     /**
      * Searches for services of the given type in the given domain.
-If a service search is already active it is stopped before starting the
-new one. Domain searches are unaffected. The callback receives
-`(event, service, moreComing)` — see the type documentation for the
-complete event table.
+     *
+     * If a service search is already active it is stopped before starting the
+     * new one. Domain searches are unaffected. The callback receives
+     * `(event, service, moreComing)` — see the type documentation for the
+     * complete event table.
      * @remarks A running search, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @param type service type string, e.g. `"_http._tcp."` or `"_ssh._tcp."`
      * @param domain mDNS domain; `"local."` for the local link, `""` for all domains
@@ -2304,9 +2465,10 @@ complete event table.
 
     /**
      * Searches for domains visible to this machine (browsable domains).
-If a browsable-domain search is already active it is stopped before
-starting the new one. Service and registration-domain searches are
-unaffected. The callback receives `(event, domain, moreComing)`.
+     *
+     * If a browsable-domain search is already active it is stopped before
+     * starting the new one. Service and registration-domain searches are
+     * unaffected. The callback receives `(event, domain, moreComing)`.
      * @param callback Called for each result with event name, domain string, and whether more results are expected
      * @returns self, for chaining
      */
@@ -2314,9 +2476,10 @@ unaffected. The callback receives `(event, domain, moreComing)`.
 
     /**
      * Searches for domains on which this machine can register services.
-If a registration-domain search is already active it is stopped before
-starting the new one. Service and browsable-domain searches are
-unaffected. The callback receives `(event, domain, moreComing)`.
+     *
+     * If a registration-domain search is already active it is stopped before
+     * starting the new one. Service and browsable-domain searches are
+     * unaffected. The callback receives `(event, domain, moreComing)`.
      * @param callback Called for each result with event name, domain string, and whether more results are expected
      * @returns self, for chaining
      */
@@ -2335,7 +2498,7 @@ unaffected. The callback receives `(event, domain, moreComing)`.
 
     /**
      * Whether to search over peer-to-peer Bluetooth/Wi-Fi in addition to
-standard network interfaces. Defaults to `false`.
+     * standard network interfaces. Defaults to `false`.
      */
     includesPeerToPeer: boolean;
 
@@ -2343,21 +2506,29 @@ standard network interfaces. Defaults to `false`.
 
 /**
  * A discovered Bonjour service record. Call `resolve()` to look up its
-hostname, port, and addresses.
-Instances are delivered by an `HSBonjourSearch` callback. Call `resolve()`
-to discover their hostname, port, and addresses, and optionally `monitor()`
-to watch for TXT record changes.
-## Callback events
-| Method | Event | Extra data |
-|--------|-------|------------|
-| `resolve()` | `"resolved"` | _(none)_ |
-| `resolve()` | `"stopped"` | _(none)_ |
-| `resolve()` | `"error"` | error message string |
-| `monitor()` | `"txtRecord"` | updated TXT record dict |
+ * hostname, port, and addresses.
+ *
+ * Instances are delivered by an `HSBonjourSearch` callback. Call `resolve()`
+ * to discover their hostname, port, and addresses, and optionally `monitor()`
+ * to watch for TXT record changes.
+ *
+ * ## Callback events
+ *
+ * | Method | Event | Extra data |
+ * |--------|-------|------------|
+ * | `resolve()` | `"resolved"` | _(none)_ |
+ * | `resolve()` | `"stopped"` | _(none)_ |
+ * | `resolve()` | `"error"` | error message string |
+ * | `monitor()` | `"txtRecord"` | updated TXT record dict |
  */
 declare class HSBonjourService {
     /**
      * Resolves the hostname, port, addresses, and TXT record of this service.
+     *
+     * The callback is called with `(event)` or `(event, errorMessage)`:
+     * - `"resolved"` — resolution complete; read `hostname`, `port`, `addresses`, `txtRecord`
+     * - `"stopped"` — resolution stopped before completing
+     * - `"error"` — resolution failed; error message in second argument
      * @remarks A resolving or monitored service, and its callbacks, stay alive until that finishes or is stopped, even if you don't keep a reference to it
      * @param timeout seconds before giving up; pass `0` for no timeout
      * @param callback Called on status changes with event name and optional error message
@@ -2367,8 +2538,9 @@ declare class HSBonjourService {
 
     /**
      * Starts monitoring the TXT record for changes. The callback fires whenever
-the TXT record is updated.
-Call `stopMonitoring()` to unsubscribe.
+     * the TXT record is updated.
+     *
+     * Call `stopMonitoring()` to unsubscribe.
      * @param callback Called when TXT data changes with the updated record
      * @returns self, for chaining
      */
@@ -2388,7 +2560,8 @@ Call `stopMonitoring()` to unsubscribe.
 
     /**
      * Returns a plain object describing this service, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the service's `name`, `type`, `domain`, `hostname`, `port`, `addresses`, `txtRecord` and `includesPeerToPeer`. `hostname` and `txtRecord` are `null` until the service has been resolved
      */
     toJSON(): Record<string, any>;
@@ -2430,7 +2603,7 @@ Call `stopMonitoring()` to unsubscribe.
 
     /**
      * The TXT record as a `{key: value}` object, or `null` if none is available.
-Populated after `resolve()` completes or when updated via `monitor()`.
+     * Populated after `resolve()` completes or when updated via `monitor()`.
      */
     readonly txtRecord: Record<string, string> | null;
 
@@ -2443,38 +2616,48 @@ Populated after `resolve()` completes or when updated via `monitor()`.
 
 /**
  * Module for discovering and interacting with camera devices.
-This module lets you enumerate cameras, capture still images, and react to
-device connect/disconnect events in real time.
-Camera access requires user permission. Call `hs.permissions.requestCamera()`
-before using ``captureImage()`` or reading ``isInUse``.
-## Enumerating cameras
-```javascript
-const cameras = hs.camera.all()
-cameras.forEach(cam => {
-    console.log(cam.name + " — " + (cam.isInUse ? "in use" : "idle"))
-})
-```
-## Finding a specific camera
-```javascript
-const cam = hs.camera.findByName("FaceTime HD Camera")
-if (cam) {
-    cam.captureImage()
-        .then(img => img.saveToFile("/tmp/snapshot.png"))
-        .catch(err => console.error("Capture error: " + err))
-}
-```
-## Watching for connect / disconnect events
-```javascript
-hs.camera.on("connected", camera => console.log("Camera connected: " + camera.name))
-hs.camera.on("disconnected", camera => console.log("Camera disconnected: " + camera.name))
-```
-## Watching a camera's in-use state
-```javascript
-const cam = hs.camera.all()[0]
-cam.on(() => {
-    console.log(cam.name + " is now " + (cam.isInUse ? "in use" : "idle"))
-})
-```
+ *
+ * This module lets you enumerate cameras, capture still images, and react to
+ * device connect/disconnect events in real time.
+ *
+ * Camera access requires user permission. Call `hs.permissions.requestCamera()`
+ * before using ``captureImage()`` or reading ``isInUse``.
+ *
+ * ## Enumerating cameras
+ *
+ * ```javascript
+ * const cameras = hs.camera.all()
+ * cameras.forEach(cam => {
+ *     console.log(cam.name + " — " + (cam.isInUse ? "in use" : "idle"))
+ * })
+ * ```
+ *
+ * ## Finding a specific camera
+ *
+ * ```javascript
+ * const cam = hs.camera.findByName("FaceTime HD Camera")
+ * if (cam) {
+ *     cam.captureImage()
+ *         .then(img => img.saveToFile("/tmp/snapshot.png"))
+ *         .catch(err => console.error("Capture error: " + err))
+ * }
+ * ```
+ *
+ * ## Watching for connect / disconnect events
+ *
+ * ```javascript
+ * hs.camera.on("connected", camera => console.log("Camera connected: " + camera.name))
+ * hs.camera.on("disconnected", camera => console.log("Camera disconnected: " + camera.name))
+ * ```
+ *
+ * ## Watching a camera's in-use state
+ *
+ * ```javascript
+ * const cam = hs.camera.all()[0]
+ * cam.on(() => {
+ *     console.log(cam.name + " is now " + (cam.isInUse ? "in use" : "idle"))
+ * })
+ * ```
  */
 declare namespace hs.camera {
     /**
@@ -2524,36 +2707,44 @@ declare namespace hs.camera {
 
 /**
  * A camera device attached to the system.
-Obtain instances via the ``hs.camera`` module — do not instantiate directly.
-## Reading camera properties
-```javascript
-const cam = hs.camera.all()[0]
-console.log(cam.name + " uid=" + cam.uid + " inUse=" + cam.isInUse)
-```
-## Watching for in-use state changes
-```javascript
-const cam = hs.camera.all()[0]
-const fn = (isInUse) => {
-    console.log(cam.name + " is now " + (isInUse ? "in use" : "not in use"))
-}
-cam.on(fn)
-// later…
-cam.off(fn)
-```
-## Capturing a still image
-```javascript
-const cam = hs.camera.all()[0]
-cam.captureImage()
-    .then(img => img.saveToFile("/tmp/shot.png"))
-    .catch(err => console.error("Capture failed: " + err))
-```
+ *
+ * Obtain instances via the ``hs.camera`` module — do not instantiate directly.
+ *
+ * ## Reading camera properties
+ *
+ * ```javascript
+ * const cam = hs.camera.all()[0]
+ * console.log(cam.name + " uid=" + cam.uid + " inUse=" + cam.isInUse)
+ * ```
+ *
+ * ## Watching for in-use state changes
+ *
+ * ```javascript
+ * const cam = hs.camera.all()[0]
+ * const fn = (isInUse) => {
+ *     console.log(cam.name + " is now " + (isInUse ? "in use" : "not in use"))
+ * }
+ * cam.on(fn)
+ * // later…
+ * cam.off(fn)
+ * ```
+ *
+ * ## Capturing a still image
+ *
+ * ```javascript
+ * const cam = hs.camera.all()[0]
+ * cam.captureImage()
+ *     .then(img => img.saveToFile("/tmp/shot.png"))
+ *     .catch(err => console.error("Capture failed: " + err))
+ * ```
  */
 declare class HSCamera {
     /**
      * Register a listener that fires whenever this camera's in-use state changes.
-The listener receives one argument: a boolean that is `true` when the camera
-starts being used and `false` when it is released. A camera only has one kind
-of event, so unlike the module-level watchers there is no event name to pass.
+     *
+     * The listener receives one argument: a boolean that is `true` when the camera
+     * starts being used and `false` when it is released. A camera only has one kind
+     * of event, so unlike the module-level watchers there is no event name to pass.
      * @param listener A JavaScript function called with `true` when the camera starts being used and `false` when released
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
@@ -2574,9 +2765,10 @@ of event, so unlike the module-level watchers there is no event name to pass.
 
     /**
      * Capture a still image from this camera.
-Camera permission must be granted via `hs.permissions.requestCamera()` before calling
-this method. The returned `HSImage` can be saved, displayed in a UI element, or
-passed to other image-processing APIs.
+     *
+     * Camera permission must be granted via `hs.permissions.requestCamera()` before calling
+     * this method. The returned `HSImage` can be saved, displayed in a UI element, or
+     * passed to other image-processing APIs.
      * @returns A Promise that resolves to an `HSImage`, or rejects on error
      */
     captureImage(): Promise<HSImage>;
@@ -2598,7 +2790,8 @@ passed to other image-processing APIs.
 
     /**
      * Whether this camera is currently being used by any application.
-Queries the underlying CoreMediaIO device state each time it is read.
+     *
+     * Queries the underlying CoreMediaIO device state each time it is read.
      */
     readonly isInUse: boolean;
 
@@ -2606,45 +2799,54 @@ Queries the underlying CoreMediaIO device state each time it is read.
 
 /**
  * # hs.canvas
-**A low-level, absolutely-positioned drawing surface**
-`hs.canvas` mirrors v1 Hammerspoon's `hs.canvas` module: elements are plain JS
-objects (mirroring v1's Lua tables) describing shapes (`rectangle`, `circle`,
-`oval`, `text`) with a `fill`/`stroke`/`strokeAndFill`/`clip`/`build`/`skip` action
-pipeline. This is a different tool from `hs.ui`, which is a SwiftUI stack/layout
-builder for app-like interfaces -- reach for `hs.canvas` when you need absolute
-positioning, clipped/composited shapes, or direct window-level/Spaces control.
-## Coordinate systems -- read this before positioning elements
-A canvas's **window position** (`create({x, y, w, h})`, and any later `x`/`y` you
-`y = 0` is the *bottom* of the screen, and `y` increases upward. This matches
-`hs.ui.window`.
-But **element content** positioned *inside* a canvas -- every `frame`, `center`, and
-`y = 0` is the *top* of the canvas, and `y` increases downward. These two coordinate
-senses are independent of each other and easy to conflate, especially when a script
-computes an element's position from the same screen geometry it used for the
-window's own placement. If a shape appears vertically mirrored from where you
-expect, this mismatch is the first thing to check.
-## Example: a rounded screen corner overlay
-```javascript
-const radius = 12
-const corner = hs.canvas.create({x: 0, y: 0, w: radius, h: radius})
-corner.appendElements([
-    { action: "build", type: "rectangle" },
-    { action: "clip", type: "circle", center: {x: radius, y: radius}, radius: radius, reversePath: true },
-    { action: "fill", type: "rectangle", fillColor: { alpha: 1 } },
-    { type: "resetClip" }
-])
-corner.levelValue(hs.canvas.windowLevels.screenSaver + 1)
-corner.behavior("canJoinAllSpaces")
-corner.show()
-```
+ *
+ * **A low-level, absolutely-positioned drawing surface**
+ *
+ * `hs.canvas` mirrors v1 Hammerspoon's `hs.canvas` module: elements are plain JS
+ * objects (mirroring v1's Lua tables) describing shapes (`rectangle`, `circle`,
+ * `oval`, `text`) with a `fill`/`stroke`/`strokeAndFill`/`clip`/`build`/`skip` action
+ * pipeline. This is a different tool from `hs.ui`, which is a SwiftUI stack/layout
+ * builder for app-like interfaces -- reach for `hs.canvas` when you need absolute
+ * positioning, clipped/composited shapes, or direct window-level/Spaces control.
+ *
+ * ## Coordinate systems -- read this before positioning elements
+ *
+ * A canvas's **window position** (`create({x, y, w, h})`, and any later `x`/`y` you
+ * compare it against, e.g. from `hs.screen`) uses unflipped AppKit screen coordinates:
+ * `y = 0` is the *bottom* of the screen, and `y` increases upward. This matches
+ * `hs.ui.window`.
+ *
+ * But **element content** positioned *inside* a canvas -- every `frame`, `center`, and
+ * `coordinates` value you pass to `appendElements()` and friends -- is drawn top-down:
+ * `y = 0` is the *top* of the canvas, and `y` increases downward. These two coordinate
+ * senses are independent of each other and easy to conflate, especially when a script
+ * computes an element's position from the same screen geometry it used for the
+ * window's own placement. If a shape appears vertically mirrored from where you
+ * expect, this mismatch is the first thing to check.
+ *
+ * ## Example: a rounded screen corner overlay
+ * ```javascript
+ * const radius = 12
+ * const corner = hs.canvas.create({x: 0, y: 0, w: radius, h: radius})
+ * corner.appendElements([
+ *     { action: "build", type: "rectangle" },
+ *     { action: "clip", type: "circle", center: {x: radius, y: radius}, radius: radius, reversePath: true },
+ *     { action: "fill", type: "rectangle", fillColor: { alpha: 1 } },
+ *     { type: "resetClip" }
+ * ])
+ * corner.levelValue(hs.canvas.windowLevels.screenSaver + 1)
+ * corner.behavior("canJoinAllSpaces")
+ * corner.show()
+ * ```
  */
 declare namespace hs.canvas {
     /**
      * Create a new canvas
-Named `create()` rather than v1's `new()` -- `new` cannot be used as a
-JavaScriptCore-exported method name (it collides with the JS `new` operator
-keyword at the bridging layer), and this codebase's conventions additionally
-forbid method names starting with `new`/`alloc`/`copy` (an ARC/ObjC hazard).
+     *
+     * Named `create()` rather than v1's `new()` -- `new` cannot be used as a
+     * JavaScriptCore-exported method name (it collides with the JS `new` operator
+     * keyword at the bridging layer), and this codebase's conventions additionally
+     * forbid method names starting with `new`/`alloc`/`copy` (an ARC/ObjC hazard).
      * @param rect A `{x, y, w, h}` dictionary describing the canvas window's frame
      * @returns A new HSCanvas, not yet shown
      */
@@ -2652,7 +2854,7 @@ forbid method names starting with `new`/`alloc`/`copy` (an ARC/ObjC hazard).
 
     /**
      * Named window levels, exposed as raw numeric values (not opaque strings) so
-scripts can do arithmetic on them, matching v1 behavior.
+     * scripts can do arithmetic on them, matching v1 behavior.
      */
     const windowLevels: Record<string, number>;
 
@@ -2670,30 +2872,33 @@ scripts can do arithmetic on them, matching v1 behavior.
 
 /**
  * # HSCanvas
-A single canvas window: an absolutely-positioned, low-level drawing surface
-mirroring v1 Hammerspoon's `hs.canvas`. Elements are plain JS objects (matching
-v1's Lua tables) added with `appendElements()` and mutated in place with
-`setElementAttribute()`/`elementAttribute()`. Supports the same `fill`/`stroke`/
-`strokeAndFill`/`clip`/`build`/`skip` action pipeline as v1, including the
-`build`+`clip`+`reversePath` technique used to punch holes in shapes (see
-`hs.canvas.windowLevels`/`hs.canvas.windowBehaviors` for the window-level/Spaces
-controls needed alongside this for overlay-style canvases).
-## Example
-```javascript
-const c = hs.canvas.create({x: 100, y: 100, w: 200, h: 200})
-c.appendElements([
-    { type: "rectangle", action: "fill", fillColor: { red: 0.2, green: 0.5, blue: 0.9, alpha: 1 } }
-])
-c.show()
-```
+ *
+ * A single canvas window: an absolutely-positioned, low-level drawing surface
+ * mirroring v1 Hammerspoon's `hs.canvas`. Elements are plain JS objects (matching
+ * v1's Lua tables) added with `appendElements()` and mutated in place with
+ * `setElementAttribute()`/`elementAttribute()`. Supports the same `fill`/`stroke`/
+ * `strokeAndFill`/`clip`/`build`/`skip` action pipeline as v1, including the
+ * `build`+`clip`+`reversePath` technique used to punch holes in shapes (see
+ * `hs.canvas.windowLevels`/`hs.canvas.windowBehaviors` for the window-level/Spaces
+ * controls needed alongside this for overlay-style canvases).
+ *
+ * ## Example
+ * ```javascript
+ * const c = hs.canvas.create({x: 100, y: 100, w: 200, h: 200})
+ * c.appendElements([
+ *     { type: "rectangle", action: "fill", fillColor: { red: 0.2, green: 0.5, blue: 0.9, alpha: 1 } }
+ * ])
+ * c.show()
+ * ```
  */
 declare class HSCanvas {
     /**
      * Show the canvas window, optionally fading it in
-A fade goes from fully transparent up to the canvas's `alpha()`. Calling `show()`,
-`hide()` or `destroy()` while a fade is running replaces that fade, so showing a
-canvas that is fading out of `hide()` brings it back. A canvas that has been
-destroyed can't be shown again, even while it is still fading out.
+     *
+     * A fade goes from fully transparent up to the canvas's `alpha()`. Calling `show()`,
+     * `hide()` or `destroy()` while a fade is running replaces that fade, so showing a
+     * canvas that is fading out of `hide()` brings it back. A canvas that has been
+     * destroyed can't be shown again, even while it is still fading out.
      * @remarks A shown canvas stays on screen, with its callbacks, until it's hidden or destroyed, even if you don't keep a reference to it
      * @param fadeInTime The number of seconds to fade the canvas in over. Defaults to `0`, which shows it immediately
      * @returns Self for chaining
@@ -2703,9 +2908,10 @@ destroyed can't be shown again, even while it is still fading out.
 
     /**
      * Hide the canvas window, optionally fading it out (elements and window config are preserved while you keep a reference to it)
-The canvas keeps its callbacks, and `isShowing()` stays `true`, until a fade-out
-has finished. Afterwards its `alpha()` is unchanged, so the next `show()` brings it
-back at the same opacity. Hiding a canvas that has been destroyed does nothing.
+     *
+     * The canvas keeps its callbacks, and `isShowing()` stays `true`, until a fade-out
+     * has finished. Afterwards its `alpha()` is unchanged, so the next `show()` brings it
+     * back at the same opacity. Hiding a canvas that has been destroyed does nothing.
      * @param fadeOutTime The number of seconds to fade the canvas out over. Defaults to `0`, which hides it immediately
      * @returns Self for chaining
      */
@@ -2713,14 +2919,16 @@ back at the same opacity. Hiding a canvas that has been destroyed does nothing.
 
     /**
      * Destroy the canvas window and release its resources, optionally fading it out first
-This releases the canvas's window, callbacks and elements (including any images
-they hold) straight away, rather than when the canvas is garbage collected. A
-destroyed canvas is finished with: from the moment `destroy()` is called, calling
-`show()`, `appendElements()`, `insertElement()`, `assignElement()`,
-`replaceElements()`, `mouseCallback()`, `draggingCallback()` or `duplicate()` on it
-throws an error, and `imageFromCanvas()` returns `null`.
-Named `destroy()` rather than v1's `delete()` -- `delete` cannot be used as a
-JavaScriptCore-exported method name in this codebase's bridging layer.
+     *
+     * This releases the canvas's window, callbacks and elements (including any images
+     * they hold) straight away, rather than when the canvas is garbage collected. A
+     * destroyed canvas is finished with: from the moment `destroy()` is called, calling
+     * `show()`, `appendElements()`, `insertElement()`, `assignElement()`,
+     * `replaceElements()`, `mouseCallback()`, `draggingCallback()` or `duplicate()` on it
+     * throws an error, and `imageFromCanvas()` returns `null`.
+     *
+     * Named `destroy()` rather than v1's `delete()` -- `delete` cannot be used as a
+     * JavaScriptCore-exported method name in this codebase's bridging layer.
      * @param fadeOutTime The number of seconds to fade the canvas out over before destroying it. Defaults to `0`, which destroys it immediately
      */
     destroy(fadeOutTime?: number): void;
@@ -2733,7 +2941,8 @@ JavaScriptCore-exported method name in this codebase's bridging layer.
 
     /**
      * Set the opacity of the whole canvas window
-This is the opacity `show()` fades in to, and that a hidden canvas comes back at.
+     *
+     * This is the opacity `show()` fades in to, and that a hidden canvas comes back at.
      * @param alpha The opacity, from `0` (fully transparent) to `1` (fully opaque). Values outside that range are clamped
      * @returns Self for chaining
      */
@@ -2772,7 +2981,9 @@ This is the opacity `show()` fades in to, and that a hidden canvas comes back at
 
     /**
      * The canvas window's current top-left corner
-the point at the window's highest `y` (its screen-visual top), not `y = 0`.
+     *
+     * "Top-left" here means the same unflipped AppKit sense `create()`/`frame()` use:
+     * the point at the window's highest `y` (its screen-visual top), not `y = 0`.
      * @returns An `{x, y}` dictionary
      */
     topLeft(): object;
@@ -2806,10 +3017,11 @@ the point at the window's highest `y` (its screen-visual top), not `y = 0`.
 
     /**
      * Set the window level to a raw numeric value
-Split out from `level(_:)` (rather than accepting a string-or-number union)
-because JSExport parameters must have a single concrete type -- see
-`hs.canvas.windowLevels`, which exposes raw numeric values (not opaque name
-strings) so scripts can do arithmetic on them, matching v1 behavior.
+     *
+     * Split out from `level(_:)` (rather than accepting a string-or-number union)
+     * because JSExport parameters must have a single concrete type -- see
+     * `hs.canvas.windowLevels`, which exposes raw numeric values (not opaque name
+     * strings) so scripts can do arithmetic on them, matching v1 behavior.
      * @param value A raw numeric window level
      * @returns Self for chaining
      */
@@ -2824,9 +3036,10 @@ strings) so scripts can do arithmetic on them, matching v1 behavior.
 
     /**
      * Set the window's Spaces/Exposé collection behavior to a combination of named behaviors
-Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
-`canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
-Unknown names are logged and ignored.
+     *
+     * Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
+     * `canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
+     * Unknown names are logged and ignored.
      * @param names Behavior names from `hs.canvas.windowBehaviors`, combined together
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -2835,8 +3048,9 @@ Unknown names are logged and ignored.
 
     /**
      * Set the window's Spaces/Exposé collection behavior to a raw bitmask
-Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
-`canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
+     *
+     * Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
+     * `canJoinAllSpaces` with `moveToActiveSpace`), leaving the current behavior unchanged.
      * @param value A raw `NSWindow.CollectionBehavior` bitmask
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -2852,8 +3066,9 @@ Throws if the behavior combines flags AppKit treats as mutually exclusive (e.g.
 
     /**
      * Set whether the canvas window ignores all mouse events, passing clicks through to whatever is behind it
-This is a capability beyond v1's `hs.canvas` API surface (not a literal v1 method
-name) -- v1 has no direct equivalent for full click pass-through.
+     *
+     * This is a capability beyond v1's `hs.canvas` API surface (not a literal v1 method
+     * name) -- v1 has no direct equivalent for full click pass-through.
      * @param flag Pass `true` to make the canvas fully click-through
      * @returns Self for chaining
      */
@@ -2861,10 +3076,11 @@ name) -- v1 has no direct equivalent for full click pass-through.
 
     /**
      * Append one or more elements to the end of the canvas
-Element `frame`/`center`/`coordinates` values are y-down (`y = 0` at the top of
-the canvas) -- a different sense from the canvas *window's* own `x`/`y` position,
-which is unflipped AppKit screen coordinates. See `hs.canvas`'s module-level docs
-for the full explanation.
+     *
+     * Element `frame`/`center`/`coordinates` values are y-down (`y = 0` at the top of
+     * the canvas) -- a different sense from the canvas *window's* own `x`/`y` position,
+     * which is unflipped AppKit screen coordinates. See `hs.canvas`'s module-level docs
+     * for the full explanation.
      * @param elements Array of element dictionaries (each needs at least a `type`)
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -2931,10 +3147,11 @@ for the full explanation.
 
     /**
      * Get a single attribute value from an element
-Returns `Any?` (mirroring `hs.userdefaults.get()`) rather than a concrete Swift
-type because an element attribute's value is genuinely heterogeneous -- a
-string, number, boolean, nested object, or array, matching v1's dynamically-typed
-Lua table values.
+     *
+     * Returns `Any?` (mirroring `hs.userdefaults.get()`) rather than a concrete Swift
+     * type because an element attribute's value is genuinely heterogeneous -- a
+     * string, number, boolean, nested object, or array, matching v1's dynamically-typed
+     * Lua table values.
      * @param index The element index
      * @param key The attribute key
      * @returns The attribute's current value, or `null` if not set
@@ -2967,13 +3184,19 @@ Lua table values.
 
     /**
      * The smallest size that can fully render a string of text, using the font attributes
-(`textFont`/`textSize`/`textWeight`/`textDesign`/`textItalic`) of an element, of an
-attributes object, or the defaults
-`index`. Any element type works; attributes it doesn't set use their defaults.
-object, so text can be measured before any element exists.
-at size 27, as a text element with no font attributes would be drawn).
-Multi-line strings (separated by `\n`) are measured correctly -- the height covers every
-line and the width is the longest line's width, not a fixed single-line size.
+     * (`textFont`/`textSize`/`textWeight`/`textDesign`/`textItalic`) of an element, of an
+     * attributes object, or the defaults
+     *
+     * Mirrors v1's `hs.canvas:minimumTextSize([index], text)`. It can be called three ways:
+     * - `minimumTextSize(index, text)` measures with the font attributes of the element at
+     *   `index`. Any element type works; attributes it doesn't set use their defaults.
+     * - `minimumTextSize(attributes, text)` measures with the font attributes in a plain
+     *   object, so text can be measured before any element exists.
+     * - `minimumTextSize(text)` measures with the default font attributes (the system font
+     *   at size 27, as a text element with no font attributes would be drawn).
+     *
+     * Multi-line strings (separated by `\n`) are measured correctly -- the height covers every
+     * line and the width is the longest line's width, not a fixed single-line size.
      * @param source The index of an element whose font attributes to measure with, an object of font attributes, or the string to measure (to use the default font attributes)
      * @param text The string to measure -- it doesn't need to match the element's own `text`. Omitted when `source` is the string
      * @returns A `{w, h}` dictionary, or `{}` (with a warning logged) if `index` is out of bounds or the arguments are invalid
@@ -2982,12 +3205,13 @@ line and the width is the longest line's width, not a fixed single-line size.
 
     /**
      * Set the callback fired for tracked mouse events
-Fires for elements with `trackMouseDown`/`trackMouseUp`/`trackMouseEnterExit`/
-`trackMouseMove`/`trackRightMouseDown`/`trackRightMouseUp` set to `true` in their
-element dictionary, and for whole-canvas regions enabled via `canvasMouseEvents()`
-(delivered with id `"_canvas"`). `mouseDown`/`mouseUp` are the left button only;
-the right button (or a Ctrl-click, the standard macOS secondary click) is reported
-separately as `rightMouseDown`/`rightMouseUp`.
+     *
+     * Fires for elements with `trackMouseDown`/`trackMouseUp`/`trackMouseEnterExit`/
+     * `trackMouseMove`/`trackRightMouseDown`/`trackRightMouseUp` set to `true` in their
+     * element dictionary, and for whole-canvas regions enabled via `canvasMouseEvents()`
+     * (delivered with id `"_canvas"`). `mouseDown`/`mouseUp` are the left button only;
+     * the right button (or a Ctrl-click, the standard macOS secondary click) is reported
+     * separately as `rightMouseDown`/`rightMouseUp`.
      * @param callback A JavaScript function called with the canvas, the event name (`"mouseDown"`/`"mouseUp"`/`"rightMouseDown"`/`"rightMouseUp"`/`"mouseEnter"`/`"mouseExit"`/`"mouseMove"`), the tracked element's id, and the event's x/y coordinates
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -2996,9 +3220,7 @@ separately as `rightMouseDown`/`rightMouseUp`.
 
     /**
      * Enable whole-canvas mouse tracking for regions not covered by any individually
-tracked element. Delivered through `mouseCallback()` with id `"_canvas"`.
-all six flags, so omitting this turns right mouse-down tracking off
-six flags, so omitting this turns right mouse-up tracking off
+     * tracked element. Delivered through `mouseCallback()` with id `"_canvas"`.
      * @param down Track mouse-down events
      * @param up Track mouse-up events
      * @param enterExit Track mouse enter/exit events
@@ -3055,10 +3277,11 @@ six flags, so omitting this turns right mouse-up tracking off
 
     /**
      * Create an independent copy of this canvas, with the same frame, elements, and
-window configuration
-Named `duplicate()` rather than v1's `copy()` -- this codebase's conventions
-forbid method names starting with `copy` (an ARC/ObjC hazard), the same rule
-that renamed `new()` to `create()`.
+     * window configuration
+     *
+     * Named `duplicate()` rather than v1's `copy()` -- this codebase's conventions
+     * forbid method names starting with `copy` (an ARC/ObjC hazard), the same rule
+     * that renamed `new()` to `create()`.
      * @returns A new HSCanvas
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
@@ -3083,53 +3306,65 @@ that renamed `new()` to `create()`.
 
 /**
  * # hs.chooser
-**A Spotlight-style chooser for presenting options to the user**
-`hs.chooser` lets you show a floating search panel that users can type into to filter and
-select from a list of items. It's ideal for launchers, emoji pickers, command palettes, and
-any interface where you want fast, keyboard-driven selection.
-## Quick Start
-```javascript
-const chooser = hs.chooser.create()
-
-chooser.setChoices([
-    { text: "Open Safari", subText: "Web browser", action: "safari" },
-    { text: "Open Terminal", subText: "Command line", action: "terminal" }
-])
-
-chooser.onSelect = (item) => {
-    if (item) console.log("Selected: " + item.text + " (" + item.action + ")")
-}
-
-chooser.show()
-```
-## Dynamic Choices
-```javascript
-const allApps = hs.application.runningApplications()
-
-chooser.setChoices((query) => {
-    const q = query.toLowerCase()
-    return allApps
-        .filter(a => a.name.toLowerCase().includes(q))
-        .map(a => ({ text: a.name, subText: a.bundleID }))
-})
-```
-## Async Choices (with debounce)
-```javascript
-let debounceTimer = null
-let cachedResults = []
-
-chooser.setChoices(() => cachedResults)
-
-chooser.onQueryChange = (query) => {
-    if (debounceTimer) debounceTimer.invalidate()
-    debounceTimer = hs.timer.doAfter(0.05, () => {
-        fetchFromAPI(query).then(results => {
-            cachedResults = results
-            chooser.refreshChoices()
-        })
-    })
-}
-```
+ *
+ * **A Spotlight-style chooser for presenting options to the user**
+ *
+ * `hs.chooser` lets you show a floating search panel that users can type into to filter and
+ * select from a list of items. It's ideal for launchers, emoji pickers, command palettes, and
+ * any interface where you want fast, keyboard-driven selection.
+ *
+ * ## Quick Start
+ *
+ * ```javascript
+ * const chooser = hs.chooser.create()
+ *
+ * chooser.setChoices([
+ *     { text: "Open Safari", subText: "Web browser", action: "safari" },
+ *     { text: "Open Terminal", subText: "Command line", action: "terminal" }
+ * ])
+ *
+ * chooser.onSelect = (item) => {
+ *     if (item) console.log("Selected: " + item.text + " (" + item.action + ")")
+ * }
+ *
+ * chooser.show()
+ * ```
+ *
+ * ## Dynamic Choices
+ *
+ * For search-as-you-type filtering powered by your own data:
+ *
+ * ```javascript
+ * const allApps = hs.application.runningApplications()
+ *
+ * chooser.setChoices((query) => {
+ *     const q = query.toLowerCase()
+ *     return allApps
+ *         .filter(a => a.name.toLowerCase().includes(q))
+ *         .map(a => ({ text: a.name, subText: a.bundleID }))
+ * })
+ * ```
+ *
+ * ## Async Choices (with debounce)
+ *
+ * For results fetched from an external source:
+ *
+ * ```javascript
+ * let debounceTimer = null
+ * let cachedResults = []
+ *
+ * chooser.setChoices(() => cachedResults)
+ *
+ * chooser.onQueryChange = (query) => {
+ *     if (debounceTimer) debounceTimer.invalidate()
+ *     debounceTimer = hs.timer.doAfter(0.05, () => {
+ *         fetchFromAPI(query).then(results => {
+ *             cachedResults = results
+ *             chooser.refreshChoices()
+ *         })
+ *     })
+ * }
+ * ```
  */
 declare namespace hs.chooser {
     /**
@@ -3142,36 +3377,56 @@ declare namespace hs.chooser {
 
 /**
  * A keyboard-driven floating chooser panel.
-Create via `hs.chooser.create()`. Configure choices, set callbacks, then call `.show()`.
-## Choice format
-Each choice is a plain object with required `text` and optional `subText`, `image`, `valid`,
-and `contextMenu` fields. All other fields are passed through to the `onSelect` callback unchanged.
-Set `contextMenu: false` on a choice to show no context menu on its row.
-```javascript
-{
-  text: "Open Safari", subText: "com.apple.Safari",
-  image: HSImage.fromAppBundle("com.apple.Safari"), valid: true, myData: 42
-}
-```
-## Context menu
-A single right-click menu, set with `contextMenu`, is shared by every row (except choices with
-`contextMenu: false`). When the user picks one of its entries, `onContextMenuSelect` is called
-with the row's choice and the menu entry.
-```javascript
-chooser.contextMenu = [
-  { title: "Open", id: "open" },
-  { type: "divider" },
-  { title: "Copy bundle ID", id: "copy" }
-]
-chooser.onContextMenuSelect = (choice, menuItem) => {
-  if (menuItem.id === "copy") hs.pasteboard.writeString(choice.subText)
-}
-```
-## Keyboard shortcuts
+ *
+ * Create via `hs.chooser.create()`. Configure choices, set callbacks, then call `.show()`.
+ *
+ * ## Choice format
+ *
+ * Each choice is a plain object with required `text` and optional `subText`, `image`, `valid`,
+ * and `contextMenu` fields. All other fields are passed through to the `onSelect` callback unchanged.
+ * Set `contextMenu: false` on a choice to show no context menu on its row.
+ *
+ * ```javascript
+ * {
+ *   text: "Open Safari", subText: "com.apple.Safari",
+ *   image: HSImage.fromAppBundle("com.apple.Safari"), valid: true, myData: 42
+ * }
+ * ```
+ *
+ * ## Context menu
+ *
+ * A single right-click menu, set with `contextMenu`, is shared by every row (except choices with
+ * `contextMenu: false`). When the user picks one of its entries, `onContextMenuSelect` is called
+ * with the row's choice and the menu entry.
+ *
+ * ```javascript
+ * chooser.contextMenu = [
+ *   { title: "Open", id: "open" },
+ *   { type: "divider" },
+ *   { title: "Copy bundle ID", id: "copy" }
+ * ]
+ * chooser.onContextMenuSelect = (choice, menuItem) => {
+ *   if (menuItem.id === "copy") hs.pasteboard.writeString(choice.subText)
+ * }
+ * ```
+ *
+ * ## Keyboard shortcuts
+ *
+ * - **Return** — confirm selection
+ * - **Escape** — dismiss (calls `onSelect` with `null`)
+ * - **↑ / ↓** — move through results
+ * - **Ctrl-N / Ctrl-P** — move through results (alternative to ↑ / ↓)
+ * - **Page Up / Page Down** (or **Fn-↑ / Fn-↓**) — move through results a page (`visibleRows` rows) at a time
+ * - **Home / End** (or **Fn-← / Fn-→**) — jump to the first / last result
+ * - **Cmd-1 ... Cmd-9, Cmd-0** — instantly select one of the first ten results
  */
 declare class HSChooser {
     /**
-     * on show. The function is responsible for filtering; the chooser displays all items it returns.
+     * Set the choices list. Pass a static array or a function:
+     *
+     * - **Array** — the chooser filters it automatically as the user types.
+     * - **Function** — called with the current query string on every `refreshChoices()` and
+     *   on show. The function is responsible for filtering; the chooser displays all items it returns.
      * @param choices An array of choice objects, or a function `(query) => [...]`
      * @returns Self for chaining
      */
@@ -3179,7 +3434,7 @@ declare class HSChooser {
 
     /**
      * Re-apply filtering (static choices) or re-invoke the choices function (dynamic).
-Call after updating an external data source in an async `onQueryChange` handler.
+     * Call after updating an external data source in an async `onQueryChange` handler.
      * @returns Self for chaining
      */
     refreshChoices(): HSChooser;
@@ -3199,8 +3454,9 @@ Call after updating an external data source in an async `onQueryChange` handler.
 
     /**
      * Programmatically confirm a selection.
-Omit `row` to confirm the currently highlighted row. Fires `onSelect` (or `onInvalid`
-for rows with `valid: false`) and hides the chooser.
+     *
+     * Omit `row` to confirm the currently highlighted row. Fires `onSelect` (or `onInvalid`
+     * for rows with `valid: false`) and hides the chooser.
      * @param row Zero-based row index, or omit to use the current selection.
      * @returns Self for chaining
      */
@@ -3208,7 +3464,7 @@ for rows with `valid: false`) and hides the chooser.
 
     /**
      * Returns the dict for the highlighted row, or for a specific row by index.
-Returns `null` if the index is out of range or no choices are set.
+     * Returns `null` if the index is out of range or no choices are set.
      * @param row Zero-based row index, or omit to query the highlighted row.
      * @returns The row dict (`{ text, subText?, image?, valid, ...extras }`) or `null`.
      */
@@ -3226,7 +3482,7 @@ Returns `null` if the index is out of range or no choices are set.
 
     /**
      * The current text in the search field. Setting this from JS updates the display but
-does not invoke the `onQueryChange` callback.
+     * does not invoke the `onQueryChange` callback.
      */
     query: string;
 
@@ -3237,13 +3493,13 @@ does not invoke the `onQueryChange` callback.
 
     /**
      * Whether searches match against `subText` in addition to `text` (default: `false`).
-Only applies when a static choices array is provided.
+     * Only applies when a static choices array is provided.
      */
     searchSubText: boolean;
 
     /**
      * When `true` and the query is non-empty but there are no matching choices, `onSelect`
-is called with `{ text: <query> }` instead of `null` (default: `false`).
+     * is called with `{ text: <query> }` instead of `null` (default: `false`).
      */
     enableDefaultForQuery: boolean;
 
@@ -3264,9 +3520,10 @@ is called with `{ text: <query> }` instead of `null` (default: `false`).
 
     /**
      * Background color of the chooser panel. When `nil` (the default), the panel uses
-the system's translucent glass/material effect.
-If you set this to a solid or near-opaque color, also set `textColor`, `subTextColor`,
-and `placeholderColor` to ensure readable contrast — they are not adjusted automatically.
+     * the system's translucent glass/material effect.
+     *
+     * If you set this to a solid or near-opaque color, also set `textColor`, `subTextColor`,
+     * and `placeholderColor` to ensure readable contrast — they are not adjusted automatically.
      */
     backgroundColor: HSColor | null;
 
@@ -3282,60 +3539,60 @@ and `placeholderColor` to ensure readable contrast — they are not adjusted aut
 
     /**
      * Width of the border drawn around the chooser panel, in points (default: `1`).
-Has no effect unless `borderColor` is also set.
+     * Has no effect unless `borderColor` is also set.
      */
     borderWidth: number;
 
     /**
      * Color of each result row's main text. When `nil` (the default), the system's
-primary label color is used.
+     * primary label color is used.
      */
     textColor: HSColor | null;
 
     /**
      * Color of each result row's subtext. When `nil` (the default), the system's
-secondary label color is used.
+     * secondary label color is used.
      */
     subTextColor: HSColor | null;
 
     /**
      * Color of the text the user types into the search field. When `nil` (the default),
-the system's primary label color is used.
+     * the system's primary label color is used.
      */
     queryColor: HSColor | null;
 
     /**
      * Color of the placeholder text (and search icon) shown in an empty search field.
-When `nil` (the default), the system's secondary label color is used.
+     * When `nil` (the default), the system's secondary label color is used.
      */
     placeholderColor: HSColor | null;
 
     /**
      * Background tint of the highlighted row. When `nil` (the default), a translucent
-tint of the system accent color is used.
+     * tint of the system accent color is used.
      */
     selectionColor: HSColor | null;
 
     /**
      * Font size of each result row's main text, in points (default: `14`). Changing this
-also rescales the ⌘-digit shortcut hint shown on the first ten rows, and changes the
-row height (and therefore the panel height) to fit. Must be a positive, finite number;
-invalid values are ignored (with a warning logged).
+     * also rescales the ⌘-digit shortcut hint shown on the first ten rows, and changes the
+     * row height (and therefore the panel height) to fit. Must be a positive, finite number;
+     * invalid values are ignored (with a warning logged).
      */
     textSize: number;
 
     /**
      * Font size of each result row's subtext, in points (default: `12`). Changing this
-also changes the row height (and therefore the panel height) to fit. Must be a
-positive, finite number; invalid values are ignored (with a warning logged).
+     * also changes the row height (and therefore the panel height) to fit. Must be a
+     * positive, finite number; invalid values are ignored (with a warning logged).
      */
     subTextSize: number;
 
     /**
      * Font size of the search field's typed text and placeholder, in points (default: `20`).
-Changing this also rescales the search icon, and changes the search bar height
-(and therefore the panel height) to fit. Must be a positive, finite number; invalid
-values are ignored (with a warning logged).
+     * Changing this also rescales the search icon, and changes the search bar height
+     * (and therefore the panel height) to fit. Must be a positive, finite number; invalid
+     * values are ignored (with a warning logged).
      */
     querySize: number;
 
@@ -3346,17 +3603,33 @@ values are ignored (with a warning logged).
 
     /**
      * Called when the user confirms a selection, or null to remove the handler.
-The argument is the chosen row object (the original dict you passed to `setChoices`,
-with `text`, `subText`, `image`, `valid`, and any custom fields intact).
-The argument is `null` when dismissed (Escape).
+     *
+     * The argument is the chosen row object (the original dict you passed to `setChoices`,
+     * with `text`, `subText`, `image`, `valid`, and any custom fields intact).
+     * The argument is `null` when dismissed (Escape).
      */
     onSelect: ((item: Record<string, any> | null) => void) | null;
 
     /**
      * Called on every keystroke with the new query string, or null to remove the handler.
-Use this to debounce expensive searches or trigger async data fetching.
+     *
+     * Use this to debounce expensive searches or trigger async data fetching.
      */
     onQueryChange: ((query: string) => void) | null;
+
+    /**
+     * Called when the selected row changes while the chooser is visible, or null to remove the handler.
+     *
+     * Use this to show something that depends on the selected row, such as a preview, and keep it
+     * up to date as the user moves through the rows.
+     *
+     * The arguments are the new `selectedRow` and the row object (same shape as `onSelect`), or
+     * `null` for the item when no rows match the query. It is called once when the chooser is
+     * shown, then whenever the selection moves to a different row, or the row it is on changes
+     * to a different choice: arrow keys, Page Up/Down, Home/End, a click, a new query, new
+     * choices, or setting `selectedRow` from JavaScript.
+     */
+    onSelectionChange: ((row: number, item: Record<string, any> | null) => void) | null;
 
     /**
      * Called after the panel becomes visible, or null to remove the handler.
@@ -3370,25 +3643,28 @@ Use this to debounce expensive searches or trigger async data fetching.
 
     /**
      * Called when the user activates a row whose `valid` field is `false`, or null to remove the handler.
-The chooser stays open; the argument is the row dict (same shape as `onSelect`).
-If unset, activating an invalid row is silently ignored.
+     * The chooser stays open; the argument is the row dict (same shape as `onSelect`).
+     * If unset, activating an invalid row is silently ignored.
      */
     onInvalid: ((item: Record<string, any>) => void) | null;
 
     /**
      * The right-click menu shown for every row (default: `[]`, no menu).
-Each entry is either `{ title: "..." }` for a menu item, or `{ type: "divider" }` for a
-separator. Any other fields on an entry (e.g. an `id`) are passed back to
-`onContextMenuSelect` unchanged, so one handler can tell the entries apart.
-Rows whose choice has `contextMenu: false` show no menu, e.g. for a "Clear history" row.
+     *
+     * Each entry is either `{ title: "..." }` for a menu item, or `{ type: "divider" }` for a
+     * separator. Any other fields on an entry (e.g. an `id`) are passed back to
+     * `onContextMenuSelect` unchanged, so one handler can tell the entries apart.
+     *
+     * Rows whose choice has `contextMenu: false` show no menu, e.g. for a "Clear history" row.
      */
     contextMenu: Array<Record<string, any>>;
 
     /**
      * Called when the user picks an entry from the `contextMenu`, or null to remove the handler.
-`choice` is the row that was right-clicked (same shape as `onSelect`'s argument) and
-`menuItem` is the `contextMenu` entry that was picked, with any custom fields intact.
-The chooser stays open.
+     *
+     * `choice` is the row that was right-clicked (same shape as `onSelect`'s argument) and
+     * `menuItem` is the `contextMenu` entry that was picked, with any custom fields intact.
+     * The chooser stays open.
      */
     onContextMenuSelect: ((choice: Record<string, any>, menuItem: Record<string, any>) => void) | null;
 
@@ -3396,24 +3672,39 @@ The chooser stays open.
 
 /**
  * Module for customising Hammerspoon's own Dock icon.
-The Dock icon is only shown when the "Show in" setting in Hammerspoon's Settings includes the Dock.
-## Adding items to the Dock icon's menu
-```js
-hs.dockicon.setMenu([
-    { title: "Reload config", fn: () => hs.reload() },
-    { title: "-" },
-    { title: "Open Console", fn: () => hs.openConsole() }
-])
-```
+ *
+ * The Dock icon is only shown when the "Show in" setting in Hammerspoon's Settings includes the Dock.
+ *
+ * ## Adding items to the Dock icon's menu
+ *
+ * ```js
+ * hs.dockicon.setMenu([
+ *     { title: "Reload config", fn: () => hs.reload() },
+ *     { title: "-" },
+ *     { title: "Open Console", fn: () => hs.openConsole() }
+ * ])
+ * ```
  */
 declare namespace hs.dockicon {
     /**
      * Set extra items for the menu shown when the Dock icon is right-clicked (or Control-clicked, or held).
-The items appear above the Dock's own items (Options, Show All Windows, Hide and Quit).
-Pass an array of menu item objects for a static menu, or a function that returns an array for a menu
-populated each time it opens. The function receives one argument: the modifier keys held when the menu
-opened, in the same form as `hs.eventtap.currentModifiers()`.
-The menu is removed when the config is reloaded.
+     *
+     * The items appear above the Dock's own items (Options, Show All Windows, Hide and Quit).
+     * Pass an array of menu item objects for a static menu, or a function that returns an array for a menu
+     * populated each time it opens. The function receives one argument: the modifier keys held when the menu
+     * opened, in the same form as `hs.eventtap.currentModifiers()`.
+     *
+     * Menu item object keys are the same as for `HSMenuBarItem.setMenu()`:
+     * - `title` (string, required): The item label. Use `"-"` for a separator line.
+     * - `fn` (function): Callback invoked when the item is chosen.
+     * - `checked` (boolean): If true, a checkmark is shown next to the item.
+     * - `disabled` (boolean): If true, the item is greyed out and cannot be chosen.
+     * - `tooltip` (string): Tooltip shown when hovering over the item.
+     * - `color` (HSColor or hex string): The colour of the item's title text.
+     * - `icon` (HSImage): Icon shown to the left of the title.
+     * - `menu` (array): Nested array of menu item objects to create a submenu.
+     *
+     * The menu is removed when the config is reloaded.
      * @param menuOrFn Array of menu item objects, a function returning such an array, or null to remove the extra items
      */
     function setMenu(menuOrFn: Array<Record<string, any>> | ((modifiers: string[]) => Array<Record<string, any>>) | null): void;
@@ -3422,18 +3713,22 @@ The menu is removed when the config is reloaded.
 
 /**
  * # hs.docs
-**Offline API documentation browser**
-Browse and query the Hammerspoon 2 API documentation from within the app.
-`hs.docs.show()` opens an `hs.ui.webview` window with the JS or TypeScript docs.
-`hs.docs.get()` returns formatted plain-text documentation from the bundled `api.json`.
+ *
+ * **Offline API documentation browser**
+ *
+ * Browse and query the Hammerspoon 2 API documentation from within the app.
+ *
+ * `hs.docs.show()` opens an `hs.ui.webview` window with the JS or TypeScript docs.
+ * `hs.docs.get()` returns formatted plain-text documentation from the bundled `api.json`.
  */
 declare namespace hs.docs {
     /**
      * Open the Hammerspoon 2 API documentation in a window
-If the documentation window is already open, it is brought to the front (and restored if
-minimized) instead of opening another one. It navigates to the requested page if
-`moduleName` is given, or if it isn't currently showing the requested docs (JS or TS);
-otherwise it stays on whatever page it is showing.
+     *
+     * If the documentation window is already open, it is brought to the front (and restored if
+     * minimized) instead of opening another one. It navigates to the requested page if
+     * `moduleName` is given, or if it isn't currently showing the requested docs (JS or TS);
+     * otherwise it stays on whatever page it is showing.
      * @param moduleName Optional module to navigate to directly (e.g. `"hs.application"`). Omit to open the index page.
      * @param showTS Pass `true` to show TypeScript docs instead of JS docs
      */
@@ -3468,41 +3763,51 @@ otherwise it stays on whatever page it is showing.
 
 /**
  * Monitor and synthesise macOS input events: keyboard, mouse, and scroll wheel.
-All coordinate parameters use **Hammerspoon screen coordinates**: the origin `(0, 0)`
-is at the top-left of the primary display and `y` increases downward, matching `hs.screen`.
-## Tapping events
-```js
-const tap = hs.eventtap.addWatcher(
-    [hs.eventtap.eventTypes.keyDown],
-    (event) => {
-        console.log("Key pressed: " + event.keyCode)
-        return hs.eventtap.emit   // pass the event through
-    }
-)
-tap.start()
-```
-## Suppressing events
-Returning `hs.eventtap.consume` from the callback prevents the event from reaching
-```js
-const blocker = hs.eventtap.addWatcher(
-    [hs.eventtap.eventTypes.leftMouseDown],
-    (event) => hs.eventtap.consume
-)
-blocker.start()
-```
-## Sending events
-```js
-hs.eventtap.keyStroke(["cmd"], "c")
-hs.eventtap.leftClick(500, 300)
-```
+ *
+ * All coordinate parameters use **Hammerspoon screen coordinates**: the origin `(0, 0)`
+ * is at the top-left of the primary display and `y` increases downward, matching `hs.screen`.
+ *
+ * ## Tapping events
+ *
+ * ```js
+ * const tap = hs.eventtap.addWatcher(
+ *     [hs.eventtap.eventTypes.keyDown],
+ *     (event) => {
+ *         console.log("Key pressed: " + event.keyCode)
+ *         return hs.eventtap.emit   // pass the event through
+ *     }
+ * )
+ * tap.start()
+ * ```
+ *
+ * ## Suppressing events
+ *
+ * Returning `hs.eventtap.consume` from the callback prevents the event from reaching
+ * other applications:
+ *
+ * ```js
+ * const blocker = hs.eventtap.addWatcher(
+ *     [hs.eventtap.eventTypes.leftMouseDown],
+ *     (event) => hs.eventtap.consume
+ * )
+ * blocker.start()
+ * ```
+ *
+ * ## Sending events
+ *
+ * ```js
+ * hs.eventtap.keyStroke(["cmd"], "c")
+ * hs.eventtap.leftClick(500, 300)
+ * ```
  */
 declare namespace hs.eventtap {
     /**
      * Create an event tap that calls a function for matching events. Call `.start()` to activate it.
-The callback receives an `HSEventTapEvent`. For modify taps (`listenOnly` omitted or false),
-return `hs.eventtap.consume` (false) to suppress the event or `hs.eventtap.emit` (true)
-to pass it through. For listen-only taps the callback's return value is ignored — events
-are always delivered to other applications. Requires Accessibility permission.
+     *
+     * The callback receives an `HSEventTapEvent`. For modify taps (`listenOnly` omitted or false),
+     * return `hs.eventtap.consume` (false) to suppress the event or `hs.eventtap.emit` (true)
+     * to pass it through. For listen-only taps the callback's return value is ignored — events
+     * are always delivered to other applications. Requires Accessibility permission.
      * @remarks event tap watchers will not be automatically destroyed by JavaScript garbage collection. You *MUST* call `removeWatcher()` if you want to dispose of a watcher.
      * @param types An array of event type integers from `hs.eventtap.eventTypes`
      * @param callback Function called for each matching event. The return value is only meaningful for modify taps.
@@ -3519,12 +3824,11 @@ are always delivered to other applications. Requires Accessibility permission.
 
     /**
      * Create a keyboard event
-If `mods` is given, the event carries exactly those modifiers, whatever modifier keys are
-held when it's created. It is a single key event: to send a whole keystroke with modifiers to an
-application, including the modifier key presses some applications need to see, use
-`hs.eventtap.keyStroke(mods, key, app)`.
-through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code
-Omit to keep the modifiers that are currently held.
+     *
+     * If `mods` is given, the event carries exactly those modifiers, whatever modifier keys are
+     * held when it's created. It is a single key event: to send a whole keystroke with modifiers to an
+     * application, including the modifier key presses some applications need to see, use
+     * `hs.eventtap.keyStroke(mods, key, app)`.
      * @param key A key name or character (e.g. "a", "space", "return", "f1"), resolved
      * @param isDown true for key down, false for key up
      * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`.
@@ -3534,9 +3838,9 @@ Omit to keep the modifiers that are currently held.
 
     /**
      * Create a keyboard event using a raw key code
-If `mods` is given, the event carries exactly those modifiers, whatever modifier keys are
-held when it's created.
-Omit to keep the modifiers that are currently held.
+     *
+     * If `mods` is given, the event carries exactly those modifiers, whatever modifier keys are
+     * held when it's created.
      * @param keyCode A numeric virtual key code
      * @param isDown true for key down, false for key up
      * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`.
@@ -3546,8 +3850,9 @@ Omit to keep the modifiers that are currently held.
 
     /**
      * Create a mouse event at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin of the primary
-display, y increases downward), matching the values returned by `hs.screen`.
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin of the primary
+     * display, y increases downward), matching the values returned by `hs.screen`.
      * @param type An event type integer from hs.eventtap.eventTypes (e.g. leftMouseDown)
      * @param x Horizontal position in Hammerspoon screen coordinates
      * @param y Vertical position in Hammerspoon screen coordinates
@@ -3558,7 +3863,8 @@ display, y increases downward), matching the values returned by `hs.screen`.
 
     /**
      * Create a scroll wheel event at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param deltaX Horizontal scroll amount in lines (positive = right)
      * @param deltaY Vertical scroll amount in lines (positive = down)
      * @param x Horizontal position in Hammerspoon screen coordinates
@@ -3569,10 +3875,11 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Create a system key event, such as a media, volume or brightness key.
-Posting these behaves like pressing the key on an Apple keyboard, so media keys are routed
-to whichever app macOS considers to be playing (including audio in a browser tab).
-Synthetic brightness keys are ignored by some Macs and external displays; use `hs.screen`
-to set brightness directly if they have no effect.
+     *
+     * Posting these behaves like pressing the key on an Apple keyboard, so media keys are routed
+     * to whichever app macOS considers to be playing (including audio in a browser tab).
+     * Synthetic brightness keys are ignored by some Macs and external displays; use `hs.screen`
+     * to set brightness directly if they have no effect.
      * @param key A system key name from `hs.eventtap.systemKeys` (e.g. "PLAY", "SOUND_UP"), case-insensitive
      * @param isDown true for key down, false for key up
      * @returns An HSEventTapEvent, or null if the key name is unknown
@@ -3581,17 +3888,16 @@ to set brightness directly if they have no effect.
 
     /**
      * Send a key down and key up event with optional modifier keys, optionally to a specific
-application.
-A 5 ms pause is inserted between the key-down and key-up events to improve
-compatibility with applications that miss very fast synthetic keystrokes.
-Without `app`, the keystroke is posted to the system, so it goes to whichever application
-is frontmost. With `app`, it is delivered straight to that application, even if it's in the
-background, without activating it. In that case the modifier keys are also pressed and
-released around the key, as a real keyboard does, so applications that track modifier
-key presses themselves see them held.
-through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code,
-which always presses the same physical key
-send it to the frontmost application.
+     * application.
+     *
+     * A 5 ms pause is inserted between the key-down and key-up events to improve
+     * compatibility with applications that miss very fast synthetic keystrokes.
+     *
+     * Without `app`, the keystroke is posted to the system, so it goes to whichever application
+     * is frontmost. With `app`, it is delivered straight to that application, even if it's in the
+     * background, without activating it. In that case the modifier keys are also pressed and
+     * released around the key, as a real keyboard does, so applications that track modifier
+     * key presses themselves see them held.
      * @param mods An array of modifier names (e.g. ["cmd", "shift"])
      * @param key A key name or character (e.g. "a", "space", "return"), resolved
      * @param app The application to send the keystroke to. Omit, or pass null, to
@@ -3600,17 +3906,19 @@ send it to the frontmost application.
 
     /**
      * Type a string of characters as individual key events.
-A 5 ms pause is inserted between each key-down and key-up event. This blocks the
-calling thread (the main thread) for the duration of typing — for long strings,
-prefer `keyStrokesAsync()` to avoid stalling the rest of Hammerspoon while typing.
+     *
+     * A 5 ms pause is inserted between each key-down and key-up event. This blocks the
+     * calling thread (the main thread) for the duration of typing — for long strings,
+     * prefer `keyStrokesAsync()` to avoid stalling the rest of Hammerspoon while typing.
      * @param text The string to type
      */
     function keyStrokes(text: string): void;
 
     /**
      * Type a string of characters as individual key events, without blocking the main thread.
-Behaves like `keyStrokes()`, but the key events are posted from a background task, so
-JavaScript execution and the rest of Hammerspoon continue running while typing proceeds.
+     *
+     * Behaves like `keyStrokes()`, but the key events are posted from a background task, so
+     * JavaScript execution and the rest of Hammerspoon continue running while typing proceeds.
      * @param text The string to type
      * @returns A Promise that resolves once every character has been posted.
      */
@@ -3618,16 +3926,19 @@ JavaScript execution and the rest of Hammerspoon continue running while typing p
 
     /**
      * Press and release a system key, such as a media, volume or brightness key.
-A 5 ms pause is inserted between the key-down and key-up events. See
-`makeSystemKeyEvent()` for details of how these keys behave.
-Be careful with `POWER` and `EJECT`, which can show a shutdown prompt or eject media.
+     *
+     * A 5 ms pause is inserted between the key-down and key-up events. See
+     * `makeSystemKeyEvent()` for details of how these keys behave.
+     *
+     * Be careful with `POWER` and `EJECT`, which can show a shutdown prompt or eject media.
      * @param key A system key name from `hs.eventtap.systemKeys` (e.g. "PLAY", "NEXT"), case-insensitive
      */
     function systemKeyStroke(key: string): void;
 
     /**
      * Post a left mouse button click at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param x Horizontal position in Hammerspoon screen coordinates
      * @param y Vertical position in Hammerspoon screen coordinates
      */
@@ -3635,7 +3946,8 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Post a right mouse button click at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param x Horizontal position in Hammerspoon screen coordinates
      * @param y Vertical position in Hammerspoon screen coordinates
      */
@@ -3643,7 +3955,8 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Post a left mouse button double-click at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param x Horizontal position in Hammerspoon screen coordinates
      * @param y Vertical position in Hammerspoon screen coordinates
      */
@@ -3651,7 +3964,8 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Post a middle mouse button click at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param x Horizontal position in Hammerspoon screen coordinates
      * @param y Vertical position in Hammerspoon screen coordinates
      */
@@ -3659,7 +3973,8 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Post a scroll wheel event at the given position.
-Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
+     *
+     * Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increases downward).
      * @param deltaX Horizontal scroll amount in lines (positive = right)
      * @param deltaY Vertical scroll amount in lines (positive = down)
      * @param x Horizontal position in Hammerspoon screen coordinates
@@ -3681,7 +3996,7 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Returns the current mouse cursor position in Hammerspoon screen coordinates
-(top-left origin of primary display, y increases downward, matching hs.screen).
+     * (top-left origin of primary display, y increases downward, matching hs.screen).
      * @returns A dictionary with "x" and "y" keys
      */
     function mouseLocation(): Record<string, number>;
@@ -3706,42 +4021,36 @@ Coordinates are in **Hammerspoon screen coordinates** (top-left origin, y increa
 
     /**
      * Returns whether Secure Input is currently turned on.
-While Secure Input is on, macOS hides keystrokes from other apps, so `hs.eventtap`
-watchers and hotkeys see no key events. Apps turn it on for password fields, and some
-apps (terminals, password managers) can leave it on by mistake.
+     *
+     * While Secure Input is on, macOS hides keystrokes from other apps, so `hs.eventtap`
+     * watchers and hotkeys see no key events. Apps turn it on for password fields, and some
+     * apps (terminals, password managers) can leave it on by mistake.
      * @returns `true` if any process has Secure Input turned on, otherwise `false`
      */
     function isSecureInputEnabled(): boolean;
 
     /**
      * Returns the process ID of an app that has Secure Input turned on, to help track down
-which app is blocking keystrokes.
-macOS doesn't document this value. When more than one process has Secure Input on, only
-one of them is reported, and it isn't always the one that turned it on most recently, so
-treat it as a starting point rather than a definitive answer.
+     * which app is blocking keystrokes.
+     *
+     * macOS doesn't document this value. When more than one process has Secure Input on, only
+     * one of them is reported, and it isn't always the one that turned it on most recently, so
+     * treat it as a starting point rather than a definitive answer.
      * @returns A process ID, or `null` if Secure Input is off or macOS doesn't say which process has it
      */
     function secureInputPID(): number | null;
 
     /**
      * Bind a keyboard shortcut using an event tap. Unlike `hs.hotkey.bind()`, this supports the
-`fn` modifier and left/right modifier key distinction (e.g. `leftCmd`, `rightAlt`).
-The hotkey is active immediately and consumes (suppresses) the key events.
-It's important to note that this a much heavier-weight tool than `hs.hotkey` - every single
-key you press will be examined by Hammerspoon to see if it matches one of the EventTap hotkeys
-(where `hs.hotkey` relies on macOS to efficiently deliver only matching keypresses). Please
-consider this when choosing to use `hs.eventtap` for hotkeys.
-Requires Accessibility permission.
-`ctrl`, `fn`) and side-specific names (`leftCmd`, `rightCmd`, `leftAlt`, `rightAlt`,
-`leftCtrl`, `rightCtrl`, `leftShift`, `rightShift`). macOS reports `fn` as held on every
-press of the arrow keys, F-keys, help, home, end, page up/down, forward delete and keypad
-clear, so on those keys a hotkey with `fn` also fires without it (one without `fn` still
-works).
-current keyboard layout (see `hs.eventtap.followsKeyboardLayout`), or a numeric virtual key code,
-which always means the same physical key
-each key repeat while the whole combination stays held, or null
-repeat shows the combination is no longer held (e.g. a modifier was let go first), or null.
-After that, the key's remaining repeats and its release pass through as normal.
+     * `fn` modifier and left/right modifier key distinction (e.g. `leftCmd`, `rightAlt`).
+     * The hotkey is active immediately and consumes (suppresses) the key events.
+     *
+     * It's important to note that this a much heavier-weight tool than `hs.hotkey` - every single
+     * key you press will be examined by Hammerspoon to see if it matches one of the EventTap hotkeys
+     * (where `hs.hotkey` relies on macOS to efficiently deliver only matching keypresses). Please
+     * consider this when choosing to use `hs.eventtap` for hotkeys.
+     *
+     * Requires Accessibility permission.
      * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
      * @param mods An array of modifier key strings. Supports generic names (`cmd`, `shift`, `alt`,
      * @param key A key name or character (e.g., "a", "space", "f1"), resolved through the
@@ -3759,26 +4068,29 @@ After that, the key's remaining repeats and its release pass through as normal.
 
     /**
      * A dictionary mapping event type names to their numeric values.
-Pass values from this dictionary to `addWatcher()` to specify which events to monitor.
+     *
+     * Pass values from this dictionary to `addWatcher()` to specify which events to monitor.
      */
     const eventTypes: Record<string, number>;
 
     /**
      * A dictionary mapping modifier key names to their bitmask values for use with `rawFlags`.
-Includes generic names (`cmd`, `shift`, `alt`, `ctrl`) and side-specific names
-(`leftCmd`, `rightCmd`, `leftShift`, `rightShift`, `leftAlt`, `rightAlt`,
-`leftCtrl`, `rightCtrl`) for distinguishing physical keys.
+     *
+     * Includes generic names (`cmd`, `shift`, `alt`, `ctrl`) and side-specific names
+     * (`leftCmd`, `rightCmd`, `leftShift`, `rightShift`, `leftAlt`, `rightAlt`,
+     * `leftCtrl`, `rightCtrl`) for distinguishing physical keys.
      */
     const modifierFlags: Record<string, number>;
 
     /**
      * A dictionary mapping system key names to their numeric codes, for use with
-`makeSystemKeyEvent()` and `systemKeyStroke()`.
-System keys are the media, volume, brightness and other special keys that macOS delivers as
-`systemDefined` events rather than ordinary key events: `SOUND_UP`, `SOUND_DOWN`, `MUTE`,
-`BRIGHTNESS_UP`, `BRIGHTNESS_DOWN`, `CONTRAST_UP`, `CONTRAST_DOWN`, `POWER`, `LAUNCH_PANEL`,
-`VIDMIRROR`, `PLAY`, `EJECT`, `NEXT`, `PREVIOUS`, `FAST`, `REWIND`, `ILLUMINATION_UP`,
-`ILLUMINATION_DOWN`, `ILLUMINATION_TOGGLE`, `CAPS_LOCK`, `HELP` and `NUM_LOCK`.
+     * `makeSystemKeyEvent()` and `systemKeyStroke()`.
+     *
+     * System keys are the media, volume, brightness and other special keys that macOS delivers as
+     * `systemDefined` events rather than ordinary key events: `SOUND_UP`, `SOUND_DOWN`, `MUTE`,
+     * `BRIGHTNESS_UP`, `BRIGHTNESS_DOWN`, `CONTRAST_UP`, `CONTRAST_DOWN`, `POWER`, `LAUNCH_PANEL`,
+     * `VIDMIRROR`, `PLAY`, `EJECT`, `NEXT`, `PREVIOUS`, `FAST`, `REWIND`, `ILLUMINATION_UP`,
+     * `ILLUMINATION_DOWN`, `ILLUMINATION_TOGGLE`, `CAPS_LOCK`, `HELP` and `NUM_LOCK`.
      */
     const systemKeys: Record<string, number>;
 
@@ -3794,17 +4106,20 @@ System keys are the media, volume, brightness and other special keys that macOS 
 
     /**
      * Whether hotkeys from `bindHotkey()` that were bound with a key name move to a
-different key when the keyboard layout changes, so that they stay on the key that types
-that character. Default is true.
-For example, a hotkey bound to `"w"` matches the key US-ANSI calls `W` while a US layout is
-active, and the key US-ANSI calls `,` after you switch to Dvorak, since that's where Dvorak
-types `w`. Hotkeys bound with a numeric key code never move.
-When false, a hotkey stays on whichever key its name resolved to when it was bound.
-Setting this back to true moves existing hotkeys to the current layout. This is separate
-from `hs.hotkey.followsKeyboardLayout`, which controls `hs.hotkey` hotkeys.
-Avoid binding some hotkeys by key name and others by numeric key code with the same
-modifiers if you switch layouts. If a hotkey moves onto a key code another hotkey already
-matches, only the one that was enabled first fires.
+     * different key when the keyboard layout changes, so that they stay on the key that types
+     * that character. Default is true.
+     *
+     * For example, a hotkey bound to `"w"` matches the key US-ANSI calls `W` while a US layout is
+     * active, and the key US-ANSI calls `,` after you switch to Dvorak, since that's where Dvorak
+     * types `w`. Hotkeys bound with a numeric key code never move.
+     *
+     * When false, a hotkey stays on whichever key its name resolved to when it was bound.
+     * Setting this back to true moves existing hotkeys to the current layout. This is separate
+     * from `hs.hotkey.followsKeyboardLayout`, which controls `hs.hotkey` hotkeys.
+     *
+     * Avoid binding some hotkeys by key name and others by numeric key code with the same
+     * modifiers if you switch layouts. If a hotkey moves onto a key code another hotkey already
+     * matches, only the one that was enabled first fires.
      */
     let followsKeyboardLayout: boolean;
 
@@ -3812,13 +4127,16 @@ matches, only the one that was enabled first fires.
 
 /**
  * An event tap watcher that intercepts input events from the system.
-Obtain instances via `hs.eventtap.addWatcher()` — do not instantiate directly.
-## Monitoring keyboard events
-```js
-const tap = hs.eventtap.addWatcher([hs.eventtap.eventTypes.keyDown], (event) => {
-    console.log("Key pressed: " + event.keyCode)
-})
-```
+ *
+ * Obtain instances via `hs.eventtap.addWatcher()` — do not instantiate directly.
+ *
+ * ## Monitoring keyboard events
+ *
+ * ```js
+ * const tap = hs.eventtap.addWatcher([hs.eventtap.eventTypes.keyDown], (event) => {
+ *     console.log("Key pressed: " + event.keyCode)
+ * })
+ * ```
  */
 declare class HSEventTap {
     /**
@@ -3867,9 +4185,10 @@ declare class HSEventTap {
 
 /**
  * An input event captured or constructed by hs.eventtap.
-Objects of this type are passed to event tap callbacks and can also be created directly
-via the factory methods on hs.eventtap. Properties can be inspected and modified before
-the event is passed through or posted back to the system.
+ *
+ * Objects of this type are passed to event tap callbacks and can also be created directly
+ * via the factory methods on hs.eventtap. Properties can be inspected and modified before
+ * the event is passed through or posted back to the system.
  */
 declare class HSEventTapEvent {
     /**
@@ -3880,9 +4199,10 @@ declare class HSEventTapEvent {
 
     /**
      * Post this event to the HID event stream, optionally targeting a specific application.
-When `app` is omitted or `null`, the event is posted to the global HID stream and
-delivered by the OS as if a real input device generated it. When an application is
-provided, the event is delivered directly to that process by PID.
+     *
+     * When `app` is omitted or `null`, the event is posted to the global HID stream and
+     * delivered by the OS as if a real input device generated it. When an application is
+     * provided, the event is delivered directly to that process by PID.
      * @param app The application to target, or null/omit to post globally
      */
     post(app: HSApplication | null): void;
@@ -3909,19 +4229,21 @@ provided, the event is delivered directly to that process by PID.
 
     /**
      * An array of active modifier key names (e.g. ["cmd", "shift"]) (get/set).
-When a device-specific modifier is detected, both the generic and side-specific
-names are included — e.g. pressing the left Command key yields ["cmd", "leftCmd"].
-Setting this replaces the event's modifiers with the named ones, accepting the same names
-as `hs.eventtap.keyStroke()` ("cmd", "shift", "alt", "ctrl", "fn", "capslock", and the
-side-specific forms such as "rightCmd"). Unknown names are ignored. This only changes the
-event's flags: an application that tracks modifier key presses itself may also need to see
-the modifier keys go down and up, which `hs.eventtap.keyStroke(mods, key, app)` does for you.
+     *
+     * When a device-specific modifier is detected, both the generic and side-specific
+     * names are included — e.g. pressing the left Command key yields ["cmd", "leftCmd"].
+     *
+     * Setting this replaces the event's modifiers with the named ones, accepting the same names
+     * as `hs.eventtap.keyStroke()` ("cmd", "shift", "alt", "ctrl", "fn", "capslock", and the
+     * side-specific forms such as "rightCmd"). Unknown names are ignored. This only changes the
+     * event's flags: an application that tracks modifier key presses itself may also need to see
+     * the modifier keys go down and up, which `hs.eventtap.keyStroke(mods, key, app)` does for you.
      */
     flags: string[];
 
     /**
      * The event's screen position as {x, y} in Hammerspoon screen coordinates
-(top-left origin of primary display, y increases downward, matching hs.screen).
+     * (top-left origin of primary display, y increases downward, matching hs.screen).
      */
     location: Record<string, number>;
 
@@ -3947,12 +4269,13 @@ the modifier keys go down and up, which `hs.eventtap.keyStroke(mods, key, app)` 
 
     /**
      * For a system key event (media, volume, brightness and other special keys), an object
-describing the key; for any other event, null.
-The object has `key` (a name from `hs.eventtap.systemKeys`, or "unknown"), `keyCode`
-(the numeric system key code), `isDown` (true for key down, false for key up) and
-`isRepeat` (true if the key is auto-repeating). Watch for these events with
-`hs.eventtap.eventTypes.systemDefined`; other kinds of system-defined event, which don't
-represent a key, also yield null.
+     * describing the key; for any other event, null.
+     *
+     * The object has `key` (a name from `hs.eventtap.systemKeys`, or "unknown"), `keyCode`
+     * (the numeric system key code), `isDown` (true for key down, false for key up) and
+     * `isRepeat` (true if the key is auto-repeating). Watch for these events with
+     * `hs.eventtap.eventTypes.systemDefined`; other kinds of system-defined event, which don't
+     * represent a key, also yield null.
      */
     readonly systemKey: Record<string, any> | null;
 
@@ -3960,7 +4283,7 @@ represent a key, also yield null.
 
 /**
  * A keyboard shortcut binding backed by an event tap. Supports fn modifier and left/right modifier
-key distinction. Obtain instances via `hs.eventtap.bindHotkey()` — do not instantiate directly.
+ * key distinction. Obtain instances via `hs.eventtap.bindHotkey()` — do not instantiate directly.
  */
 declare class HSEventTapHotkey {
     /**
@@ -3988,7 +4311,7 @@ declare class HSEventTapHotkey {
 
     /**
      * The virtual key code this hotkey currently matches. For a hotkey bound by key name
-this follows the keyboard layout (see `hs.eventtap.followsKeyboardLayout`).
+     * this follows the keyboard layout (see `hs.eventtap.followsKeyboardLayout`).
      */
     readonly keyCode: number;
 
@@ -4006,80 +4329,102 @@ this follows the keyboard layout (see `hs.eventtap.followsKeyboardLayout`).
 
 /**
  * Module for filesystem operations.
-`hs.fs` provides a comprehensive set of filesystem operations covering file
-I/O, directory management, path manipulation, metadata access, symbolic
-links, Finder tags, and macOS-specific features like file bookmarks and
-Uniform Type Identifiers.
-It replaces both Hammerspoon v1's `hs.fs` module and the functionality that
-was previously available through Lua's built-in `io` and `file` modules.
-## Reading and writing files
-```javascript
-const contents = hs.fs.read("/etc/hosts");           // entire file
-const chunk    = hs.fs.read("/etc/hosts", 100, 50);  // 50 bytes from offset 100
-
-hs.fs.eachLine("/etc/hosts", function(line) {
-    console.log(line);
-    // return false to stop early
-});
-
-hs.fs.write("/tmp/hello.txt", "Hello, world!\n");
-hs.fs.append("/tmp/hello.txt", "More content\n");
-```
-## Working with open files
-For incremental, positioned, binary, or locked access, open the file to get an
-```javascript
-const f = hs.fs.open("~/notes.txt", "r+");
-const firstLine = f.readLine();
-f.seek(0, "end");
-f.writeLine("appended");
-f.close();
-
-// Or let hs.fs.withFile() close it for you:
-const header = hs.fs.withFile("~/image.png", "r", f => f.readBytes(8));
-```
-## Errors
-Functions that fail return `null` or `false` and set `hs.fs.lastError` to an object like
-`{code: "ENOENT", message: "No such file or directory"}`. Most failures are also logged to the
-Console; failures that are often expected (such as `hs.fs.open()` on a missing file) are not.
-## Directory operations
-```javascript
-hs.fs.mkdir("~/Projects/new-thing");
-
-const files = hs.fs.list("~/Documents");
-const all   = hs.fs.listRecursive("~/Documents");
-```
-## Path utilities
-```javascript
-const abs  = hs.fs.pathToAbsolute("~/Library");
-const tmp  = hs.fs.tempDirectory();
-const home = hs.fs.homeDirectory();
-```
-## Metadata
-```javascript
-const info = hs.fs.attributes("/etc/hosts");
-// { size: 1234, type: "file", permissions: 420,
-//   ownerID: 0, groupID: 0,
-//   creationDate: 1700000000.0, modificationDate: 1700001000.0 }
-```
+ *
+ * `hs.fs` provides a comprehensive set of filesystem operations covering file
+ * I/O, directory management, path manipulation, metadata access, symbolic
+ * links, Finder tags, and macOS-specific features like file bookmarks and
+ * Uniform Type Identifiers.
+ *
+ * It replaces both Hammerspoon v1's `hs.fs` module and the functionality that
+ * was previously available through Lua's built-in `io` and `file` modules.
+ *
+ * ## Reading and writing files
+ *
+ * ```javascript
+ * const contents = hs.fs.read("/etc/hosts");           // entire file
+ * const chunk    = hs.fs.read("/etc/hosts", 100, 50);  // 50 bytes from offset 100
+ *
+ * hs.fs.eachLine("/etc/hosts", function(line) {
+ *     console.log(line);
+ *     // return false to stop early
+ * });
+ *
+ * hs.fs.write("/tmp/hello.txt", "Hello, world!\n");
+ * hs.fs.append("/tmp/hello.txt", "More content\n");
+ * ```
+ *
+ * ## Working with open files
+ *
+ * For incremental, positioned, binary, or locked access, open the file to get an
+ * `HSFile` object (the equivalent of a Lua `io` file handle):
+ *
+ * ```javascript
+ * const f = hs.fs.open("~/notes.txt", "r+");
+ * const firstLine = f.readLine();
+ * f.seek(0, "end");
+ * f.writeLine("appended");
+ * f.close();
+ *
+ * // Or let hs.fs.withFile() close it for you:
+ * const header = hs.fs.withFile("~/image.png", "r", f => f.readBytes(8));
+ * ```
+ *
+ * ## Errors
+ *
+ * Functions that fail return `null` or `false` and set `hs.fs.lastError` to an object like
+ * `{code: "ENOENT", message: "No such file or directory"}`. Most failures are also logged to the
+ * Console; failures that are often expected (such as `hs.fs.open()` on a missing file) are not.
+ *
+ * ## Directory operations
+ *
+ * ```javascript
+ * hs.fs.mkdir("~/Projects/new-thing");
+ *
+ * const files = hs.fs.list("~/Documents");
+ * const all   = hs.fs.listRecursive("~/Documents");
+ * ```
+ *
+ * ## Path utilities
+ *
+ * ```javascript
+ * const abs  = hs.fs.pathToAbsolute("~/Library");
+ * const tmp  = hs.fs.tempDirectory();
+ * const home = hs.fs.homeDirectory();
+ * ```
+ *
+ * ## Metadata
+ *
+ * ```javascript
+ * const info = hs.fs.attributes("/etc/hosts");
+ * // { size: 1234, type: "file", permissions: 420,
+ * //   ownerID: 0, groupID: 0,
+ * //   creationDate: 1700000000.0, modificationDate: 1700001000.0 }
+ * ```
  */
 declare namespace hs.fs {
     /**
      * Open a file, returning an `HSFile` object for reading and/or writing it.
-| Mode | Read | Write | Creates | Truncates | Notes |
-|------|------|-------|---------|-----------|-------|
-| `"r"`  | ✓ | | | | The default |
-| `"r+"` | ✓ | ✓ | | | |
-| `"w"`  | | ✓ | ✓ | ✓ | |
-| `"w+"` | ✓ | ✓ | ✓ | ✓ | |
-| `"a"`  | | ✓ | ✓ | | Every write goes to the end of the file |
-| `"a+"` | ✓ | ✓ | ✓ | | Reads start at the beginning; every write goes to the end |
-Add `x` to a `w` mode (`"wx"`, `"w+x"`) to fail if the file already exists. A `b` is accepted and
-ignored, since all files can be read as text or bytes.
-Directories cannot be opened. A file that can't be opened (for example because it doesn't exist) is
-not logged to the Console, since that is often an expected outcome; check `hs.fs.lastError` instead.
-Invalid arguments, such as an unknown mode, are logged.
-Close the file with `close()` when you are finished with it; any files still open are closed
-automatically when your configuration is reloaded.
+     *
+     * Modes follow C's `fopen()` (and Lua's `io.open()`):
+     *
+     * | Mode | Read | Write | Creates | Truncates | Notes |
+     * |------|------|-------|---------|-----------|-------|
+     * | `"r"`  | ✓ | | | | The default |
+     * | `"r+"` | ✓ | ✓ | | | |
+     * | `"w"`  | | ✓ | ✓ | ✓ | |
+     * | `"w+"` | ✓ | ✓ | ✓ | ✓ | |
+     * | `"a"`  | | ✓ | ✓ | | Every write goes to the end of the file |
+     * | `"a+"` | ✓ | ✓ | ✓ | | Reads start at the beginning; every write goes to the end |
+     *
+     * Add `x` to a `w` mode (`"wx"`, `"w+x"`) to fail if the file already exists. A `b` is accepted and
+     * ignored, since all files can be read as text or bytes.
+     *
+     * Directories cannot be opened. A file that can't be opened (for example because it doesn't exist) is
+     * not logged to the Console, since that is often an expected outcome; check `hs.fs.lastError` instead.
+     * Invalid arguments, such as an unknown mode, are logged.
+     *
+     * Close the file with `close()` when you are finished with it; any files still open are closed
+     * automatically when your configuration is reloaded.
      * @param path Path to the file. `~` is expanded.
      * @param mode The open mode. Defaults to `"r"`.
      * @param permissions POSIX permission bits applied if the file is created, e.g. `0o600` (`0` creates a file with no permissions). Defaults to `0o644` when omitted; any other non-integer value, including `NaN`, fails with `EINVAL`. The process umask is applied in either case.
@@ -4089,9 +4434,10 @@ automatically when your configuration is reloaded.
 
     /**
      * Create and open a new, uniquely named temporary file.
-The file is created in `hs.fs.tempDirectory()` with permissions `0o600` and opened in `"w+"` mode, so its
-`path` always starts with `hs.fs.tempDirectory()`.
-It is not deleted automatically; call `remove()` on it when you no longer need it on disk.
+     *
+     * The file is created in `hs.fs.tempDirectory()` with permissions `0o600` and opened in `"w+"` mode, so its
+     * `path` always starts with `hs.fs.tempDirectory()`.
+     * It is not deleted automatically; call `remove()` on it when you no longer need it on disk.
      * @param prefix A prefix for the file name. Must not contain `/`. Defaults to `"hs"`.
      * @returns An `HSFile`, or `null` on failure (see `hs.fs.lastError`).
      */
@@ -4099,10 +4445,13 @@ It is not deleted automatically; call `remove()` on it when you no longer need i
 
     /**
      * Open a file, pass it to a function, and close it again afterwards.
-The file is closed when the function returns, even if it throws (in which case the exception
-propagates to you). The function must do all its work synchronously: an `async` function would
-find the file already closed after its first `await`.
-`hs.fs.withFile(path, f => ...)`.
+     *
+     * The file is closed when the function returns, even if it throws (in which case the exception
+     * propagates to you). The function must do all its work synchronously: an `async` function would
+     * find the file already closed after its first `await`.
+     *
+     * The mode may be omitted, in which case the file is opened for reading (`"r"`):
+     * `hs.fs.withFile(path, f => ...)`.
      * @param path Path to the file. `~` is expanded.
      * @param mode The open mode, as for `hs.fs.open()`. Defaults to `"r"`; if you omit it, pass the callback in its place.
      * @param callback Called with the open file. Required unless it was passed in place of `mode`.
@@ -4121,10 +4470,11 @@ find the file already closed after its first `await`.
 
     /**
      * Call a function for each line of a file.
-This behaves exactly like opening the file and calling `HSFile.eachLine()`: line endings (`\n` or
-`\r\n`) are stripped; the callback may return `false` (and only `false`) to stop early; if the
-callback throws, iteration stops and the exception propagates to you; and invalid UTF-8 stops
-iteration with `hs.fs.lastError.code === "EILSEQ"`.
+     *
+     * This behaves exactly like opening the file and calling `HSFile.eachLine()`: line endings (`\n` or
+     * `\r\n`) are stripped; the callback may return `false` (and only `false`) to stop early; if the
+     * callback throws, iteration stops and the exception propagates to you; and invalid UTF-8 stops
+     * iteration with `hs.fs.lastError.code === "EILSEQ"`.
      * @param path Path to the file. `~` is expanded.
      * @param callback Called once per line. Return `false` to stop.
      * @returns `true` if iteration completed or was stopped by the callback returning `false`; `false` if the file could not be opened or read (see `hs.fs.lastError`), or if the callback threw.
@@ -4133,7 +4483,8 @@ iteration with `hs.fs.lastError.code === "EILSEQ"`.
 
     /**
      * Write a UTF-8 string to a file, creating it or overwriting any existing content.
-Intermediate directories are not created automatically; use `mkdir` first if needed.
+     *
+     * Intermediate directories are not created automatically; use `mkdir` first if needed.
      * @param path Path to the file. `~` is expanded.
      * @param content String to write.
      * @param inPlace Whether to write the file in-place or atomically. Defaults to atomically (false).
@@ -4151,7 +4502,7 @@ Intermediate directories are not created automatically; use `mkdir` first if nee
 
     /**
      * Determine if a filesystem object exists at the given path
-Unlike `isFile` and `isDirectory`, this follows symlinks.
+     * Unlike `isFile` and `isDirectory`, this follows symlinks.
      * @param path Path to check. `~` is expanded.
      * @returns `true` if any filesystem entry (file, directory, symlink, etc.) exists at the path.
      */
@@ -4159,7 +4510,7 @@ Unlike `isFile` and `isDirectory`, this follows symlinks.
 
     /**
      * Determine if a file exists at the given path
-This does **not** follow symlinks; a symlink pointing at a file returns `false`.
+     * This does **not** follow symlinks; a symlink pointing at a file returns `false`.
      * @param path Path to check. `~` is expanded.
      * @returns `true` if a regular file (not a directory or symlink) exists at the path.
      */
@@ -4167,7 +4518,7 @@ This does **not** follow symlinks; a symlink pointing at a file returns `false`.
 
     /**
      * Determine if a directory exists at the given path
-This does **not** follow symlinks; a symlink pointing at a directory returns `false`.
+     * This does **not** follow symlinks; a symlink pointing at a directory returns `false`.
      * @param path Path to check. `~` is expanded.
      * @returns `true` if a directory exists at the path.
      */
@@ -4196,8 +4547,9 @@ This does **not** follow symlinks; a symlink pointing at a directory returns `fa
 
     /**
      * Copy a file or directory to a new location.
-The destination must not already exist. If `source` is a directory, its
-entire contents are copied recursively.
+     *
+     * The destination must not already exist. If `source` is a directory, its
+     * entire contents are copied recursively.
      * @param source Path to the existing file or directory. `~` is expanded.
      * @param destination Path for the copy. `~` is expanded.
      * @returns `true` on success, `false` on failure.
@@ -4206,7 +4558,8 @@ entire contents are copied recursively.
 
     /**
      * Move (rename) a file or directory.
-The destination must not already exist.
+     *
+     * The destination must not already exist.
      * @param source Path to the existing file or directory. `~` is expanded.
      * @param destination New path. `~` is expanded.
      * @returns `true` on success, `false` on failure.
@@ -4215,8 +4568,9 @@ The destination must not already exist.
 
     /**
      * Delete a file or directory at the given path.
-Directories are removed recursively. To remove only an empty directory,
-use `rmdir` instead.
+     *
+     * Directories are removed recursively. To remove only an empty directory,
+     * use `rmdir` instead.
      * @param path Path to delete. `~` is expanded.
      * @returns `true` on success, `false` on failure.
      */
@@ -4224,8 +4578,9 @@ use `rmdir` instead.
 
     /**
      * List the immediate contents of a directory.
-Returns bare filenames (not full paths), sorted alphabetically.
-The `.` and `..` entries are never included.
+     *
+     * Returns bare filenames (not full paths), sorted alphabetically.
+     * The `.` and `..` entries are never included.
      * @param path Path to the directory. `~` is expanded.
      * @returns Sorted array of filenames, or `null` if the path cannot be read.
      */
@@ -4233,7 +4588,8 @@ The `.` and `..` entries are never included.
 
     /**
      * Recursively list all entries under a directory.
-Returns paths relative to `path`, sorted alphabetically.
+     *
+     * Returns paths relative to `path`, sorted alphabetically.
      * @param path Path to the root directory. `~` is expanded.
      * @returns Sorted array of relative paths, or `null` if the path cannot be read.
      */
@@ -4241,7 +4597,8 @@ Returns paths relative to `path`, sorted alphabetically.
 
     /**
      * Create a directory, including all necessary intermediate directories.
-Succeeds silently if the directory already exists.
+     *
+     * Succeeds silently if the directory already exists.
      * @param path Path of the directory to create. `~` is expanded.
      * @returns `true` on success, `false` on failure.
      */
@@ -4249,8 +4606,9 @@ Succeeds silently if the directory already exists.
 
     /**
      * Remove an empty directory.
-Fails if the directory is not empty. Use `deletePath` to remove a non-empty
-directory recursively.
+     *
+     * Fails if the directory is not empty. Use `deletePath` to remove a non-empty
+     * directory recursively.
      * @param path Path of the directory to remove. `~` is expanded.
      * @returns `true` on success, `false` on failure.
      */
@@ -4271,8 +4629,9 @@ directory recursively.
 
     /**
      * Resolve a path to its absolute, canonical form.
-Expands `~`, resolves `.` and `..`, and follows all symbolic links.
-Returns `null` if any component of the path does not exist.
+     *
+     * Expands `~`, resolves `.` and `..`, and follows all symbolic links.
+     * Returns `null` if any component of the path does not exist.
      * @param path Path to resolve.
      * @returns Absolute canonical path, or `null` if it cannot be resolved.
      */
@@ -4280,8 +4639,9 @@ Returns `null` if any component of the path does not exist.
 
     /**
      * Return the localised display name for a file or directory as shown by Finder.
-For example, `/Library` appears as `"Library"` in Finder even though its
-on-disk name is the same.
+     *
+     * For example, `/Library` appears as `"Library"` in Finder even though its
+     * on-disk name is the same.
      * @param path Path to the file or directory. `~` is expanded.
      * @returns Display name string, or `null` if the path does not exist.
      */
@@ -4289,8 +4649,9 @@ on-disk name is the same.
 
     /**
      * Returns the temporary directory for the current user.
-The path is fully resolved (e.g. `/private/var/folders/...` rather than the `/var/folders/...`
-symlink), so it matches the `path` of files created by `hs.fs.tempFile()`.
+     *
+     * The path is fully resolved (e.g. `/private/var/folders/...` rather than the `/var/folders/...`
+     * symlink), so it matches the `path` of files created by `hs.fs.tempFile()`.
      * @returns Absolute temporary directory path, with symlinks resolved (always ends with `/`).
      */
     function tempDirectory(): string;
@@ -4310,7 +4671,18 @@ symlink), so it matches the `path` of files created by `hs.fs.tempFile()`.
 
     /**
      * Get metadata attributes for a file or directory.
-Does not follow symbolic links. Use `isSymlink` to detect links before calling this if needed.
+     *
+     * Does not follow symbolic links. Use `isSymlink` to detect links before calling this if needed.
+     *
+     * Returns an object with:
+     * - `size` — Size in bytes (`number`).
+     * - `type` — One of `"file"`, `"directory"`, `"symlink"`, `"socket"`, `"characterSpecial"`, `"blockSpecial"`, or `"unknown"`.
+     * - `permissions` — POSIX permission bits as an integer (e.g. `0o644` = `420`).
+     * - `ownerID` — Owner UID.
+     * - `groupID` — Owner GID.
+     * - `inode` — Inode number.
+     * - `creationDate` — Creation date as seconds since the Unix epoch.
+     * - `modificationDate` — Last modification date as seconds since the Unix epoch.
      * @param path Path to inspect. `~` is expanded.
      * @returns Attributes object, or `null` if the path cannot be accessed.
      */
@@ -4318,8 +4690,9 @@ Does not follow symbolic links. Use `isSymlink` to detect links before calling t
 
     /**
      * Set the access and modification times of a file, creating it if it does not exist
-(equivalent to the POSIX `touch` command).
-The argument order matches Hammerspoon v1 (LuaFileSystem) and Node's `fs.utimes`: access time first.
+     * (equivalent to the POSIX `touch` command).
+     *
+     * The argument order matches Hammerspoon v1 (LuaFileSystem) and Node's `fs.utimes`: access time first.
      * @param path Path to the file. `~` is expanded.
      * @param accessDate Seconds since the Unix epoch (fractions allowed). Defaults to now.
      * @param modificationDate Seconds since the Unix epoch (fractions allowed). Defaults to `accessDate`.
@@ -4329,7 +4702,8 @@ The argument order matches Hammerspoon v1 (LuaFileSystem) and Node's `fs.utimes`
 
     /**
      * Set the POSIX permission bits of a file or directory.
-Follows symbolic links.
+     *
+     * Follows symbolic links.
      * @param path Path to the file or directory. `~` is expanded.
      * @param permissions The permission bits, as an integer between `0` and `0o7777`, e.g. `0o644`. Use an octal literal: decimal `755` is a different (and unusual) mode.
      * @returns `true` on success, `false` on failure (including `EINVAL` if `permissions` is missing or out of range).
@@ -4338,7 +4712,8 @@ Follows symbolic links.
 
     /**
      * Create a hard link at `destination` pointing at `source`.
-Both paths must be on the same filesystem volume.
+     *
+     * Both paths must be on the same filesystem volume.
      * @param source Path of the existing file.
      * @param destination Path for the new hard link.
      * @returns `true` on success, `false` on failure.
@@ -4347,8 +4722,9 @@ Both paths must be on the same filesystem volume.
 
     /**
      * Create a symbolic link at `destination` pointing at `source`.
-Unlike hard links, symlinks may cross filesystem boundaries and may
-point to paths that do not yet exist.
+     *
+     * Unlike hard links, symlinks may cross filesystem boundaries and may
+     * point to paths that do not yet exist.
      * @param source The path the symlink will point to.
      * @param destination The path where the symlink will be created.
      * @returns `true` on success, `false` on failure.
@@ -4371,7 +4747,7 @@ point to paths that do not yet exist.
 
     /**
      * Replace all Finder tags on a file or directory.
-This function is only available on macOS Tahoe (26) or later.
+     * This function is only available on macOS Tahoe (26) or later.
      * @param path Path to the file or directory. `~` is expanded.
      * @param newTags Array of tag name strings.
      * @returns `true` on success, `false` on failure.
@@ -4380,7 +4756,7 @@ This function is only available on macOS Tahoe (26) or later.
 
     /**
      * Add Finder tags to a file or directory (union with existing tags).
-This function is only available on macOS Tahoe (26) or later.
+     * This function is only available on macOS Tahoe (26) or later.
      * @param path Path to the file or directory. `~` is expanded.
      * @param newTags Array of tag name strings to add.
      * @returns `true` on success, `false` on failure.
@@ -4389,8 +4765,9 @@ This function is only available on macOS Tahoe (26) or later.
 
     /**
      * Remove specific Finder tags from a file or directory.
-This function is only available on macOS Tahoe (26) or later.
-Tags not currently present are silently ignored.
+     * This function is only available on macOS Tahoe (26) or later.
+     *
+     * Tags not currently present are silently ignored.
      * @param path Path to the file or directory. `~` is expanded.
      * @param tagsToRemove Array of tag name strings to remove.
      * @returns `true` on success, `false` on failure.
@@ -4406,8 +4783,9 @@ Tags not currently present are silently ignored.
 
     /**
      * Encode a file path as a persistent bookmark that survives file moves and renames.
-The returned string is base64-encoded bookmark data that can be stored and
-later resolved with `pathFromBookmark`.
+     *
+     * The returned string is base64-encoded bookmark data that can be stored and
+     * later resolved with `pathFromBookmark`.
      * @param path Path to the file or directory. `~` is expanded.
      * @returns Base64-encoded bookmark string, or `null` on failure.
      */
@@ -4422,6 +4800,19 @@ later resolved with `pathFromBookmark`.
 
     /**
      * Return information about all currently mounted filesystem volumes.
+     *
+     * Returns an object keyed by the volume mount path. Each value contains:
+     * - `name` — Localised display name of the volume.
+     * - `isLocal` — `true` if the volume is locally connected.
+     * - `isInternal` — `true` if the volume resides on internal storage.
+     * - `isEjectable` — `true` if the volume can be ejected.
+     * - `isRemovable` — `true` if the volume resides on removable media.
+     * - `isBrowsable` — `true` if the volume can be browsed by the user.
+     * - `isReadOnly` — `true` if the volume is mounted read-only.
+     * - `isRootFileSystem` — `true` if this is the root filesystem (`/`).
+     * - `totalCapacity` — Total size in bytes.
+     * - `availableCapacity` — Available space in bytes.
+     * - `uuid` — Volume UUID string (if available).
      * @param showHidden Pass `true` to include hidden volumes. Defaults to `false`.
      * @returns Object keyed by mount path, or `null` on failure.
      */
@@ -4436,8 +4827,9 @@ later resolved with `pathFromBookmark`.
 
     /**
      * Create a new volume event watcher.
-Call `setCallback()` and `start()` on the returned object to begin receiving
-volume mount/unmount/rename events.
+     *
+     * Call `setCallback()` and `start()` on the returned object to begin receiving
+     * volume mount/unmount/rename events.
      * @returns An `HSVolumeWatcher` object.
      */
     function addVolumeWatcher(): HSVolumeWatcher;
@@ -4450,8 +4842,9 @@ volume mount/unmount/rename events.
 
     /**
      * Create a watcher for filesystem events at a given path.
-Events are batched and delivered with a latency of approximately one second.
-Call `setCallback()` and `start()` on the returned object to begin receiving events.
+     *
+     * Events are batched and delivered with a latency of approximately one second.
+     * Call `setCallback()` and `start()` on the returned object to begin receiving events.
      * @param path The path to watch. `~` is expanded.
      * @returns An `HSPathWatcher` object.
      */
@@ -4459,8 +4852,9 @@ Call `setCallback()` and `start()` on the returned object to begin receiving eve
 
     /**
      * Get the value of an extended attribute for a file or directory.
-Attribute values are returned as ISO Latin-1 encoded strings so that arbitrary byte
-sequences are represented without loss. ASCII text attribute values appear readable as-is.
+     *
+     * Attribute values are returned as ISO Latin-1 encoded strings so that arbitrary byte
+     * sequences are represented without loss. ASCII text attribute values appear readable as-is.
      * @param path Path to the file or directory. `~` is expanded.
      * @param attribute Name of the extended attribute.
      * @param options Array of option strings: `"noFollow"` (do not follow symlinks), `"hfsCompression"`, `"createOnly"`, `"replaceOnly"`, `"noSecurity"`, `"noDefault"`. Pass an empty array or omit to use no options.
@@ -4479,8 +4873,9 @@ sequences are represented without loss. ASCII text attribute values appear reada
 
     /**
      * Set the value of an extended attribute for a file or directory.
-The value is written as ISO Latin-1 bytes, providing a lossless round-trip with
-`xattrGet`. Plain ASCII strings work directly without any encoding.
+     *
+     * The value is written as ISO Latin-1 bytes, providing a lossless round-trip with
+     * `xattrGet`. Plain ASCII strings work directly without any encoding.
      * @param path Path to the file or directory. `~` is expanded.
      * @param attribute Name of the extended attribute.
      * @param value The value to write.
@@ -4501,10 +4896,11 @@ The value is written as ISO Latin-1 bytes, providing a lossless round-trip with
 
     /**
      * The error from the most recent failed `hs.fs` function, or `null` if none has failed.
-The object has a `code` (a POSIX error name such as `"ENOENT"`, `"EEXIST"`, or `"EACCES"`, or
-`"EINVAL"` for invalid arguments) and a human-readable `message`. Like C's `errno`, it is not
-cleared by successful calls, so only consult it after a function has reported failure.
-Errors from methods on an open file are recorded on that file's own `lastError` instead.
+     *
+     * The object has a `code` (a POSIX error name such as `"ENOENT"`, `"EEXIST"`, or `"EACCES"`, or
+     * `"EINVAL"` for invalid arguments) and a human-readable `message`. Like C's `errno`, it is not
+     * cleared by successful calls, so only consult it after a function has reported failure.
+     * Errors from methods on an open file are recorded on that file's own `lastError` instead.
      */
     const lastError: {code: string, message: string} | null;
 
@@ -4512,27 +4908,34 @@ Errors from methods on an open file are recorded on that file's own `lastError` 
 
 /**
  * An open file, created by `hs.fs.open()` or `hs.fs.tempFile()`.
-`HSFile` is the equivalent of a Lua `io` file handle in Hammerspoon v1. It supports
-reading and writing text (UTF-8) or binary data (`Uint8Array`), seeking, truncating,
-advisory locking, and operating on the underlying path (rename, duplicate, remove).
-All reads and writes go straight to the file descriptor with no user-space buffering,
-so `position` is always exact and data written is immediately visible to other
-processes. Use `flush()` if you also need it forced to stable storage.
-Operations that fail return `null` or `false` and set `lastError` to an object of the
-form `{code: "ENOENT", message: "No such file or directory"}`. `lastError` is not cleared
-by successful calls, so only consult it after a call has reported failure.
-Always `close()` files when you are finished with them, or use `hs.fs.withFile()`, which
-closes the file for you. Any files still open are closed when your configuration is reloaded.
+ *
+ * `HSFile` is the equivalent of a Lua `io` file handle in Hammerspoon v1. It supports
+ * reading and writing text (UTF-8) or binary data (`Uint8Array`), seeking, truncating,
+ * advisory locking, and operating on the underlying path (rename, duplicate, remove).
+ *
+ * All reads and writes go straight to the file descriptor with no user-space buffering,
+ * so `position` is always exact and data written is immediately visible to other
+ * processes. Use `flush()` if you also need it forced to stable storage.
+ *
+ * Operations that fail return `null` or `false` and set `lastError` to an object of the
+ * form `{code: "ENOENT", message: "No such file or directory"}`. `lastError` is not cleared
+ * by successful calls, so only consult it after a call has reported failure.
+ *
+ * Always `close()` files when you are finished with them, or use `hs.fs.withFile()`, which
+ * closes the file for you. Any files still open are closed when your configuration is reloaded.
  */
 declare class HSFile {
     /**
      * Read UTF-8 text from the current position.
-When `byteCount` is given, at most that many bytes are read. If that would split a multi-byte
-UTF-8 character, reading stops before the character so it is returned whole by the next read.
-If the data is not valid UTF-8, `null` is returned, the position is left unchanged, and
-`lastError.code` is `"EILSEQ"`. Use `readBytes()` for binary data.
-Like Lua's `f:read("a")`, reading to the end of the file never signals end of file: at the end it
-returns `""`. Only a read with a `byteCount` returns `null` at end of file, so loop on `read(n)`.
+     *
+     * When `byteCount` is given, at most that many bytes are read. If that would split a multi-byte
+     * UTF-8 character, reading stops before the character so it is returned whole by the next read.
+     *
+     * If the data is not valid UTF-8, `null` is returned, the position is left unchanged, and
+     * `lastError.code` is `"EILSEQ"`. Use `readBytes()` for binary data.
+     *
+     * Like Lua's `f:read("a")`, reading to the end of the file never signals end of file: at the end it
+     * returns `""`. Only a read with a `byteCount` returns `null` at end of file, so loop on `read(n)`.
      * @param byteCount Maximum number of bytes to read. Omit (or pass `0`) to read to the end of the file.
      * @returns The text read; `""` when reading to the end of the file from its end; `null` for a `byteCount` read at end of file, or on error.
      */
@@ -4540,7 +4943,8 @@ returns `""`. Only a read with a `byteCount` returns `null` at end of file, so l
 
     /**
      * Read the next line of UTF-8 text.
-Both `\n` and `\r\n` line endings are recognised. A final line with no trailing newline is still returned.
+     *
+     * Both `\n` and `\r\n` line endings are recognised. A final line with no trailing newline is still returned.
      * @param keepNewline Pass `true` to keep the line ending in the returned string. Defaults to `false`.
      * @returns The line, or `null` at end of file or on error.
      */
@@ -4548,12 +4952,14 @@ Both `\n` and `\r\n` line endings are recognised. A final line with no trailing 
 
     /**
      * Call a function for each remaining line of the file.
-Line endings are stripped. The callback may return `false` to stop early, leaving the position
-immediately after the last line delivered. If the callback throws, iteration stops and the
-exception propagates to the caller.
-The callback may use this file: if it moves the position or changes the file's contents, iteration
-continues from the current position with the file as it now is. If it closes the file, iteration
-stops and `eachLine` returns `false` with `lastError.code === "EBADF"`.
+     *
+     * Line endings are stripped. The callback may return `false` to stop early, leaving the position
+     * immediately after the last line delivered. If the callback throws, iteration stops and the
+     * exception propagates to the caller.
+     *
+     * The callback may use this file: if it moves the position or changes the file's contents, iteration
+     * continues from the current position with the file as it now is. If it closes the file, iteration
+     * stops and `eachLine` returns `false` with `lastError.code === "EBADF"`.
      * @param callback Called once per line. Return `false` to stop.
      * @returns `true` if iteration completed or was stopped by the callback returning `false`; `false` on error, if the callback threw, or if the file was closed during iteration.
      */
@@ -4561,15 +4967,17 @@ stops and `eachLine` returns `false` with `lastError.code === "EBADF"`.
 
     /**
      * Read all remaining lines of the file into an array.
-Line endings are stripped. On error the position is left unchanged.
+     *
+     * Line endings are stripped. On error the position is left unchanged.
      * @returns An array of lines (empty at end of file), or `null` on error.
      */
     readLines(): string[] | null;
 
     /**
      * Read raw bytes from the current position.
-As with `read()`, reading to the end of the file returns an empty `Uint8Array` at the end, while a
-read with a `byteCount` returns `null` at end of file.
+     *
+     * As with `read()`, reading to the end of the file returns an empty `Uint8Array` at the end, while a
+     * read with a `byteCount` returns `null` at end of file.
      * @param byteCount Maximum number of bytes to read. Omit (or pass `0`) to read to the end of the file.
      * @returns The bytes read; empty when reading to the end of the file from its end; `null` for a `byteCount` read at end of file, or on error.
      */
@@ -4598,8 +5006,9 @@ read with a `byteCount` returns `null` at end of file.
 
     /**
      * Force any written data out to stable storage (`fsync`).
-Writes are not buffered by `HSFile`, so other processes see them immediately; `flush()` additionally
-guarantees they survive a crash or power loss.
+     *
+     * Writes are not buffered by `HSFile`, so other processes see them immediately; `flush()` additionally
+     * guarantees they survive a crash or power loss.
      * @returns `true` on success, `false` on failure.
      */
     flush(): boolean;
@@ -4613,8 +5022,9 @@ guarantees they survive a crash or power loss.
 
     /**
      * Move the current position.
-Unlike Lua's `f:seek()`, the offset is required: to find the current position or the size of the
-file without moving, use the `position` and `size` properties.
+     *
+     * Unlike Lua's `f:seek()`, the offset is required: to find the current position or the size of the
+     * file without moving, use the `position` and `size` properties.
      * @param offset The byte offset (an integer), relative to `whence`. May be negative for `"cur"` and `"end"`.
      * @param whence `"set"` (from the start of the file), `"cur"` (from the current position), or `"end"` (from the end of the file). Defaults to `"set"`.
      * @returns The new position, or `null` on failure (including `EINVAL` if `offset` is missing or not an integer).
@@ -4629,10 +5039,11 @@ file without moving, use the `position` and `size` properties.
 
     /**
      * Rename (move) the file on disk. The file stays open and `path` is updated.
-Both paths must be on the same volume. By default this fails if `newPath` already exists.
-While the file is open, this fails with `"ESTALE"` if `path` no longer refers to it (for example
-because another process moved it and put something else in its place), rather than acting on
-the wrong file. Once the file is closed, it acts on whatever is at `path`.
+     *
+     * Both paths must be on the same volume. By default this fails if `newPath` already exists.
+     * While the file is open, this fails with `"ESTALE"` if `path` no longer refers to it (for example
+     * because another process moved it and put something else in its place), rather than acting on
+     * the wrong file. Once the file is closed, it acts on whatever is at `path`.
      * @param newPath The new path. `~` is expanded.
      * @param overwrite Pass `true` to atomically replace any existing file at `newPath`. Defaults to `false`.
      * @returns `true` on success, `false` on failure.
@@ -4641,8 +5052,9 @@ the wrong file. Once the file is closed, it acts on whatever is at `path`.
 
     /**
      * Copy the file on disk to a new path, including its metadata. The original stays open.
-Fails if `destination` already exists, if the file has been removed, or (while the file is open)
-with `"ESTALE"` if `path` no longer refers to it.
+     *
+     * Fails if `destination` already exists, if the file has been removed, or (while the file is open)
+     * with `"ESTALE"` if `path` no longer refers to it.
      * @param destination The path for the copy. `~` is expanded.
      * @returns `true` on success, `false` on failure.
      */
@@ -4650,17 +5062,19 @@ with `"ESTALE"` if `path` no longer refers to it.
 
     /**
      * Remove the file from disk.
-The file stays open: you can keep reading and writing it until `close()`, after which its storage is freed.
-While the file is open, this fails with `"ESTALE"` if `path` no longer refers to it, so a file that
-has since replaced it is never removed by mistake.
+     *
+     * The file stays open: you can keep reading and writing it until `close()`, after which its storage is freed.
+     * While the file is open, this fails with `"ESTALE"` if `path` no longer refers to it, so a file that
+     * has since replaced it is never removed by mistake.
      * @returns `true` on success, `false` on failure.
      */
     remove(): boolean;
 
     /**
      * Get metadata for the open file.
-Returns the same object as `hs.fs.attributes()`, but reads it from the open file itself, so it
-remains accurate after the file has been renamed or removed.
+     *
+     * Returns the same object as `hs.fs.attributes()`, but reads it from the open file itself, so it
+     * remains accurate after the file has been renamed or removed.
      * @returns Attributes object, or `null` on failure.
      */
     attributes(): Record<string, any> | null;
@@ -4674,7 +5088,8 @@ remains accurate after the file has been renamed or removed.
 
     /**
      * Set the access and modification times of the file.
-The argument order matches `hs.fs.touch()` and Hammerspoon v1: access time first.
+     *
+     * The argument order matches `hs.fs.touch()` and Hammerspoon v1: access time first.
      * @param accessDate Seconds since the Unix epoch (fractions allowed). Defaults to now.
      * @param modificationDate Seconds since the Unix epoch (fractions allowed). Defaults to `accessDate`.
      * @returns `true` on success, `false` on failure (including `EINVAL` for a `NaN`, infinite, or out-of-range timestamp).
@@ -4683,8 +5098,9 @@ The argument order matches `hs.fs.touch()` and Hammerspoon v1: access time first
 
     /**
      * Take an advisory lock on the file (`flock`).
-Advisory locks only affect other processes that also use locking; they do not prevent reads or writes.
-Locks are released by `unlock()` or when the file is closed.
+     *
+     * Advisory locks only affect other processes that also use locking; they do not prevent reads or writes.
+     * Locks are released by `unlock()` or when the file is closed.
      * @param shared Pass `true` for a shared (read) lock, which several processes may hold at once. Defaults to `false` (an exclusive lock).
      * @param wait Pass `true` to wait until the lock is available. **This blocks Hammerspoon until the lock is acquired.** Defaults to `false`, which fails immediately with `lastError.code === "EAGAIN"` if the lock is held elsewhere.
      * @returns `true` if the lock was acquired, `false` otherwise.
@@ -4735,8 +5151,9 @@ Locks are released by `unlock()` or when the file is closed.
 
     /**
      * The error from the most recent failed operation on this file, or `null` if no operation has failed.
-The object has a `code` (a POSIX error name such as `"ENOENT"`, `"EACCES"`, `"EAGAIN"`, or `"EILSEQ"`
-for invalid UTF-8) and a human-readable `message`. It is not cleared by successful operations.
+     *
+     * The object has a `code` (a POSIX error name such as `"ENOENT"`, `"EACCES"`, `"EAGAIN"`, or `"EILSEQ"`
+     * for invalid UTF-8) and a human-readable `message`. It is not cleared by successful operations.
      */
     readonly lastError: {code: string, message: string} | null;
 
@@ -4744,31 +5161,39 @@ for invalid UTF-8) and a human-readable `message`. It is not cleared by successf
 
 /**
  * Watches a filesystem path for changes and invokes a callback when they occur.
-Created via `hs.fs.createPathWatcher(path)`. Set a callback with `setCallback()`,
-then call `start()` to begin receiving events.
-| Flag | Meaning |
-|------|---------|
-| `"itemCreated"` | Item was created |
-| `"itemRemoved"` | Item was removed |
-| `"itemRenamed"` | Item was renamed or moved |
-| `"itemModified"` | File data was modified |
-| `"itemInodeMetaMod"` | Inode metadata changed (permissions, timestamps, etc.) |
-| `"itemFinderInfoMod"` | Finder info changed |
-| `"itemChangeOwner"` | Ownership or group changed |
-| `"itemXattrMod"` | Extended attributes changed |
-| `"itemIsFile"` | The item is a file |
-| `"itemIsDir"` | The item is a directory |
-| `"itemIsSymlink"` | The item is a symbolic link |
-| `"itemIsHardlink"` | The item is a hard link |
-| `"itemIsLastHardlink"` | This is the last hard link to the inode |
-| `"itemCloned"` | Item was cloned |
-| `"ownEvent"` | Event was generated by this process |
-| `"mustScanSubDirs"` | Subtree must be rescanned (events may have been dropped) |
-| `"userDropped"` | Events were dropped at the user-space level |
-| `"kernelDropped"` | Events were dropped at the kernel level |
-| `"rootChanged"` | The watched root path itself changed |
-| `"mount"` | A volume was mounted under the watched path |
-| `"unmount"` | A volume was unmounted from under the watched path |
+ *
+ * Created via `hs.fs.createPathWatcher(path)`. Set a callback with `setCallback()`,
+ * then call `start()` to begin receiving events.
+ *
+ * The callback receives `(paths, flags)`:
+ * - `paths`: array of changed file/directory paths
+ * - `flags`: parallel array of string arrays, one per path, describing what changed
+ *
+ * Possible flag values in each per-path array:
+ *
+ * | Flag | Meaning |
+ * |------|---------|
+ * | `"itemCreated"` | Item was created |
+ * | `"itemRemoved"` | Item was removed |
+ * | `"itemRenamed"` | Item was renamed or moved |
+ * | `"itemModified"` | File data was modified |
+ * | `"itemInodeMetaMod"` | Inode metadata changed (permissions, timestamps, etc.) |
+ * | `"itemFinderInfoMod"` | Finder info changed |
+ * | `"itemChangeOwner"` | Ownership or group changed |
+ * | `"itemXattrMod"` | Extended attributes changed |
+ * | `"itemIsFile"` | The item is a file |
+ * | `"itemIsDir"` | The item is a directory |
+ * | `"itemIsSymlink"` | The item is a symbolic link |
+ * | `"itemIsHardlink"` | The item is a hard link |
+ * | `"itemIsLastHardlink"` | This is the last hard link to the inode |
+ * | `"itemCloned"` | Item was cloned |
+ * | `"ownEvent"` | Event was generated by this process |
+ * | `"mustScanSubDirs"` | Subtree must be rescanned (events may have been dropped) |
+ * | `"userDropped"` | Events were dropped at the user-space level |
+ * | `"kernelDropped"` | Events were dropped at the kernel level |
+ * | `"rootChanged"` | The watched root path itself changed |
+ * | `"mount"` | A volume was mounted under the watched path |
+ * | `"unmount"` | A volume was unmounted from under the watched path |
  */
 declare class HSPathWatcher {
     /**
@@ -4805,14 +5230,18 @@ declare class HSPathWatcher {
 
 /**
  * A volume event watcher that monitors filesystem mount/unmount/rename events.
-Create via `hs.fs.addVolumeWatcher()`. Set a callback with `setCallback()`, then
-call `start()` to begin receiving events.
-| Event | Info keys |
-|-------|-----------|
-| `"didMount"` | `path: string` |
-| `"didUnmount"` | `path: string` |
-| `"willUnmount"` | `path: string` |
-| `"didRename"` | `path: string`, `name: string`, `oldPath?: string`, `oldName?: string` |
+ *
+ * Create via `hs.fs.addVolumeWatcher()`. Set a callback with `setCallback()`, then
+ * call `start()` to begin receiving events.
+ *
+ * The callback receives `(event, info)`:
+ *
+ * | Event | Info keys |
+ * |-------|-----------|
+ * | `"didMount"` | `path: string` |
+ * | `"didUnmount"` | `path: string` |
+ * | `"willUnmount"` | `path: string` |
+ * | `"didRename"` | `path: string`, `name: string`, `oldPath?: string`, `oldName?: string` |
  */
 declare class HSVolumeWatcher {
     /**
@@ -4933,9 +5362,6 @@ declare namespace hs.hashing {
 declare namespace hs.hotkey {
     /**
      * Bind a hotkey
-`cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
-through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which
-always means the same physical key
      * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
      * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
      * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
@@ -4960,9 +5386,6 @@ always means the same physical key
 
     /**
      * Create a hotkey without enabling it
-`cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
-through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which
-always means the same physical key
      * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
      * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
      * @param onPressed A JavaScript function to call when the hotkey is pressed, or null for no callback
@@ -5010,9 +5433,9 @@ always means the same physical key
 
     /**
      * Bind a hotkey from a single options object. Like hs.hotkey.bind()/create(), but also
-accepts a `message` and a `repeat` callback. `message` is available on any hotkey (not
-just ones created via bindSpec()) by setting `.message` directly on the returned object;
-see hs.hotkey's message property for exactly when it is shown.
+     * accepts a `message` and a `repeat` callback. `message` is available on any hotkey (not
+     * just ones created via bindSpec()) by setting `.message` directly on the returned object;
+     * see hs.hotkey's message property for exactly when it is shown.
      * @param spec An object with the following fields:
      * @returns A hotkey object, or null if binding failed
      */
@@ -5028,7 +5451,7 @@ see hs.hotkey's message property for exactly when it is shown.
 
     /**
      * Create and enable a hotkey that, while held down, displays a list of all currently
-enabled hotkeys (and their messages, if any) as an on-screen toast.
+     * enabled hotkeys (and their messages, if any) as an on-screen toast.
      * @param mods Modifier keys for the trigger hotkey (e.g. ["cmd", "shift"])
      * @param key Key name or numeric key code for the trigger hotkey (e.g. "/")
      * @returns A hotkey object
@@ -5037,24 +5460,27 @@ enabled hotkeys (and their messages, if any) as an on-screen toast.
 
     /**
      * Duration in seconds for the on-screen toast shown when a hotkey with a
-`message` set fires. Default is 1.
+     * `message` set fires. Default is 1.
      */
     let alertDuration: number;
 
     /**
      * Whether hotkeys bound with a key name move to a different key when the keyboard
-layout changes, so that they stay on the key that types that character. Default is true.
-For example, a hotkey bound to `"w"` is on the key US-ANSI calls `W` while a US layout is
-active, and moves to the key US-ANSI calls `,` when you switch to Dvorak, since that's where
-Dvorak types `w`. Hotkeys bound with a numeric key code never move.
-When false, a hotkey stays on whichever key its name resolved to when it was created, as in
-Hammerspoon v1. Setting this back to true moves existing hotkeys to the current layout.
-If the new layout doesn't type a hotkey's character and the character has no US-ANSI
-position either, the hotkey stays where it is and a warning is logged.
-Avoid binding some hotkeys by key name and others by numeric key code with the same
-modifiers if you switch layouts. A hotkey that moves onto a key code another hotkey already
-holds can't be registered there, so it's disabled with an error logged, and it stays
-disabled until you call its `enable()` again, even after switching back.
+     * layout changes, so that they stay on the key that types that character. Default is true.
+     *
+     * For example, a hotkey bound to `"w"` is on the key US-ANSI calls `W` while a US layout is
+     * active, and moves to the key US-ANSI calls `,` when you switch to Dvorak, since that's where
+     * Dvorak types `w`. Hotkeys bound with a numeric key code never move.
+     *
+     * When false, a hotkey stays on whichever key its name resolved to when it was created, as in
+     * Hammerspoon v1. Setting this back to true moves existing hotkeys to the current layout.
+     * If the new layout doesn't type a hotkey's character and the character has no US-ANSI
+     * position either, the hotkey stays where it is and a warning is logged.
+     *
+     * Avoid binding some hotkeys by key name and others by numeric key code with the same
+     * modifiers if you switch layouts. A hotkey that moves onto a key code another hotkey already
+     * holds can't be registered there, so it's disabled with an error logged, and it stays
+     * disabled until you call its `enable()` again, even after switching back.
      */
     let followsKeyboardLayout: boolean;
 
@@ -5099,15 +5525,15 @@ declare class HSHotkey {
 
     /**
      * The virtual key code this hotkey is currently registered on. For a hotkey bound by
-key name this follows the keyboard layout (see `hs.hotkey.followsKeyboardLayout`).
+     * key name this follows the keyboard layout (see `hs.hotkey.followsKeyboardLayout`).
      */
     readonly keyCode: number;
 
     /**
      * An optional description of what this hotkey does, or null if none was set.
-When set, it is shown as an on-screen toast via `hs.ui.alert()` (duration controlled by
-`hs.hotkey.alertDuration`) just before the hotkey's callback runs: before the pressed
-callback if one exists, otherwise before the released callback if one exists.
+     * When set, it is shown as an on-screen toast via `hs.ui.alert()` (duration controlled by
+     * `hs.hotkey.alertDuration`) just before the hotkey's callback runs: before the pressed
+     * callback if one exists, otherwise before the released callback if one exists.
      */
     message: string | null;
 
@@ -5179,17 +5605,20 @@ declare class HSHotkeyModal {
 
 /**
  * HTTP client module for making network requests from JavaScript.
-All request methods return Promises that resolve with a result object containing
-`status` (number), `body` (string), and `headers` (object). On network failure,
-`status` is -1 and `body` is an empty string.
-## Quick start
-```js
-hs.http.get("https://api.example.com/data").then(r => {
-    if (r.status === 200) {
-        console.log("Got: " + r.body)
-    }
-})
-```
+ *
+ * All request methods return Promises that resolve with a result object containing
+ * `status` (number), `body` (string), and `headers` (object). On network failure,
+ * `status` is -1 and `body` is an empty string.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * hs.http.get("https://api.example.com/data").then(r => {
+ *     if (r.status === 200) {
+ *         console.log("Got: " + r.body)
+ *     }
+ * })
+ * ```
  */
 declare namespace hs.http {
     /**
@@ -5198,7 +5627,7 @@ declare namespace hs.http {
      * @param headers Optional dictionary of request headers.
      * @returns Resolves with the HTTP response.
      */
-    function get(url: string, headers?: Record<string, string> | null): Promise<{status: number, body: string, headers: object}>;
+    function get(url: string, headers?: Record<string, string> | null): Promise<{status: number, url: string, body: string, headers: object}>;
 
     /**
      * Perform an HTTP POST request.
@@ -5207,7 +5636,7 @@ declare namespace hs.http {
      * @param headers Optional dictionary of request headers.
      * @returns Resolves with the HTTP response.
      */
-    function post(url: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, body: string, headers: object}>;
+    function post(url: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, url: string, body: string, headers: object}>;
 
     /**
      * Perform an HTTP PUT request.
@@ -5216,23 +5645,25 @@ declare namespace hs.http {
      * @param headers Optional dictionary of request headers.
      * @returns Resolves with the HTTP response.
      */
-    function put(url: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, body: string, headers: object}>;
+    function put(url: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, url: string, body: string, headers: object}>;
 
     /**
      * Perform an HTTP request with any method (GET, POST, PUT, DELETE, PATCH, etc.).
-Use this for methods not covered by the convenience helpers, such as DELETE or PATCH.
+     *
+     * Use this for methods not covered by the convenience helpers, such as DELETE or PATCH.
      * @param url The URL to request.
      * @param method The HTTP method string (e.g. "DELETE", "PATCH", "HEAD").
      * @param body Optional request body string.
      * @param headers Optional dictionary of request headers.
      * @returns Resolves with the HTTP response.
      */
-    function doRequest(url: string, method: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, body: string, headers: object}>;
+    function doRequest(url: string, method: string, body?: string | null, headers?: Record<string, string> | null): Promise<{status: number, url: string, body: string, headers: object}>;
 
     /**
      * URL-encode a string for use as a query parameter value.
-Encodes characters that are illegal in a URL query string (including `?`, `=`, `+`, `&`, `#`)
-using percent-encoding.
+     *
+     * Encodes characters that are illegal in a URL query string (including `?`, `=`, `+`, `&`, `#`)
+     * using percent-encoding.
      * @param string The string to encode.
      * @returns The percent-encoded string.
      */
@@ -5240,8 +5671,9 @@ using percent-encoding.
 
     /**
      * Parse a URL into its component parts.
-Returns an object containing only the fields present in the URL. The `queryItems` field
-is an array of `{name, value}` objects from the query string.
+     *
+     * Returns an object containing only the fields present in the URL. The `queryItems` field
+     * is an array of `{name, value}` objects from the query string.
      * @param url The URL string to parse.
      * @returns An object with any of the fields: `scheme`, `host`, `port`, `user`, `password`, `path`, `query`, `fragment`, `queryItems`. Returns `null` if the URL is unparseable.
      */
@@ -5249,8 +5681,9 @@ is an array of `{name, value}` objects from the query string.
 
     /**
      * Convert HTML entities in a string to their UTF-8 character equivalents.
-Handles named entities (e.g. `&amp;`, `&lt;`, `&copy;`), decimal numeric references
-(`&#38;`), and hexadecimal numeric references (`&#x26;`).
+     *
+     * Handles named entities (e.g. `&amp;`, `&lt;`, `&copy;`), decimal numeric references
+     * (`&#38;`), and hexadecimal numeric references (`&#x26;`).
      * @param string The string containing HTML entities.
      * @returns The string with HTML entities replaced by their UTF-8 characters.
      */
@@ -5258,10 +5691,11 @@ Handles named entities (e.g. `&amp;`, `&lt;`, `&copy;`), decimal numeric referen
 
     /**
      * Open a WebSocket connection to the given URL.
-The connection begins immediately. Use the returned object's chainable setter methods to
-register event callbacks. The connection stays open, with its callbacks, until either end
-closes it, even if you don't keep a reference to it. It is automatically closed when
-`hs.reload()` is called or the engine shuts down.
+     *
+     * The connection begins immediately. Use the returned object's chainable setter methods to
+     * register event callbacks. The connection stays open, with its callbacks, until either end
+     * closes it, even if you don't keep a reference to it. It is automatically closed when
+     * `hs.reload()` is called or the engine shuts down.
      * @param url The WebSocket URL (`ws://` or `wss://`).
      * @returns An `HSWebSocket` object, or `null` if the URL is invalid.
      */
@@ -5271,9 +5705,11 @@ closes it, even if you don't keep a reference to it. It is automatically closed 
 
 /**
  * A WebSocket client connection created by `hs.http.openWebSocket()`.
-The connection opens immediately when returned. Use the chainable setter methods to register
-event callbacks, then call `send()` to transmit messages.
-Do not instantiate `HSWebSocket` directly — use `hs.http.openWebSocket()`.
+ *
+ * The connection opens immediately when returned. Use the chainable setter methods to register
+ * event callbacks, then call `send()` to transmit messages.
+ *
+ * Do not instantiate `HSWebSocket` directly — use `hs.http.openWebSocket()`.
  */
 declare class HSWebSocket {
     /**
@@ -5306,7 +5742,8 @@ declare class HSWebSocket {
 
     /**
      * Send a text message to the server.
-The connection must be open (`readyState === 1`).
+     *
+     * The connection must be open (`readyState === 1`).
      * @param message The text message to send.
      * @returns This WebSocket, for chaining.
      */
@@ -5314,13 +5751,15 @@ The connection must be open (`readyState === 1`).
 
     /**
      * Close the WebSocket connection with a normal closure code (1000).
-If a close callback is registered, it is invoked synchronously.
+     *
+     * If a close callback is registered, it is invoked synchronously.
      */
     close(): void;
 
     /**
      * Destroy this WebSocket, releasing all resources without invoking callbacks.
-Called automatically by `hs.http.shutdown()`. After `destroy()`, do not use this object.
+     *
+     * Called automatically by `hs.http.shutdown()`. After `destroy()`, do not use this object.
      */
     destroy(): void;
 
@@ -5331,6 +5770,11 @@ Called automatically by `hs.http.shutdown()`. After `destroy()`, do not use this
 
     /**
      * The current connection state.
+     *
+     * - `0` = Connecting
+     * - `1` = Open
+     * - `2` = Closing
+     * - `3` = Closed
      */
     readonly readyState: number;
 
@@ -5338,51 +5782,63 @@ Called automatically by `hs.http.shutdown()`. After `destroy()`, do not use this
 
 /**
  * Module for creating and managing HTTP servers.
-Create a server with `hs.httpserver.create()`, configure it with chainable setters,
-then call `start()`. The server accepts both synchronous and async (Promise-returning)
-request handler callbacks.
-## Quick start
-```js
-const server = hs.httpserver.create()
-    .setPort(8080)
-    .setCallback((method, path, headers, body) => {
-        return {body: "<h1>Hello from Hammerspoon!</h1>", status: 200, headers: {"Content-Type": "text/html"}}
-    })
-    .start()
-console.log("Listening on port " + server.getPort())
-```
-## Async callback
-```js
-server.setCallback(async (method, path, headers, body) => {
-    const data = await hs.http.get("https://api.example.com/data")
-    return {body: data.body, status: 200, headers: {"Content-Type": "application/json"}}
-})
-```
-## Static file serving
-```js
-const server = hs.httpserver.create()
-    .setPort(8080)
-    .setDocumentRoot("/Users/me/Sites")
-    .start()
-```
-## TLS (HTTPS)
-```bash
-openssl genrsa -out key.pem 2048
-openssl req -new -x509 -key key.pem -out cert.pem -days 365
-openssl pkcs12 -export -out identity.p12 -inkey key.pem -in cert.pem
-```
-```js
-const server = hs.httpserver.create()
-    .setPort(8443)
-    .setTLSFromPKCS12("/path/to/identity.p12", "passphrase")
-    .setCallback(handler)
-    .start()
-```
+ *
+ * Create a server with `hs.httpserver.create()`, configure it with chainable setters,
+ * then call `start()`. The server accepts both synchronous and async (Promise-returning)
+ * request handler callbacks.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * const server = hs.httpserver.create()
+ *     .setPort(8080)
+ *     .setCallback((method, path, headers, body) => {
+ *         return {body: "<h1>Hello from Hammerspoon!</h1>", status: 200, headers: {"Content-Type": "text/html"}}
+ *     })
+ *     .start()
+ * console.log("Listening on port " + server.getPort())
+ * ```
+ *
+ * ## Async callback
+ *
+ * ```js
+ * server.setCallback(async (method, path, headers, body) => {
+ *     const data = await hs.http.get("https://api.example.com/data")
+ *     return {body: data.body, status: 200, headers: {"Content-Type": "application/json"}}
+ * })
+ * ```
+ *
+ * ## Static file serving
+ *
+ * ```js
+ * const server = hs.httpserver.create()
+ *     .setPort(8080)
+ *     .setDocumentRoot("/Users/me/Sites")
+ *     .start()
+ * ```
+ *
+ * ## TLS (HTTPS)
+ *
+ * Hammerspoon 2 cannot generate TLS certificates itself, you will need to supply a p12 file, which you can generate with:
+ * ```bash
+ * openssl genrsa -out key.pem 2048
+ * openssl req -new -x509 -key key.pem -out cert.pem -days 365
+ * openssl pkcs12 -export -out identity.p12 -inkey key.pem -in cert.pem
+ * ```
+ *
+ * ```js
+ * const server = hs.httpserver.create()
+ *     .setPort(8443)
+ *     .setTLSFromPKCS12("/path/to/identity.p12", "passphrase")
+ *     .setCallback(handler)
+ *     .start()
+ * ```
  */
 declare namespace hs.httpserver {
     /**
      * Create a new HTTP server instance.
-The server is not running until you call `start()` on the returned object.
+     *
+     * The server is not running until you call `start()` on the returned object.
      * @returns A new `HSHTTPServer` instance.
      */
     function create(): HSHTTPServer;
@@ -5391,15 +5847,18 @@ The server is not running until you call `start()` on the returned object.
 
 /**
  * An HTTP server instance created by `hs.httpserver.create()`.
-Configure with chainable setter methods, then call `start()` to begin accepting connections.
-The server supports synchronous and async (Promise-returning) request callbacks, optional
-static file serving, HTTP Basic authentication, Bonjour advertisement, and TLS via PKCS#12.
-Do not instantiate `HSHTTPServer` directly — use `hs.httpserver.create()`.
+ *
+ * Configure with chainable setter methods, then call `start()` to begin accepting connections.
+ * The server supports synchronous and async (Promise-returning) request callbacks, optional
+ * static file serving, HTTP Basic authentication, Bonjour advertisement, and TLS via PKCS#12.
+ *
+ * Do not instantiate `HSHTTPServer` directly — use `hs.httpserver.create()`.
  */
 declare class HSHTTPServer {
     /**
      * Set the TCP port to listen on. Must be called before `start()`.
-Pass 0 to let the OS assign an available port (use `getPort()` after `start()` to discover it).
+     *
+     * Pass 0 to let the OS assign an available port (use `getPort()` after `start()` to discover it).
      * @param port TCP port number (0–65535).
      * @returns This server, for chaining.
      */
@@ -5407,8 +5866,9 @@ Pass 0 to let the OS assign an available port (use `getPort()` after `start()` t
 
     /**
      * Set the network interface to listen on.
-Pass `null` to listen on all interfaces (the default). Pass `"localhost"` or `"loopback"`
-to restrict to the loopback interface only.
+     *
+     * Pass `null` to listen on all interfaces (the default). Pass `"localhost"` or `"loopback"`
+     * to restrict to the loopback interface only.
      * @param iface Interface name or IP address string, or `null` for all interfaces.
      * @returns This server, for chaining.
      */
@@ -5416,8 +5876,9 @@ to restrict to the loopback interface only.
 
     /**
      * Set a password required for Basic authentication.
-When set, every request must supply an `Authorization: Basic` header with any
-username and the configured password. Pass `null` to disable authentication.
+     *
+     * When set, every request must supply an `Authorization: Basic` header with any
+     * username and the configured password. Pass `null` to disable authentication.
      * @param password The required password, or `null` to remove authentication.
      * @returns This server, for chaining.
      */
@@ -5425,7 +5886,8 @@ username and the configured password. Pass `null` to disable authentication.
 
     /**
      * Set the maximum allowed incoming request body size in bytes.
-Requests with a body exceeding this limit receive a 413 response. Defaults to 10 MB.
+     *
+     * Requests with a body exceeding this limit receive a 413 response. Defaults to 10 MB.
      * @param size Maximum body size in bytes.
      * @returns This server, for chaining.
      */
@@ -5433,7 +5895,8 @@ Requests with a body exceeding this limit receive a 413 response. Defaults to 10
 
     /**
      * Set the Bonjour service name advertised on the local network.
-Only used when Bonjour is enabled via `setBonjour(true)`.
+     *
+     * Only used when Bonjour is enabled via `setBonjour(true)`.
      * @param name The Bonjour service name.
      * @returns This server, for chaining.
      */
@@ -5448,12 +5911,18 @@ Only used when Bonjour is enabled via `setBonjour(true)`.
 
     /**
      * Set the request handler callback.
-`path` never includes the query string. `query` is an object mapping each query parameter name
-to its percent-decoded value (`+` is decoded as a space). A parameter that appears more than once
-maps to an array of its values, in order. A parameter with no `=` maps to an empty string. If the
-request has no query string, `query` is an empty object.
-If the callback returns `null` or `undefined`, the server falls through to static file serving
-(if a document root is set), or responds with 404.
+     *
+     * The callback receives `(method, path, headers, body, query)` and must return either:
+     * - A plain object `{body, status, headers}` for a synchronous response.
+     * - A Promise resolving to `{body, status, headers}` for an async response.
+     *
+     * `path` never includes the query string. `query` is an object mapping each query parameter name
+     * to its percent-decoded value (`+` is decoded as a space). A parameter that appears more than once
+     * maps to an array of its values, in order. A parameter with no `=` maps to an empty string. If the
+     * request has no query string, `query` is an empty object.
+     *
+     * If the callback returns `null` or `undefined`, the server falls through to static file serving
+     * (if a document root is set), or responds with 404.
      * @param callback The request handler, or `null` to clear.
      * @returns This server, for chaining.
      */
@@ -5461,8 +5930,9 @@ If the callback returns `null` or `undefined`, the server falls through to stati
 
     /**
      * Set the filesystem path to serve static files from.
-When a document root is set, requests not handled by the callback are served as
-static files from this directory. Pass `null` to disable static file serving.
+     *
+     * When a document root is set, requests not handled by the callback are served as
+     * static files from this directory. Pass `null` to disable static file serving.
      * @param path Absolute path to a directory, or `null` to disable.
      * @returns This server, for chaining.
      */
@@ -5470,7 +5940,8 @@ static files from this directory. Pass `null` to disable static file serving.
 
     /**
      * Set the list of index filenames checked when a directory is requested.
-Defaults to `["index.html", "index.htm"]`. Files are checked in order.
+     *
+     * Defaults to `["index.html", "index.htm"]`. Files are checked in order.
      * @param files Array of filename strings.
      * @returns This server, for chaining.
      */
@@ -5478,7 +5949,8 @@ Defaults to `["index.html", "index.htm"]`. Files are checked in order.
 
     /**
      * Enable or disable directory listing for requests that map to a directory with no index file.
-When disabled (the default), directory requests without an index file return 403.
+     *
+     * When disabled (the default), directory requests without an index file return 403.
      * @param allow `true` to serve directory listings, `false` to return 403 (default).
      * @returns This server, for chaining.
      */
@@ -5486,8 +5958,9 @@ When disabled (the default), directory requests without an index file return 403
 
     /**
      * Configure TLS using a PKCS#12 (.p12) identity file.
-When TLS is configured, the server accepts HTTPS connections. The `.p12` file must
-contain both the certificate and the private key.
+     *
+     * When TLS is configured, the server accepts HTTPS connections. The `.p12` file must
+     * contain both the certificate and the private key.
      * @param path Absolute path to the `.p12` file.
      * @param password The password protecting the `.p12` file.
      * @returns This server, for chaining.
@@ -5496,8 +5969,9 @@ contain both the certificate and the private key.
 
     /**
      * Start the server and begin accepting connections.
-The server must be configured before calling `start()`. To restart the server with new
-settings, call `stop()` followed by `start()`.
+     *
+     * The server must be configured before calling `start()`. To restart the server with new
+     * settings, call `stop()` followed by `start()`.
      * @remarks A running server, and its callbacks, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This server, for chaining.
      */
@@ -5511,13 +5985,15 @@ settings, call `stop()` followed by `start()`.
 
     /**
      * Destroy this server, releasing all resources.
-After calling `destroy()`, the server object should not be used.
+     *
+     * After calling `destroy()`, the server object should not be used.
      */
     destroy(): void;
 
     /**
      * Get the TCP port the server is currently listening on.
-Returns 0 if the server is not running.
+     *
+     * Returns 0 if the server is not running.
      * @returns The TCP port number.
      */
     getPort(): number;
@@ -5536,11 +6012,17 @@ Returns 0 if the server is not running.
 
     /**
      * Register a WebSocket handler for a URL path.
-When a client connects and performs a WebSocket upgrade handshake on `path`, the callback
-is invoked with three arguments: `event` (string), `connection` (HSWebSocketConnection),
-and `message` (string).
-**Events:**
-Pass `null` to remove the WebSocket handler for the path.
+     *
+     * When a client connects and performs a WebSocket upgrade handshake on `path`, the callback
+     * is invoked with three arguments: `event` (string), `connection` (HSWebSocketConnection),
+     * and `message` (string).
+     *
+     * **Events:**
+     * - `"connected"` — a new client connected; `message` is `""`.
+     * - `"message"` — the client sent a text frame; `message` contains the text.
+     * - `"closed"` — the client disconnected; `message` is `""`.
+     *
+     * Pass `null` to remove the WebSocket handler for the path.
      * @param path The URL path to handle WebSocket connections on (e.g. `"/ws"`).
      * @param callback The event handler, or `null` to remove.
      * @returns This server, for chaining.
@@ -5556,10 +6038,12 @@ Pass `null` to remove the WebSocket handler for the path.
 
 /**
  * A WebSocket connection to a single client, passed to the callback registered with
-`server.setWebSocketCallback()`.
-Use `send()` to push messages to the connected client and `close()` to end the connection.
-Do not instantiate `HSWebSocketConnection` directly — it is created by the server when a
-client performs a WebSocket upgrade.
+ * `server.setWebSocketCallback()`.
+ *
+ * Use `send()` to push messages to the connected client and `close()` to end the connection.
+ *
+ * Do not instantiate `HSWebSocketConnection` directly — it is created by the server when a
+ * client performs a WebSocket upgrade.
  */
 declare class HSWebSocketConnection {
     /**
@@ -5570,7 +6054,8 @@ declare class HSWebSocketConnection {
 
     /**
      * Close the WebSocket connection to the client.
-Sends a WebSocket close frame and cancels the underlying TCP connection.
+     *
+     * Sends a WebSocket close frame and cancels the underlying TCP connection.
      */
     close(): void;
 
@@ -5588,71 +6073,90 @@ Sends a WebSocket close frame and cancels the underlying TCP connection.
 
 /**
  * Module for enabling CLI access to Hammerspoon 2 via the `hs2` command-line tool.
-IPC must be explicitly started from your configuration — it does not run by default.
-Once started, the `hs2` command-line tool can evaluate JavaScript interactively, with
-optional live log streaming.
-`hs2` and Hammerspoon 2 talk to each other via XPC, through a small broker process
-(`HammerspoonIPCBroker`) that ships inside the app bundle. The first call to `start()`
-registers the broker with launchd as a background item, which macOS will tell you about
-in a notification. If the broker is disabled in System Settings → General →
-Login Items & Extensions, IPC will not work until it is re-enabled. launchd starts the
-broker on demand, and it exits by itself when nothing has been connected for a while.
-Communication is secured with a same-team code-signing requirement in release builds,
-so only binaries signed with the same Team ID can connect.
-## Quick start
-```js
-// In your Hammerspoon 2 config (init.js):
-hs.ipc.start()
-```
-```js
-hs.ipc.installBinary()   // symlinks hs2 to /usr/local/bin/hs2
-```
-```bash
-hs2
-hs2> hs.reload()
-undefined
-hs2> 2 + 2
-4
-```
-```bash
-hs2 --log-level info
-```
-JavaScript can also be piped or redirected into `hs2`, one statement per line. When it
-isn't running interactively, `hs2` exits with status 65 if any of the lines threw an
-```bash
-echo 'hs.reload()' | hs2 --no-prompt || echo "failed with status $?"
-hs2 --no-prompt < script.js
-```
+ *
+ * IPC must be explicitly started from your configuration — it does not run by default.
+ * Once started, the `hs2` command-line tool can evaluate JavaScript interactively, with
+ * optional live log streaming.
+ *
+ * `hs2` and Hammerspoon 2 talk to each other via XPC, through a small broker process
+ * (`HammerspoonIPCBroker`) that ships inside the app bundle. The first call to `start()`
+ * registers the broker with launchd as a background item, which macOS will tell you about
+ * in a notification. If the broker is disabled in System Settings → General →
+ * Login Items & Extensions, IPC will not work until it is re-enabled. launchd starts the
+ * broker on demand, and it exits by itself when nothing has been connected for a while.
+ *
+ * Communication is secured with a same-team code-signing requirement in release builds,
+ * so only binaries signed with the same Team ID can connect.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * // In your Hammerspoon 2 config (init.js):
+ * hs.ipc.start()
+ * ```
+ *
+ * Install the CLI tool once:
+ * ```js
+ * hs.ipc.installBinary()   // symlinks hs2 to /usr/local/bin/hs2
+ * ```
+ *
+ * Then in a terminal:
+ * ```bash
+ * hs2
+ * hs2> hs.reload()
+ * undefined
+ * hs2> 2 + 2
+ * 4
+ * ```
+ *
+ * Run with live log output:
+ * ```bash
+ * hs2 --log-level info
+ * ```
+ *
+ * JavaScript can also be piped or redirected into `hs2`, one statement per line. When it
+ * isn't running interactively, `hs2` exits with status 65 if any of the lines threw an
+ * error, and 1 if it couldn't reach Hammerspoon 2 at all:
+ * ```bash
+ * echo 'hs.reload()' | hs2 --no-prompt || echo "failed with status $?"
+ * hs2 --no-prompt < script.js
+ * ```
  */
 declare namespace hs.ipc {
     /**
      * Start accepting commands from `hs2`.
-Registers the IPC broker with launchd (if it isn't already registered) and connects to it.
-In release builds, only processes signed with the same Team ID can connect.
-Calling `start()` when already running logs a warning and does nothing.
-Problems, such as the broker having been disabled in System Settings, are logged to the console.
-Only one running copy of Hammerspoon 2 can receive commands from `hs2` at a time. If another
-copy calls `start()`, it takes over, and this copy stops (with a warning in the console).
+     *
+     * Registers the IPC broker with launchd (if it isn't already registered) and connects to it.
+     * In release builds, only processes signed with the same Team ID can connect.
+     * Calling `start()` when already running logs a warning and does nothing.
+     * Problems, such as the broker having been disabled in System Settings, are logged to the console.
+     *
+     * Only one running copy of Hammerspoon 2 can receive commands from `hs2` at a time. If another
+     * copy calls `start()`, it takes over, and this copy stops (with a warning in the console).
      */
     function start(): void;
 
     /**
      * Stop accepting commands from `hs2`.
-Disconnects from the IPC broker. Any running `hs2` sessions stay open, and will
-work again if `start()` is called.
+     *
+     * Disconnects from the IPC broker. Any running `hs2` sessions stay open, and will
+     * work again if `start()` is called.
      */
     function stop(): void;
 
     /**
      * Install the `hs2` command-line tool to the given directory as a symlink.
-Creates a symlink in the target directory that points to the `hs2` binary inside the
-Hammerspoon 2 app bundle. Using a symlink means the CLI automatically reflects any
-app update without reinstalling. Any existing `hs2` file at that path is replaced.
-The directory must be on your `$PATH` for `hs2` to work without a full path.
-**Permissions:** `/usr/local/bin` is typically user-writable on Intel Macs with Homebrew.
-On Apple Silicon, prefer `/opt/homebrew/bin`. On a stock Mac (no Homebrew), both
-directories require root — if this method returns `false`, run the logged command in
-a terminal with `sudo`.
+     *
+     * Creates a symlink in the target directory that points to the `hs2` binary inside the
+     * Hammerspoon 2 app bundle. Using a symlink means the CLI automatically reflects any
+     * app update without reinstalling. Any existing `hs2` file at that path is replaced.
+     *
+     * The directory must be on your `$PATH` for `hs2` to work without a full path.
+     *
+     * **Permissions:** `/usr/local/bin` is typically user-writable on Intel Macs with Homebrew.
+     * On Apple Silicon, prefer `/opt/homebrew/bin`. On a stock Mac (no Homebrew), both
+     * directories require root — if this method returns `false`, run the logged command in
+     * a terminal with `sudo`.
      * @param directory Directory to install into. Defaults to `/usr/local/bin`.
      * @returns `true` on success, `false` on error (details logged to the console).
      */
@@ -5674,7 +6178,8 @@ a terminal with `sudo`.
 
     /**
      * Whether Hammerspoon 2 is currently connected to the IPC broker, and so can receive commands from `hs2`.
-Connecting happens in the background, so this becomes `true` shortly after `start()` is called.
+     *
+     * Connecting happens in the background, so this becomes `true` shortly after `start()` is called.
      */
     const isListening: boolean;
 
@@ -5682,15 +6187,16 @@ Connecting happens in the background, so this becomes `true` shortly after `star
 
 /**
  * Module for querying and controlling CapsLock state, and for enumerating attached keyboards
-and controlling their LEDs individually.
+ * and controlling their LEDs individually.
  */
 declare namespace hs.keyboard {
     /**
      * Checks the system-wide state of CapsLock.
-This reflects a single, global lock state shared by every attached keyboard — macOS has
-no public API to query the functional (character-affecting) CapsLock state independently
-per keyboard. For a genuinely per-keyboard signal, see `keyboardCapsLockState()`, which
-reads each keyboard's own CapsLock LED.
+     *
+     * This reflects a single, global lock state shared by every attached keyboard — macOS has
+     * no public API to query the functional (character-affecting) CapsLock state independently
+     * per keyboard. For a genuinely per-keyboard signal, see `keyboardCapsLockState()`, which
+     * reads each keyboard's own CapsLock LED.
      * @returns true if CapsLock is currently on, false otherwise
      */
     function capsLockState(): boolean;
@@ -5719,18 +6225,20 @@ reads each keyboard's own CapsLock LED.
 
     /**
      * Returns all currently attached keyboard HID devices.
-Each object has `keyboardID` (number — pass to `keyboardCapsLockState()`/`setKeyboardLED()`),
-`productName` (string), `vendorName` (string), `productID` (number), and `vendorID` (number).
-`serialNumber` (string) and `locationID` (number) are included when available.
+     *
+     * Each object has `keyboardID` (number — pass to `keyboardCapsLockState()`/`setKeyboardLED()`),
+     * `productName` (string), `vendorName` (string), `productID` (number), and `vendorID` (number).
+     * `serialNumber` (string) and `locationID` (number) are included when available.
      * @returns An array of objects describing each attached keyboard
      */
     function attachedKeyboards(): Record<string, any>[];
 
     /**
      * Checks a specific keyboard's own CapsLock LED state.
-Unlike `capsLockState()`, this queries the individual keyboard identified by `keyboardID`
-(from `attachedKeyboards()`), reflecting how modern macOS tracks CapsLock independently per
-physical keyboard.
+     *
+     * Unlike `capsLockState()`, this queries the individual keyboard identified by `keyboardID`
+     * (from `attachedKeyboards()`), reflecting how modern macOS tracks CapsLock independently per
+     * physical keyboard.
      * @remarks Requires Input Monitoring permission — see `hs.permissions.requestInputMonitoring()`.
      * @param keyboardID A keyboard identifier, as returned by `attachedKeyboards()`
      * @returns true if that keyboard's CapsLock LED is on, false if it is off, unavailable, or the keyboard was not found
@@ -5751,46 +6259,57 @@ physical keyboard.
 
 /**
  * Access information about the current keyboard layout and input sources, and respond to changes.
-## Reading the current layout
-```js
-console.log("Layout: " + hs.keycodes.currentLayout())
-console.log("Source ID: " + hs.keycodes.currentSourceID())
-```
-## Key code mapping
-Key codes identify physical keys, while characters depend on the keyboard layout. `map` and
-`names` follow the current layout, so on Dvorak `map["w"]` is the key code of the key that
-types `w` there.
-```js
-// Look up a keycode by name
-const code = hs.keycodes.map["a"]    // e.g. 0 on ANSI US
-// Look up a name by keycode
-const name = hs.keycodes.names[0]    // e.g. "a"
-```
-## Switching layouts
-```js
-hs.keycodes.setLayout("British")
-```
-## Watching for input source changes
-```js
-hs.keycodes.on('change', () => {
-    console.log("Switched to: " + hs.keycodes.currentLayout())
-})
-```
+ *
+ * ## Reading the current layout
+ *
+ * ```js
+ * console.log("Layout: " + hs.keycodes.currentLayout())
+ * console.log("Source ID: " + hs.keycodes.currentSourceID())
+ * ```
+ *
+ * ## Key code mapping
+ *
+ * Key codes identify physical keys, while characters depend on the keyboard layout. `map` and
+ * `names` follow the current layout, so on Dvorak `map["w"]` is the key code of the key that
+ * types `w` there.
+ *
+ * ```js
+ * // Look up a keycode by name
+ * const code = hs.keycodes.map["a"]    // e.g. 0 on ANSI US
+ * // Look up a name by keycode
+ * const name = hs.keycodes.names[0]    // e.g. "a"
+ * ```
+ *
+ * ## Switching layouts
+ *
+ * ```js
+ * hs.keycodes.setLayout("British")
+ * ```
+ *
+ * ## Watching for input source changes
+ *
+ * ```js
+ * hs.keycodes.on('change', () => {
+ *     console.log("Switched to: " + hs.keycodes.currentLayout())
+ * })
+ * ```
  */
 declare namespace hs.keycodes {
     /**
      * Returns the localized name of the current keyboard layout.
-Uses the base keyboard layout, which is the underlying layout even when an input
-method (such as a CJK input method) is also active.
+     *
+     * Uses the base keyboard layout, which is the underlying layout even when an input
+     * method (such as a CJK input method) is also active.
      * @returns The display name of the active layout (e.g. `"U.S."`, `"British"`), or `null`.
      */
     function currentLayout(): string | null;
 
     /**
      * Returns the localized name of the active input method, or `null` if none is active.
-Input methods are distinct from keyboard layouts. They provide complex character
-composition such as CJK input. Returns `null` when using a plain keyboard layout
-with no input method overlay.
+     *
+     * Input methods are distinct from keyboard layouts. They provide complex character
+     * composition such as CJK input. Returns `null` when using a plain keyboard layout
+     * with no input method overlay.
      * @returns The display name of the active input method (e.g. `"Hiragana"`), or `null`.
      */
     function currentMethod(): string | null;
@@ -5815,7 +6334,6 @@ with no input method overlay.
 
     /**
      * Switches the active keyboard layout to the one with the given localized name.
-Use `layouts()` to enumerate valid names.
      * @param layoutName The localized name of the layout to activate (e.g. `"U.S."`).
      * @returns `true` if the layout was found and selected, `false` otherwise.
      */
@@ -5823,7 +6341,6 @@ Use `layouts()` to enumerate valid names.
 
     /**
      * Switches the active input method to the one with the given localized name.
-Use `methods()` to enumerate valid names.
      * @param methodName The localized name of the input method to activate.
      * @returns `true` if the method was found and selected, `false` otherwise.
      */
@@ -5831,7 +6348,6 @@ Use `methods()` to enumerate valid names.
 
     /**
      * Switches the active input source to the one with the given reverse-DNS identifier.
-Use `currentSourceID()` to see the current value.
      * @param sourceID The input source ID to activate (e.g. `"com.apple.keylayout.British"`).
      * @returns `true` if the source was found and selected, `false` otherwise.
      */
@@ -5839,8 +6355,8 @@ Use `currentSourceID()` to see the current value.
 
     /**
      * Register a listener that fires whenever the keyboard input source changes.
-Read `currentLayout()`, `currentSourceID()`, or `map` inside the listener to inspect the new
-state.
+     * Read `currentLayout()`, `currentSourceID()`, or `map` inside the listener to inspect the new
+     * state.
      * @param event The event to listen for (the only event this module emits)
      * @param listener Called with no arguments when the input source changes
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -5864,20 +6380,33 @@ state.
 
     /**
      * A mapping from key names to macOS virtual key codes, following the current keyboard layout.
-This is the same mapping `hs.hotkey` and `hs.eventtap` use to turn a key name into a key
-code. For the reverse direction, use `names`. The map is rebuilt automatically whenever
-the keyboard input source changes.
-the layout doesn't type (e.g. `1` on AZERTY) map to their US-ANSI key position.
-`semicolon`, `quote`, `comma`, `period`, `slash`, `grave`. Each is the key that types that
-character in the current layout, so `comma` and `,` are always the same key.
+     *
+     * This is the same mapping `hs.hotkey` and `hs.eventtap` use to turn a key name into a key
+     * code. For the reverse direction, use `names`. The map is rebuilt automatically whenever
+     * the keyboard input source changes.
+     *
+     * Names include:
+     * - **Characters**: every character the current layout types with no modifiers held. Characters
+     *   the layout doesn't type (e.g. `1` on AZERTY) map to their US-ANSI key position.
+     * - **Punctuation words**: `minus`, `equal`, `leftbracket`, `rightbracket`, `backslash`,
+     *   `semicolon`, `quote`, `comma`, `period`, `slash`, `grave`. Each is the key that types that
+     *   character in the current layout, so `comma` and `,` are always the same key.
+     * - **Function keys**: `f1`–`f20`
+     * - **Navigation**: `home`, `end`, `pageup`, `pagedown`, `left`, `right`, `up`, `down`
+     * - **Numpad**: `pad0`–`pad9`, `pad.`, `pad+`, `pad-`, `pad*`, `pad/`, `pad=`, `padenter`, `padclear`
+     * - **Modifiers**: `cmd`, `rightcmd`, `shift`, `ctrl`, `alt`, `rightshift`, `rightalt`, `rightctrl`, `fn`, `capslock`
+     * - **Control**: `return`, `tab`, `space`, `delete`, `forwarddelete`, `escape`, `help`
+     * - **Media**: `volup`, `voldown`, `mute`
+     * - **JIS**: `yen`, `underscore`, `pad,`, `eisu`, `kana`
      */
     const map: Record<string, number>;
 
     /**
      * A mapping from macOS virtual key codes to key names, following the current keyboard layout.
-The reverse of `map`. Each key code maps to its fixed name if it has one (e.g. `return`,
-`f1`), otherwise to the character the current layout types on it. Key codes with neither
-are absent. JavaScript object keys are strings, so `names[36]` and `names["36"]` are the same.
+     *
+     * The reverse of `map`. Each key code maps to its fixed name if it has one (e.g. `return`,
+     * `f1`), otherwise to the character the current layout types on it. Key codes with neither
+     * are absent. JavaScript object keys are strings, so `names[36]` and `names["36"]` are the same.
      */
     const names: Record<string, string>;
 
@@ -5885,20 +6414,25 @@ are absent. JavaScript object keys are strings, so `names[36]` and `names["36"]`
 
 /**
  * Retrieve information about the user's Language & Region settings, and respond to changes.
-Locales encapsulate linguistic, cultural, and technological conventions — things like the
-symbol used for a decimal separator, or the way dates and calendars are formatted.
-## Reading locale information
-```js
-console.log("Current locale: " + hs.locale.current())
-const info = hs.locale.details()
-console.log("Uses metric: " + info.usesMetricSystem)
-```
-## Watching for changes
-```js
-hs.locale.on('change', () => {
-    console.log("Locale settings changed: " + JSON.stringify(hs.locale.details()))
-})
-```
+ *
+ * Locales encapsulate linguistic, cultural, and technological conventions — things like the
+ * symbol used for a decimal separator, or the way dates and calendars are formatted.
+ *
+ * ## Reading locale information
+ *
+ * ```js
+ * console.log("Current locale: " + hs.locale.current())
+ * const info = hs.locale.details()
+ * console.log("Uses metric: " + info.usesMetricSystem)
+ * ```
+ *
+ * ## Watching for changes
+ *
+ * ```js
+ * hs.locale.on('change', () => {
+ *     console.log("Locale settings changed: " + JSON.stringify(hs.locale.details()))
+ * })
+ * ```
  */
 declare namespace hs.locale {
     /**
@@ -5921,7 +6455,6 @@ declare namespace hs.locale {
 
     /**
      * Returns detailed information about the current or a specified locale.
-user's currently selected locale is used.
      * @param identifier A locale identifier from `availableLocales()`. If omitted, the
      * @returns A dictionary describing the locale, including (where available):
      */
@@ -5929,9 +6462,6 @@ user's currently selected locale is used.
 
     /**
      * Returns the localized display name for a locale identifier.
-of the strings returned by `availableLocales()`.
-currently selected locale is used. Must be one of the strings returned by
-`availableLocales()`.
      * @param localeCode The locale identifier to look up (e.g. `"de_CH"`). Must be one
      * @param baseLocaleCode The locale to display the name in. If omitted, the user's
      * @returns A dictionary with `name` (e.g. `"German"`) and `nameWithDialect`
@@ -5940,7 +6470,7 @@ currently selected locale is used. Must be one of the strings returned by
 
     /**
      * Register a listener that fires whenever any of the user's locale settings change.
-Read `current()` or `details()` inside the listener to inspect the new state.
+     * Read `current()` or `details()` inside the listener to inspect the new state.
      * @param event The event to listen for (the only event this module emits)
      * @param listener Called with no arguments when locale settings change
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -5966,28 +6496,35 @@ Read `current()` or `details()` inside the listener to inspect the new state.
 
 /**
  * Determine the Mac's location via macOS Location Services.
-Location data is obtained through WiFi network scanning and, where available, GPS
-hardware. User permission is required — call `hs.permissions.requestLocation()`
-before using any tracking features.
-The module exposes a `geocoder` sub-object for forward/reverse geocoding without
-requiring Location Services.
-## locationTable
-| Key | Type | Description |
-|-----|------|-------------|
-| `latitude` | number | Degrees north (positive) or south (negative) |
-| `longitude` | number | Degrees east (positive) or west (negative) |
-| `altitude` | number | Metres above sea level (`0` if unknown) |
-| `horizontalAccuracy` | number | Uncertainty radius in metres (`-1` if invalid) |
-| `verticalAccuracy` | number | Altitude accuracy in metres (`-1` if invalid) |
-| `course` | number | Direction of travel in degrees (`-1` if invalid) |
-| `speed` | number | Metres per second (`-1` if invalid) |
-| `timestamp` | number | Seconds since the Unix epoch |
+ *
+ * Location data is obtained through WiFi network scanning and, where available, GPS
+ * hardware. User permission is required — call `hs.permissions.requestLocation()`
+ * before using any tracking features.
+ *
+ * The module exposes a `geocoder` sub-object for forward/reverse geocoding without
+ * requiring Location Services.
+ *
+ * ## locationTable
+ *
+ * A `locationTable` is a plain JS object with the following keys:
+ *
+ * | Key | Type | Description |
+ * |-----|------|-------------|
+ * | `latitude` | number | Degrees north (positive) or south (negative) |
+ * | `longitude` | number | Degrees east (positive) or west (negative) |
+ * | `altitude` | number | Metres above sea level (`0` if unknown) |
+ * | `horizontalAccuracy` | number | Uncertainty radius in metres (`-1` if invalid) |
+ * | `verticalAccuracy` | number | Altitude accuracy in metres (`-1` if invalid) |
+ * | `course` | number | Direction of travel in degrees (`-1` if invalid) |
+ * | `speed` | number | Metres per second (`-1` if invalid) |
+ * | `timestamp` | number | Seconds since the Unix epoch |
  */
 declare namespace hs.location {
     /**
      * Geocodes an address string into an array of placemarkTables.
-Returns a Promise that resolves with an array of placemarkTable objects
-(sorted by relevance) or rejects with an error message.
+     *
+     * Returns a Promise that resolves with an array of placemarkTable objects
+     * (sorted by relevance) or rejects with an error message.
      * @param address a free-form address string in any locale
      * @returns a Promise resolving to an array of placemarkTables
      */
@@ -5995,8 +6532,9 @@ Returns a Promise that resolves with an array of placemarkTable objects
 
     /**
      * Reverse-geocodes a locationTable into an array of placemarkTables.
-Returns a Promise that resolves with matching placemarks or rejects with
-an error.
+     *
+     * Returns a Promise that resolves with matching placemarks or rejects with
+     * an error.
      * @param locationTable an object with at least `latitude` and `longitude`
      * @returns a Promise resolving to an array of placemarkTables
      */
@@ -6016,15 +6554,17 @@ an error.
 
     /**
      * Returns the most recently cached location as a locationTable, or null.
-Activates Location Services if not already running. The cache is updated
-periodically while any watcher is running.
+     *
+     * Activates Location Services if not already running. The cache is updated
+     * periodically while any watcher is running.
      * @returns a locationTable, or null if no cached location is available
      */
     function get(): Record<string, any> | null;
 
     /**
      * Calculates the straight-line distance in metres between two locationTables.
-Does not require Location Services.
+     *
+     * Does not require Location Services.
      * @param from locationTable with at least `latitude` and `longitude`
      * @param to locationTable with at least `latitude` and `longitude`
      * @returns distance in metres, or `-1` if either table is invalid
@@ -6051,8 +6591,8 @@ Does not require Location Services.
 
     /**
      * Creates a new location watcher object. Call `.start()` on it to begin
-receiving updates. The watcher is automatically stopped when the module
-shuts down.
+     * receiving updates. The watcher is automatically stopped when the module
+     * shuts down.
      * @returns an HSLocationWatcher
      */
     function addWatcher(): HSLocationWatcher;
@@ -6067,13 +6607,17 @@ shuts down.
 
 /**
  * An independent location tracking object.
-Create via `hs.location.addWatcher()`. Call `start()` to begin receiving
-updates, and set a callback to handle them.
-| Event | Data |
-|-------|------|
-| `"location"` | a locationTable |
-| `"error"` | an error message string |
-| `"authorizationChanged"` | the new status string (`"authorized"`, `"denied"`, `"restricted"`, `"notDetermined"`) |
+ *
+ * Create via `hs.location.addWatcher()`. Call `start()` to begin receiving
+ * updates, and set a callback to handle them.
+ *
+ * The callback receives `(event, data)`:
+ *
+ * | Event | Data |
+ * |-------|------|
+ * | `"location"` | a locationTable |
+ * | `"error"` | an error message string |
+ * | `"authorizationChanged"` | the new status string (`"authorized"`, `"denied"`, `"restricted"`, `"notDetermined"`) |
  */
 declare class HSLocationWatcher {
     /**
@@ -6109,7 +6653,7 @@ declare class HSLocationWatcher {
 
     /**
      * The minimum distance in metres the device must move before a new update
-is delivered. Defaults to `kCLDistanceFilterNone` (all movements reported).
+     * is delivered. Defaults to `kCLDistanceFilterNone` (all movements reported).
      */
     distanceFilter: number;
 
@@ -6117,35 +6661,42 @@ is delivered. Defaults to `kCLDistanceFilterNone` (all movements reported).
 
 /**
  * Module for creating and managing macOS system menu bar items.
-Menu bar items appear in the right side of the macOS menu bar (alongside the clock, Wi-Fi icon, etc.).
-Each item can display a title, an icon, or both, and can open a menu or invoke a callback when clicked.
-## Creating a simple title item
-```js
-const item = hs.menubar.create()
-item.title = "Hello"
-item.setClickCallback(() => console.log("clicked!"))
-```
-## Creating an icon item with a static menu
-```js
-const item = hs.menubar.create()
-item.setIcon(HSImage.fromSymbol("star.fill"))
-item.setTooltip("My automation")
-item.setMenu([
-    { title: "Reload config", fn: () => hs.reload() },
-    { title: "-" },
-    { title: "Remove from menubar", fn: () => item.hide() }
-])
-```
-## Creating an item with a dynamic menu
-```js
-const item = hs.menubar.create()
-item.title = "Dynamic"
-item.setMenu(() => [
-    { title: "Time: " + new Date().toLocaleTimeString() },
-    { title: "-" },
-    { title: "Remove from menubar", fn: () => item.hide() }
-])
-```
+ *
+ * Menu bar items appear in the right side of the macOS menu bar (alongside the clock, Wi-Fi icon, etc.).
+ * Each item can display a title, an icon, or both, and can open a menu or invoke a callback when clicked.
+ *
+ * ## Creating a simple title item
+ *
+ * ```js
+ * const item = hs.menubar.create()
+ * item.title = "Hello"
+ * item.setClickCallback(() => console.log("clicked!"))
+ * ```
+ *
+ * ## Creating an icon item with a static menu
+ *
+ * ```js
+ * const item = hs.menubar.create()
+ * item.setIcon(HSImage.fromSymbol("star.fill"))
+ * item.setTooltip("My automation")
+ * item.setMenu([
+ *     { title: "Reload config", fn: () => hs.reload() },
+ *     { title: "-" },
+ *     { title: "Remove from menubar", fn: () => item.hide() }
+ * ])
+ * ```
+ *
+ * ## Creating an item with a dynamic menu
+ *
+ * ```js
+ * const item = hs.menubar.create()
+ * item.title = "Dynamic"
+ * item.setMenu(() => [
+ *     { title: "Time: " + new Date().toLocaleTimeString() },
+ *     { title: "-" },
+ *     { title: "Remove from menubar", fn: () => item.hide() }
+ * ])
+ * ```
  */
 declare namespace hs.menubar {
     /**
@@ -6160,7 +6711,7 @@ declare namespace hs.menubar {
 
 /**
  * Object representing a macOS system menu bar item.
-Create instances with `hs.menubar.create()`.
+ * Create instances with `hs.menubar.create()`.
  */
 declare class HSMenuBarItem {
     /**
@@ -6177,29 +6728,46 @@ declare class HSMenuBarItem {
 
     /**
      * Set a callback invoked when the item is clicked with any mouse button (only fires when no menu is set).
-from 1 (so a mouse's fourth and fifth buttons are `"button4"` and `"button5"`). A Ctrl-click, the
-standard macOS secondary click, is reported as `"right"` (and `modifiers` still includes `"ctrl"`).
-`hs.eventtap.currentModifiers()` (e.g. `["cmd", "leftCmd"]`).
-To offer a menu alongside a click action, leave the menu unset and call `popUpMenu()` from this callback.
+     *
+     * The callback receives two arguments:
+     * - `button` (string): `"left"`, `"right"` or `"middle"`, or `"buttonN"` for other buttons, numbered
+     *   from 1 (so a mouse's fourth and fifth buttons are `"button4"` and `"button5"`). A Ctrl-click, the
+     *   standard macOS secondary click, is reported as `"right"` (and `modifiers` still includes `"ctrl"`).
+     * - `modifiers` (string[]): The modifier keys held during the click, in the same form as
+     *   `hs.eventtap.currentModifiers()` (e.g. `["cmd", "leftCmd"]`).
+     *
+     * To offer a menu alongside a click action, leave the menu unset and call `popUpMenu()` from this callback.
      * @param fn A function to call on click, or null to remove the callback
      */
     setClickCallback(fn: ((button: string, modifiers: string[]) => void) | null): void;
 
     /**
      * Set the menu for this item. Pass an array of menu item objects for a static menu,
-or a function that returns an array for a dynamic menu populated each time it opens.
-The function receives one argument: the modifier keys held when the menu opened, in the same form as
-`hs.eventtap.currentModifiers()`.
-While a menu is set, clicking the item opens the menu and the click callback is not called.
+     * or a function that returns an array for a dynamic menu populated each time it opens.
+     * The function receives one argument: the modifier keys held when the menu opened, in the same form as
+     * `hs.eventtap.currentModifiers()`.
+     *
+     * While a menu is set, clicking the item opens the menu and the click callback is not called.
+     *
+     * Menu item object keys:
+     * - `title` (string, required): The item label. Use `"-"` for a separator line.
+     * - `fn` (function): Callback invoked when the item is chosen.
+     * - `checked` (boolean): If true, a checkmark is shown next to the item.
+     * - `disabled` (boolean): If true, the item is greyed out and cannot be chosen.
+     * - `tooltip` (string): Tooltip shown when hovering over the item.
+     * - `color` (HSColor or hex string): The colour of the item's title text.
+     * - `icon` (HSImage): Icon shown to the left of the title.
+     * - `menu` (array): Nested array of menu item objects to create a submenu.
      * @param menuOrFn Array of menu item objects, a function returning such an array, or null to remove the menu
      */
     setMenu(menuOrFn: Array<Record<string, any>> | ((modifiers: string[]) => Array<Record<string, any>>) | null): void;
 
     /**
      * Immediately open a menu below this item, independently of any menu set with `setMenu()`.
-This is intended to be called from a click callback, so that a single item can perform an action on one
-kind of click and offer a menu on another. The menu item objects are the same as for `setMenu()`.
-If the item is hidden, the menu opens at the mouse pointer instead.
+     *
+     * This is intended to be called from a click callback, so that a single item can perform an action on one
+     * kind of click and offer a menu on another. The menu item objects are the same as for `setMenu()`.
+     * If the item is hidden, the menu opens at the mouse pointer instead.
      * @param entries Array of menu item objects
      */
     popUpMenu(entries: Array<Record<string, any>>): void;
@@ -6223,9 +6791,10 @@ If the item is hidden, the menu opens at the mouse pointer instead.
 
     /**
      * Permanently remove this item from the menu bar and release all resources.
-After calling `destroy()`, the item is no longer usable.
-This is called automatically on `hs.reload()`. Use `hide()` instead
-if you only want to temporarily remove the item without freeing it.
+     *
+     * After calling `destroy()`, the item is no longer usable.
+     * This is called automatically on `hs.reload()`. Use `hide()` instead
+     * if you only want to temporarily remove the item without freeing it.
      */
     destroy(): void;
 
@@ -6243,8 +6812,8 @@ if you only want to temporarily remove the item without freeing it.
 
 /**
  * A module for enumerating, watching, and communicating with MIDI devices.
-IMPORTANT NOTE: This module has not had very much real-world testing yet. Please report positive or
-negative feedback via GitHub Issues.
+ * IMPORTANT NOTE: This module has not had very much real-world testing yet. Please report positive or
+ * negative feedback via GitHub Issues.
  */
 declare namespace hs.midi {
     /**
@@ -6255,30 +6824,33 @@ declare namespace hs.midi {
 
     /**
      * Returns the names of all available MIDI sources. This includes endpoints published
-by other apps (e.g. virtual instruments) as well as each individual port of a device
-(e.g. each IAC Driver bus, or each port of a multi-port MIDI interface), so a single
-port can be opened with `virtualSourceNamed()`.
+     * by other apps (e.g. virtual instruments) as well as each individual port of a device
+     * (e.g. each IAC Driver bus, or each port of a multi-port MIDI interface), so a single
+     * port can be opened with `virtualSourceNamed()`.
      * @returns An array of source name strings
      */
     function virtualSources(): string[];
 
     /**
      * Sets or removes a callback fired whenever the set of connected MIDI devices
-or virtual sources changes.
-The callback receives two arguments: the current result of `devices()` and the
-current result of `virtualSources()`.
+     * or virtual sources changes.
+     *
+     * The callback receives two arguments: the current result of `devices()` and the
+     * current result of `virtualSources()`.
      * @param fn The function to call on any MIDI setup change, or `null` to remove it
      */
     function deviceCallback(fn: ((devices: string[], virtualSources: string[]) => void) | null): void;
 
     /**
      * Creates an `hs.midi` object for a physical device.
-For a device with several ports, the callback receives messages from the device's
-first source, and `sendCommand()` sends to its first destination. `sendSysex()` and
-`identityRequest()` send to every destination on the device. To use a specific
-port, open it by name with `virtualSourceNamed()`.
-`new`/`alloc`/`copy`-prefixed method names, which have special meaning under
-Objective-C's ARC ownership conventions.
+     *
+     * For a device with several ports, the callback receives messages from the device's
+     * first source, and `sendCommand()` sends to its first destination. `sendSysex()` and
+     * `identityRequest()` send to every destination on the device. To use a specific
+     * port, open it by name with `virtualSourceNamed()`.
+     *
+     * `new`/`alloc`/`copy`-prefixed method names, which have special meaning under
+     * Objective-C's ARC ownership conventions.
      * @param deviceName The name of the device, as returned by `devices()`
      * @returns An `HSMIDIDevice` object, or `nil` if no device has that name
      */
@@ -6286,9 +6858,10 @@ Objective-C's ARC ownership conventions.
 
     /**
      * Creates an `hs.midi` object for a single MIDI source, such as one port of a
-multi-port device. Messages sent with `sendCommand()`, `sendSysex()` and
-`identityRequest()` go to the destination with the same name, if there is one.
-the same ARC-related reason as `deviceNamed()`.
+     * multi-port device. Messages sent with `sendCommand()`, `sendSysex()` and
+     * `identityRequest()` go to the destination with the same name, if there is one.
+     *
+     * the same ARC-related reason as `deviceNamed()`.
      * @param virtualSourceName The name of the virtual source, as returned by `virtualSources()`
      * @returns An `HSMIDIDevice` object, or `nil` if no virtual source has that name
      */
@@ -6303,16 +6876,18 @@ the same ARC-related reason as `deviceNamed()`.
 
 /**
  * A MIDI device or virtual source, created via `hs.midi.deviceNamed()` or
-`hs.midi.virtualSourceNamed()`.
+ * `hs.midi.virtualSourceNamed()`.
  */
 declare class HSMIDIDevice {
     /**
      * Sets or removes the callback fired when a MIDI message is received.
-The callback receives five arguments: this device object, the device's name,
-the command type as a string (e.g. `"noteOn"`, `"controlChange"`,
-`"systemExclusive"` — see `hs.midi.commandTypes` for the full set), a
-human-readable description, and a metadata table of command-specific fields.
-when released, but some send `noteOn` with `velocity` 0 instead of `noteOff`.
+     *
+     * The callback receives five arguments: this device object, the device's name,
+     * the command type as a string (e.g. `"noteOn"`, `"controlChange"`,
+     * `"systemExclusive"` — see `hs.midi.commandTypes` for the full set), a
+     * human-readable description, and a metadata table of command-specific fields.
+     *
+     * when released, but some send `noteOn` with `velocity` 0 instead of `noteOff`.
      * @remarks A device with a callback, and the callback, stay alive until the callback is removed or the device is destroyed, even if you don't keep a reference to it
      * @param fn The function to call on each received message, or `null` to remove it
      * @returns This device object, for chaining
@@ -6321,6 +6896,14 @@ when released, but some send `noteOn` with `velocity` 0 instead of `noteOff`.
 
     /**
      * Sends a MIDI command to the device.
+     *
+     * Supported `commandType` values and their `metadata` fields:
+     * - `noteOn`, `noteOff`: `note` (0-127), `velocity` (0-127), `channel` (0-15)
+     * - `polyphonicKeyPressure`: `note` (0-127), `pressure` (0-127), `channel` (0-15)
+     * - `controlChange`: `controllerNumber` (0-127), `controllerValue` (0-127), `channel` (0-15)
+     * - `programChange`: `programNumber` (0-127), `channel` (0-15)
+     * - `channelPressure`: `pressure` (0-127), `channel` (0-15)
+     * - `pitchWheelChange`: `pitchChange` (0-16383, center `8192`), `channel` (0-15)
      * @param commandType The command type string
      * @param metadata A table of command-specific fields
      * @returns `true` if the command was sent, `false` if the device has no
@@ -6329,26 +6912,27 @@ when released, but some send `noteOn` with `velocity` 0 instead of `noteOff`.
 
     /**
      * Sends a System Exclusive command to the device. For a device with several ports,
-the command is sent to every port.
+     * the command is sent to every port.
      * @param command A hex string (whitespace ignored), e.g. `"F0 7E 7F 06 01 F7"`
      */
     sendSysex(command: string): void;
 
     /**
      * Sends a MIDI Identity Request. The device's reply, if any, arrives via the
-callback set with `setCallback()` as a `systemExclusive` message.
+     * callback set with `setCallback()` as a `systemExclusive` message.
      */
     identityRequest(): void;
 
     /**
      * Stops receiving from and releases all resources held by this device object.
-Called automatically when Hammerspoon reloads.
+     * Called automatically when Hammerspoon reloads.
      */
     destroy(): void;
 
     /**
      * Returns a plain object describing this device, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the device's `name`, `displayName`, `manufacturer`, `model`, `isOnline` and `isVirtual`
      */
     toJSON(): Record<string, any>;
@@ -6385,7 +6969,7 @@ Called automatically when Hammerspoon reloads.
 
     /**
      * Whether this object was created for a single source via `hs.midi.virtualSourceNamed()`,
-rather than for a whole device via `hs.midi.deviceNamed()`.
+     * rather than for a whole device via `hs.midi.deviceNamed()`.
      */
     readonly isVirtual: boolean;
 
@@ -6393,31 +6977,39 @@ rather than for a whole device via `hs.midi.deviceNamed()`.
 
 /**
  * Control and inspect the mouse pointer and attached mouse devices.
-## Position
-All coordinates use **Hammerspoon screen coordinates**: `(0, 0)` is at the top-left
-of the primary display and `y` increases downward.
-```js
-const pos = hs.mouse.absolutePosition()
-console.log("Mouse at " + pos.x + ", " + pos.y)
-
-hs.mouse.setAbsolutePosition(100, 200)
-```
-## Device info
-```js
-console.log("Mice: " + hs.mouse.count())
-hs.mouse.names().forEach(n => console.log(n))
-```
-## Cursor
-```js
-console.log(hs.mouse.currentCursorType())   // e.g. "arrow"
-console.log(hs.mouse.scrollDirection())      // "natural" or "normal"
-```
+ *
+ * ## Position
+ *
+ * All coordinates use **Hammerspoon screen coordinates**: `(0, 0)` is at the top-left
+ * of the primary display and `y` increases downward.
+ *
+ * ```js
+ * const pos = hs.mouse.absolutePosition()
+ * console.log("Mouse at " + pos.x + ", " + pos.y)
+ *
+ * hs.mouse.setAbsolutePosition(100, 200)
+ * ```
+ *
+ * ## Device info
+ *
+ * ```js
+ * console.log("Mice: " + hs.mouse.count())
+ * hs.mouse.names().forEach(n => console.log(n))
+ * ```
+ *
+ * ## Cursor
+ *
+ * ```js
+ * console.log(hs.mouse.currentCursorType())   // e.g. "arrow"
+ * console.log(hs.mouse.scrollDirection())      // "natural" or "normal"
+ * ```
  */
 declare namespace hs.mouse {
     /**
      * Returns the current mouse pointer position in Hammerspoon screen coordinates.
-Hammerspoon coordinates have `(0, 0)` at the top-left of the primary display,
-with `y` increasing downward.
+     *
+     * Hammerspoon coordinates have `(0, 0)` at the top-left of the primary display,
+     * with `y` increasing downward.
      * @returns An object with `x` and `y` number properties.
      */
     function absolutePosition(): Record<string, number>;
@@ -6431,8 +7023,9 @@ with `y` increasing downward.
 
     /**
      * Returns the mouse pointer position relative to the screen it is currently on.
-The returned coordinates have `(0, 0)` at the top-left corner of the screen
-that the cursor is on.
+     *
+     * The returned coordinates have `(0, 0)` at the top-left corner of the screen
+     * that the cursor is on.
      * @returns An object with `x` and `y` number properties, or `null` if no screen can be determined.
      */
     function getRelativePosition(): Record<string, number> | null;
@@ -6466,17 +7059,19 @@ that the cursor is on.
 
     /**
      * Returns the current mouse tracking speed (acceleration level).
-Values range from `-1.0` (system default, acceleration disabled) to `3.0` (maximum acceleration).
-Returns `-1.0` if the value cannot be read.
+     *
+     * Values range from `-1.0` (system default, acceleration disabled) to `3.0` (maximum acceleration).
+     * Returns `-1.0` if the value cannot be read.
      * @returns The current tracking speed as a number.
      */
     function trackingSpeed(): number;
 
     /**
      * Sets the mouse tracking speed (acceleration level).
-The change takes effect immediately for the current login session and is also persisted
-to preferences so it survives a restart. Values outside the valid range or non-finite
-values are rejected with a warning and no change is made.
+     *
+     * The change takes effect immediately for the current login session and is also persisted
+     * to preferences so it survives a restart. Values outside the valid range or non-finite
+     * values are rejected with a warning and no change is made.
      * @param speed Desired tracking speed in the range `-1.0` to `3.0`.
      */
     function setTrackingSpeed(speed: number): void;
@@ -6489,7 +7084,6 @@ values are rejected with a warning and no change is made.
 
     /**
      * Returns the name of the cursor type currently set by this application.
-has the keyboard focus, the visible system cursor may differ.
      * @remarks This reflects the cursor set by the Hammerspoon process. If another application
      * @returns A string such as `"arrow"`, `"iBeam"`, `"crosshair"`, `"pointingHand"`,
      */
@@ -6499,20 +7093,42 @@ has the keyboard focus, the visible system cursor may differ.
 
 /**
  * Connect to MQTT brokers to publish messages and subscribe to topics.
-MQTT is a lightweight publish/subscribe protocol, widely used for home automation (e.g. Home
-Assistant, Zigbee2MQTT, Tasmota) and IoT devices. Create a client with `create()`, then
-`connect()` it, and listen for messages with its `on()` method.
-Both MQTT 3.1.1 and MQTT 5 brokers are supported, over plain TCP, TLS, and WebSockets.
-**Note:** this module is new and has not yet been well tested. It has only been tested against a
-simple MQTT 3.1.1 test broker, not against real brokers, MQTT 5, TLS or WebSockets. Please report
-any problems you find.
+ *
+ * MQTT is a lightweight publish/subscribe protocol, widely used for home automation (e.g. Home
+ * Assistant, Zigbee2MQTT, Tasmota) and IoT devices. Create a client with `create()`, then
+ * `connect()` it, and listen for messages with its `on()` method.
+ *
+ * Both MQTT 3.1.1 and MQTT 5 brokers are supported, over plain TCP, TLS, and WebSockets.
+ *
+ * **Note:** this module is new and has not yet been well tested. It has only been tested against a
+ * simple MQTT 3.1.1 test broker, not against real brokers, MQTT 5, TLS or WebSockets. Please report
+ * any problems you find.
  */
 declare namespace hs.mqtt {
     /**
      * Creates an MQTT client. The client doesn't connect until you call its `connect()` method.
-`mqtt://` (TCP, port 1883), `mqtts://` (TLS, port 8883), `ws://` (WebSocket, port 80) or
-`wss://` (WebSocket over TLS, port 443). A URL may include a port, a username and password
-(`mqtt://user:pass@host`), and for WebSockets a path (defaults to `/mqtt`).
+     *
+     * The `server` is either a host name, or a URL whose scheme chooses the transport:
+     * `mqtt://` (TCP, port 1883), `mqtts://` (TLS, port 8883), `ws://` (WebSocket, port 80) or
+     * `wss://` (WebSocket over TLS, port 443). A URL may include a port, a username and password
+     * (`mqtt://user:pass@host`), and for WebSockets a path (defaults to `/mqtt`).
+     *
+     * Options (all optional, and overriding anything given in the URL):
+     *  - `port`: the broker's port
+     *  - `clientID`: the MQTT client identifier. Defaults to `"hammerspoon-"` followed by eight random characters. Brokers disconnect an existing client when another connects with the same identifier
+     *  - `username`, `password`: credentials for the broker
+     *  - `tls`: `true` to connect with TLS
+     *  - `websocket`: `true` to connect over a WebSocket, and `websocketPath` for its path
+     *  - `version`: the MQTT version, `"3.1.1"` (the default) or `"5"`
+     *  - `keepAlive`: seconds between keep-alive pings. Defaults to `60`
+     *  - `connectTimeout`: seconds to wait for the broker to accept the connection. Defaults to `10`
+     *  - `timeout`: seconds to wait for the broker to acknowledge a `subscribe()`, an `unsubscribe()`, or a `publish()` with QoS 1 or 2, before its Promise rejects. Defaults to `5`
+     *  - `cleanSession`: `false` to ask the broker to keep the client's subscriptions and queued messages while it's disconnected. Defaults to `true`
+     *  - `will`: `{topic, payload, qos, retain}`, a message the broker publishes if the client disconnects without calling `disconnect()`
+     *  - `reconnectInterval`: seconds to wait before trying to reconnect when the connection is lost, retrying until `disconnect()` is called. While the network is unavailable, the client waits for it to return instead. Defaults to `0`, which doesn't reconnect
+     *  - `caCertificate`: the CA certificate to trust for the broker instead of the system's, e.g. for a self-signed certificate: the path of a DER or PEM file, or `"keychain:<name>"` for the certificates with that name in your keychain. Without it, the broker's certificate must be trusted by macOS, which includes CA certificates you've added to your keychain and marked as trusted
+     *  - `clientCertificate`: the path of a PKCS#12 (.p12) file with a certificate and private key to identify the client, and `clientCertificatePassword` for its password
+     *  - `allowUntrustedCertificates`: `true` to accept any certificate from the broker. This makes the connection insecure, so use `caCertificate` instead if you can
      * @param server The broker's host name or URL
      * @param options Connection options
      * @returns A new `HSMQTTClient`, or `null` if the server or options are invalid (the reason is logged to the Console)
@@ -6523,11 +7139,13 @@ declare namespace hs.mqtt {
 
 /**
  * A connection to an MQTT broker, created by `hs.mqtt.create()`.
-The client does nothing until you call `connect()`. Messages for the topics you `subscribe()`
-to arrive as `"message"` events (see `on()`).
-A connected client keeps working after you drop your reference to it, until you call
-`disconnect()` or `destroy()`, or Hammerspoon reloads its configuration. So does a client
-with listeners registered by `on()`.
+ *
+ * The client does nothing until you call `connect()`. Messages for the topics you `subscribe()`
+ * to arrive as `"message"` events (see `on()`).
+ *
+ * A connected client keeps working after you drop your reference to it, until you call
+ * `disconnect()` or `destroy()`, or Hammerspoon reloads its configuration. So does a client
+ * with listeners registered by `on()`.
  */
 declare class HSMQTTClient {
     /**
@@ -6568,7 +7186,13 @@ declare class HSMQTTClient {
 
     /**
      * Register a listener for this client's events.
-A client with listeners stays alive until you remove them or call `destroy()`.
+     *
+     * Listeners receive:
+     *  - `"connected"`: `()`, each time the client connects, including when it reconnects by itself
+     *  - `"disconnected"`: `(reason)`, `null` when you called `disconnect()`, otherwise a description of why the connection was lost
+     *  - `"message"`: `(message)`, an object with the message's `topic`, its `payload` decoded as UTF-8, its raw `bytes` (a Uint8Array), its `qos`, and whether it is `retain`ed and a `duplicate`
+     *
+     * A client with listeners stays alive until you remove them or call `destroy()`.
      * @param event The event to listen for
      * @param listener Called when the event occurs
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -6638,7 +7262,8 @@ A client with listeners stays alive until you remove them or call `destroy()`.
 declare namespace hs.network {
     /**
      * Returns all network interfaces present on this system.
-Each object contains `name` (string), `isLoopback` (boolean), `isUp` (boolean), and `isRunning` (boolean). A `displayName` string is included when the system provides a human-readable label for the interface (e.g. `"Wi-Fi"` or `"Ethernet"`).
+     *
+     * Each object contains `name` (string), `isLoopback` (boolean), `isUp` (boolean), and `isRunning` (boolean). A `displayName` string is included when the system provides a human-readable label for the interface (e.g. `"Wi-Fi"` or `"Ethernet"`).
      * @returns An array of objects describing each network interface.
      */
     function interfaces(): Record<string, any>[];
@@ -6651,7 +7276,8 @@ Each object contains `name` (string), `isLoopback` (boolean), `isUp` (boolean), 
 
     /**
      * Returns all IP addresses assigned to this host.
-Each object contains `interface` (the BSD name of the interface), `address` (the address string), and `family` (`"ipv4"` or `"ipv6"`).
+     *
+     * Each object contains `interface` (the BSD name of the interface), `address` (the address string), and `family` (`"ipv4"` or `"ipv6"`).
      * @returns An array of address objects.
      */
     function addresses(): Record<string, any>[];
@@ -6664,7 +7290,8 @@ Each object contains `interface` (the BSD name of the interface), `address` (the
 
     /**
      * Asynchronously resolves a hostname to its IP addresses using the system DNS resolver.
-Uses CFHost, which respects the system's network configuration including VPN routes and proxy settings.
+     *
+     * Uses CFHost, which respects the system's network configuration including VPN routes and proxy settings.
      * @param hostname The hostname to resolve (e.g. `"example.com"` or `"localhost"`).
      * @param family The address family to query: `"ipv4"` for A records only, `"ipv6"` for AAAA records only, or `"both"` to return all addresses. Defaults to `"both"` when omitted.
      * @returns A Promise that resolves to an array of IP address strings, or rejects with an error message if the lookup fails.
@@ -6673,9 +7300,10 @@ Uses CFHost, which respects the system's network configuration including VPN rou
 
     /**
      * Creates a reachability monitor for a specific IP address.
-Returns `null` if `address` is not a valid IPv4 or IPv6 address literal.
-Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
-because `NWPathMonitor` does not support per-address targeting.
+     *
+     * Returns `null` if `address` is not a valid IPv4 or IPv6 address literal.
+     * Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
+     * because `NWPathMonitor` does not support per-address targeting.
      * @param address An IPv4 or IPv6 address string (e.g. `"192.168.1.1"` or `"::1"`).
      * @returns A new `HSNetworkReachability` monitor, or `null` if the address is invalid.
      */
@@ -6683,9 +7311,10 @@ because `NWPathMonitor` does not support per-address targeting.
 
     /**
      * Creates a reachability monitor for a source/destination IP address pair.
-Returns `null` if either address is not a valid IPv4 or IPv6 address literal.
-Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
-because `NWPathMonitor` does not support per-address targeting.
+     *
+     * Returns `null` if either address is not a valid IPv4 or IPv6 address literal.
+     * Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
+     * because `NWPathMonitor` does not support per-address targeting.
      * @param localAddress An IPv4 or IPv6 source address string.
      * @param remoteAddress An IPv4 or IPv6 destination address string.
      * @returns A new `HSNetworkReachability` monitor, or `null` if either address is invalid.
@@ -6694,9 +7323,10 @@ because `NWPathMonitor` does not support per-address targeting.
 
     /**
      * Creates a reachability monitor for a given hostname.
-Returns `null` if `hostName` is empty.
-Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
-because `NWPathMonitor` does not support per-hostname targeting.
+     *
+     * Returns `null` if `hostName` is empty.
+     * Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
+     * because `NWPathMonitor` does not support per-hostname targeting.
      * @param hostName A hostname string (e.g. `"example.com"`).
      * @returns A new `HSNetworkReachability` monitor, or `null` if `hostName` is empty.
      */
@@ -6704,28 +7334,30 @@ because `NWPathMonitor` does not support per-hostname targeting.
 
     /**
      * Creates a reachability monitor for general internet connectivity.
-This is the most common factory method. Use it when you want to know whether the
-device currently has a working internet connection.
+     *
+     * This is the most common factory method. Use it when you want to know whether the
+     * device currently has a working internet connection.
      * @returns A new `HSNetworkReachability` monitor.
      */
     function reachabilityInternet(): HSNetworkReachability;
 
     /**
      * Creates a reachability monitor for link-local connectivity.
-Link-local addresses cover the `169.254.x.x` (IPv4) and `fe80::/10` (IPv6) ranges
-used for direct device-to-device communication without a router.
-Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
-because `NWPathMonitor` does not distinguish link-local reachability.
+     *
+     * Link-local addresses cover the `169.254.x.x` (IPv4) and `fe80::/10` (IPv6) ranges
+     * used for direct device-to-device communication without a router.
+     * Under the hood this monitors general system connectivity (the same as `reachabilityInternet()`),
+     * because `NWPathMonitor` does not distinguish link-local reachability.
      * @returns A new `HSNetworkReachability` monitor.
      */
     function reachabilityLinkLocal(): HSNetworkReachability;
 
     /**
      * Returns the contents of the macOS System Configuration dynamic store as a dictionary.
-The store holds live network configuration for the running system — interface addresses,
-routing, DNS servers, proxy settings, VPN state, and more. Keys follow a hierarchical
-path convention (e.g. `"State:/Network/Global/IPv4"`).
-Omit or pass `null` to return all keys (equivalent to `".*"`).
+     *
+     * The store holds live network configuration for the running system — interface addresses,
+     * routing, DNS servers, proxy settings, VPN state, and more. Keys follow a hierarchical
+     * path convention (e.g. `"State:/Network/Global/IPv4"`).
      * @param pattern An optional regular expression that filters which keys are included.
      * @returns A dictionary mapping key strings to their current values. Values may be
      */
@@ -6733,16 +7365,18 @@ Omit or pass `null` to return all keys (equivalent to `".*"`).
 
     /**
      * Returns a mapping of all configured network location UUIDs to their display names.
-Use this to discover available locations before calling `configurationSetLocation()`.
+     *
+     * Use this to discover available locations before calling `configurationSetLocation()`.
      * @returns A dictionary mapping UUID strings to human-readable location names.
      */
     function configurationLocations(): Record<string, string>;
 
     /**
      * Switches the active network location to the one with the given name or UUID.
-Pass the location's display name (e.g. `"Home"`) or its UUID from `configurationLocations()`.
-The change is applied immediately. Returns `false` if the location was not found or
-the preferences could not be committed (e.g. insufficient privileges).
+     *
+     * Pass the location's display name (e.g. `"Home"`) or its UUID from `configurationLocations()`.
+     * The change is applied immediately. Returns `false` if the location was not found or
+     * the preferences could not be committed (e.g. insufficient privileges).
      * @param location A location display name or UUID string.
      * @returns `true` if the location was changed successfully, `false` otherwise.
      */
@@ -6750,20 +7384,34 @@ the preferences could not be committed (e.g. insufficient privileges).
 
     /**
      * Creates a watcher that fires a callback when System Configuration dynamic store keys change.
-Call `setKeys()` to specify which keys (or patterns) to watch, `setCallback()` to register
-the handler, then `start()` to begin monitoring. The module automatically stops and
-destroys all watchers on `hs.reload()`.
+     *
+     * Call `setKeys()` to specify which keys (or patterns) to watch, `setCallback()` to register
+     * the handler, then `start()` to begin monitoring. The module automatically stops and
+     * destroys all watchers on `hs.reload()`.
      * @returns A new `HSNetworkConfigurationWatcher` object.
      */
     function configurationWatcher(): HSNetworkConfigurationWatcher;
 
     /**
      * Sends ICMP Echo Requests to `server` and reports results via a callback.
-DNS resolution and the first ping begin immediately. The returned object can be used to
-pause, resume, or cancel the ping, and to read statistics. The ping runs to completion,
-with its callback, even if you don't keep a reference to it.
-`timeout` (seconds per packet, default 2.0), `family` (`"any"` | `"ipv4"` | `"ipv6"`, default `"any"`),
-and `callback` (function).
+     *
+     * DNS resolution and the first ping begin immediately. The returned object can be used to
+     * pause, resume, or cancel the ping, and to read statistics. The ping runs to completion,
+     * with its callback, even if you don't keep a reference to it.
+     *
+     * The `options` argument may be:
+     * - Omitted (or `undefined`) — uses all defaults.
+     * - A callback function — used as the event handler with all other options at their defaults.
+     * - An object with any of: `count` (integer, default 5), `interval` (seconds, default 1.0),
+     *   `timeout` (seconds per packet, default 2.0), `family` (`"any"` | `"ipv4"` | `"ipv6"`, default `"any"`),
+     *   and `callback` (function).
+     *
+     * The callback receives `(ping, event, info)`:
+     * - `"didStart"` — info is the resolved IP address string.
+     * - `"didFail"` — info is an error message string (e.g. DNS failure).
+     * - `"sendPacketFailed"` — info is `[packetObject, errorString]`.
+     * - `"receivedPacket"` — info is the packet object (see `HSNetworkPing.packets()`).
+     * - `"didFinish"` — info is the summary string.
      * @param server A hostname or IP address to ping.
      * @param options A callback function or options object. Optional.
      * @returns An `HSNetworkPing` object, or `null` if the arguments are invalid.
@@ -6772,10 +7420,12 @@ and `callback` (function).
 
     /**
      * A dictionary of named flag constants for use with `HSNetworkReachability.status()`.
-Compare individual bits against these constants to determine which network conditions apply.
-The numeric values match the deprecated `SCNetworkReachabilityFlags` for backward compatibility.
-Keys: `transientConnection`, `reachable`, `connectionRequired`, `connectionOnTraffic`,
-`interventionRequired`, `connectionOnDemand`, `isLocalAddress`, `isDirect`.
+     *
+     * Compare individual bits against these constants to determine which network conditions apply.
+     * The numeric values match the deprecated `SCNetworkReachabilityFlags` for backward compatibility.
+     *
+     * Keys: `transientConnection`, `reachable`, `connectionRequired`, `connectionOnTraffic`,
+     * `interventionRequired`, `connectionOnDemand`, `isLocalAddress`, `isDirect`.
      */
     const reachabilityFlags: Record<string, number>;
 
@@ -6787,9 +7437,10 @@ Keys: `transientConnection`, `reachable`, `connectionRequired`, `connectionOnTra
 declare class HSNetworkConfigurationWatcher {
     /**
      * Specifies which dynamic store keys (or key patterns) to watch for changes.
-Must be called before `start()`. Each element of `keys` is treated as a string literal
-when `pattern` is `false` (the default), or as a regular expression when `pattern` is `true`.
-Calling `setKeys` again replaces the previous set of watched keys.
+     *
+     * Must be called before `start()`. Each element of `keys` is treated as a string literal
+     * when `pattern` is `false` (the default), or as a regular expression when `pattern` is `true`.
+     * Calling `setKeys` again replaces the previous set of watched keys.
      * @param keys An array of exact key strings (when `pattern` is `false`) or regular expressions (when `pattern` is `true`).
      * @param pattern Pass `true` to treat each element of `keys` as a regular expression; omit or pass `false` for literal key matching.
      * @returns This watcher for chaining.
@@ -6798,9 +7449,10 @@ Calling `setKeys` again replaces the previous set of watched keys.
 
     /**
      * Sets the callback invoked when a watched key changes.
-The callback receives `(watcher, changedKeys)` where `changedKeys` is an array of key
-strings that changed since the last notification. Call `hs.network.configurationStore()`
-inside the callback to read the updated values.
+     *
+     * The callback receives `(watcher, changedKeys)` where `changedKeys` is an array of key
+     * strings that changed since the last notification. Call `hs.network.configurationStore()`
+     * inside the callback to read the updated values.
      * @param callback Called whenever a watched key changes.
      * @returns This watcher for chaining.
      */
@@ -6808,9 +7460,10 @@ inside the callback to read the updated values.
 
     /**
      * Starts watching for dynamic store changes.
-The callback registered with `setCallback()` will be invoked whenever a key matching the
-patterns registered with `setKeys()` changes. Call `setKeys()` and `setCallback()` before
-calling `start()`.
+     *
+     * The callback registered with `setCallback()` will be invoked whenever a key matching the
+     * patterns registered with `setKeys()` changes. Call `setKeys()` and `setCallback()` before
+     * calling `start()`.
      * @remarks A started watcher, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This watcher for chaining.
      */
@@ -6818,7 +7471,8 @@ calling `start()`.
 
     /**
      * Stops watching for dynamic store changes.
-The callback will no longer be invoked. Call `start()` again to resume monitoring.
+     *
+     * The callback will no longer be invoked. Call `start()` again to resume monitoring.
      * @returns This watcher for chaining.
      */
     stop(): HSNetworkConfigurationWatcher;
@@ -6832,11 +7486,17 @@ The callback will no longer be invoked. Call `start()` again to resume monitorin
 
 /**
  * Object representing an active or completed ICMP ping operation.
-Create instances with `hs.network.ping()`.
+ * Create instances with `hs.network.ping()`.
  */
 declare class HSNetworkPing {
     /**
      * Returns packet statistics for all sent packets, or for a single packet by its zero-based sequence number.
+     *
+     * Each packet object contains:
+     * - `sequenceNumber` (number) — zero-based index
+     * - `icmpIdentifier` (number) — the ICMP identifier used (may be kernel-assigned)
+     * - `status` (string) — `"sent"`, `"received"`, or `"timeout"`
+     * - `rtt` (number | null) — round-trip time in seconds, or `null` if no reply was received
      * @param sequenceNumber Omit to get all packets as an array; pass an integer to get a single packet object, or `null` if that sequence does not exist.
      * @returns An array of packet objects when called without arguments, or a single packet object (or `null`).
      */
@@ -6867,6 +7527,13 @@ declare class HSNetworkPing {
 
     /**
      * Replaces the ping's callback function.
+     *
+     * The callback receives `(ping, event, info)`:
+     * - `"didStart"` — info is the resolved IP address string.
+     * - `"didFail"` — info is an error message string.
+     * - `"sendPacketFailed"` — info is `[packetObject, errorString]`.
+     * - `"receivedPacket"` — info is the packet object.
+     * - `"didFinish"` — info is the summary string.
      * @param callback The new callback function.
      * @returns This ping object for chaining.
      */
@@ -6894,7 +7561,7 @@ declare class HSNetworkPing {
 
     /**
      * The total number of ICMP Echo Requests to send. May be increased while the ping is running
-provided the new value is greater than the number already sent.
+     * provided the new value is greater than the number already sent.
      */
     count: number;
 
@@ -6916,27 +7583,30 @@ provided the new value is greater than the number already sent.
 declare class HSNetworkReachability {
     /**
      * Returns the current reachability flags as a numeric bitmask.
-Compare against constants in `hs.network.reachabilityFlags`. Returns `0` if the
-network is currently unreachable.
+     *
+     * Compare against constants in `hs.network.reachabilityFlags`. Returns `0` if the
+     * network is currently unreachable.
      * @returns A number representing the current reachability bitmask.
      */
     status(): number;
 
     /**
      * Returns a human-readable summary of the current reachability flags.
-The string contains 8 characters in order: `t` (transient/expensive), `R` (reachable),
-`c` (connectionRequired), `C` (connectionOnTraffic — always `-`), `i` (interventionRequired/constrained),
-`D` (connectionOnDemand — always `-`), `l` (isLocalAddress — always `-`), `d` (isDirect).
-A letter appears when that flag is set; `-` appears when it is clear.
+     *
+     * The string contains 8 characters in order: `t` (transient/expensive), `R` (reachable),
+     * `c` (connectionRequired), `C` (connectionOnTraffic — always `-`), `i` (interventionRequired/constrained),
+     * `D` (connectionOnDemand — always `-`), `l` (isLocalAddress — always `-`), `d` (isDirect).
+     * A letter appears when that flag is set; `-` appears when it is clear.
      * @returns An 8-character flag string such as `"-R-----d"`.
      */
     statusString(): string;
 
     /**
      * Replaces the callback invoked when reachability changes.
-The callback receives `(reachability, flags)` where `flags` is the same numeric
-bitmask as returned by `status()`. Call `start()` after `setCallback()` to begin
-monitoring.
+     *
+     * The callback receives `(reachability, flags)` where `flags` is the same numeric
+     * bitmask as returned by `status()`. Call `start()` after `setCallback()` to begin
+     * monitoring.
      * @param callback Called on each reachability status change.
      * @returns This reachability object for chaining.
      */
@@ -6944,8 +7614,9 @@ monitoring.
 
     /**
      * Starts monitoring for reachability changes.
-After calling `start()`, the callback registered with `setCallback()` is invoked
-whenever the reachability status changes.
+     *
+     * After calling `start()`, the callback registered with `setCallback()` is invoked
+     * whenever the reachability status changes.
      * @remarks A started object, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns This reachability object for chaining.
      */
@@ -6953,7 +7624,8 @@ whenever the reachability status changes.
 
     /**
      * Stops monitoring for reachability changes.
-The callback will no longer be invoked. Call `start()` again to resume monitoring.
+     *
+     * The callback will no longer be invoked. Call `start()` again to resume monitoring.
      * @returns This reachability object for chaining.
      */
     stop(): HSNetworkReachability;
@@ -6967,91 +7639,111 @@ The callback will no longer be invoked. Call `start()` again to resume monitorin
 
 /**
  * Module for creating and displaying macOS system notifications.
-macOS notifications require user permission before they will appear. Request it once
-(typically at startup) via `hs.permissions.requestNotifications()` and it will be
-```js
-hs.permissions.requestNotifications().then(granted => {
-    if (granted) hs.notify.show("Hammerspoon", "Notifications are enabled!")
-})
-```
-## Quick notification
-```js
-// Fire and forget
-hs.notify.show("Build complete", "Your project compiled successfully.")
-
-// With a callback invoked when the user interacts
-hs.notify.show("Build complete", "Click to view the log.", (response) => {
-    console.log("User tapped:", response.actionIdentifier)
-})
-```
-## Rich notification
-```js
-const n = hs.notify.create({
-    title:    "New message",
-    subtitle: "From Alice",
-    body:     "Are you free tonight?",
-    sound:    true,
-    threadIdentifier: "messages-alice",
-    actions: [
-        { identifier: "REPLY", title: "Reply", textInput: true,
-          textInputButtonTitle: "Send", textInputPlaceholder: "Type a reply…" },
-        { identifier: "DISMISS", title: "Dismiss", destructive: true }
-    ],
-    callback: (response) => {
-        if (response.actionIdentifier === "REPLY") {
-            console.log("Reply text:", response.userText)
-        }
-    }
-})
-n.send()
-// Later, if needed:
-n.withdraw()
-```
-## Callback response object
-| Property | Type | Description |
-|----------|------|-------------|
-| `actionIdentifier` | string | `"DEFAULT"` when the user tapped the notification body; `"DISMISS"` when dismissed (if `.customDismissAction` is set); otherwise the action's `identifier` string |
-| `userText` | string? | Text entered in a `textInput` action; only present when applicable |
-| `userInfo` | object | The `userInfo` object originally passed to `create()`, if any |
-| `notificationId` | string | The notification's unique identifier |
-## Options for `create()`
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `title` | string | *(required)* | The bold heading line |
-| `subtitle` | string | — | A second line shown beneath the title |
-| `body` | string | — | The main message body |
-| `sound` | boolean \| string | `true` | `true` = default sound, `false` = no sound, string = named `.aiff` file |
-| `badge` | number | — | Value to show on the app icon badge |
-| `threadIdentifier` | string | — | Groups related notifications visually in Notification Center |
-| `userInfo` | object | `{}` | Arbitrary payload passed back to the callback |
-| `interruptionLevel` | string | `"active"` | `"passive"`, `"active"`, or `"timeSensitive"` — controls Focus/DND behaviour (macOS 12+) |
-| `trigger` | object | — | When to deliver the notification (see below). Omit for immediate delivery. |
-| `actions` | array | — | Action buttons (see below) |
-| `callback` | function | — | Invoked when the user interacts with the notification |
-## Triggers
-Pass a `trigger` object in `create()`'s options to schedule the notification instead of delivering it
-```js
-trigger: { type: "timeInterval", interval: 300 }
-```
-**Calendar** — deliver at a specific date/time. Provide either a JS `Date` object or individual
-```js
-// At a specific moment
-trigger: { type: "calendar", date: new Date("2026-06-01T09:00:00") }
-
-// At 09:00 on the next day that matches (e.g. next Monday, weekday 2)
-trigger: { type: "calendar", weekday: 2, hour: 9, minute: 0 }
-```
-Supported component keys: `year`, `month`, `day`, `hour`, `minute`, `second`, `weekday`.
-## Action objects
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `identifier` | string | *(required)* | Unique identifier passed to the callback |
-| `title` | string | *(required)* | Button label |
-| `destructive` | boolean | `false` | Renders the title in a destructive (red) style |
-| `foreground` | boolean | `false` | Brings Hammerspoon to the foreground when tapped |
-| `textInput` | boolean | `false` | Converts this action to an inline text-reply button |
-| `textInputButtonTitle` | string | `"Send"` | Label on the reply send button (requires `textInput: true`) |
-| `textInputPlaceholder` | string | `""` | Placeholder shown in the text field (requires `textInput: true`) |
+ *
+ * macOS notifications require user permission before they will appear. Request it once
+ * (typically at startup) via `hs.permissions.requestNotifications()` and it will be
+ * remembered across sessions:
+ *
+ * ```js
+ * hs.permissions.requestNotifications().then(granted => {
+ *     if (granted) hs.notify.show("Hammerspoon", "Notifications are enabled!")
+ * })
+ * ```
+ *
+ * ## Quick notification
+ *
+ * ```js
+ * // Fire and forget
+ * hs.notify.show("Build complete", "Your project compiled successfully.")
+ *
+ * // With a callback invoked when the user interacts
+ * hs.notify.show("Build complete", "Click to view the log.", (response) => {
+ *     console.log("User tapped:", response.actionIdentifier)
+ * })
+ * ```
+ *
+ * ## Rich notification
+ *
+ * ```js
+ * const n = hs.notify.create({
+ *     title:    "New message",
+ *     subtitle: "From Alice",
+ *     body:     "Are you free tonight?",
+ *     sound:    true,
+ *     threadIdentifier: "messages-alice",
+ *     actions: [
+ *         { identifier: "REPLY", title: "Reply", textInput: true,
+ *           textInputButtonTitle: "Send", textInputPlaceholder: "Type a reply…" },
+ *         { identifier: "DISMISS", title: "Dismiss", destructive: true }
+ *     ],
+ *     callback: (response) => {
+ *         if (response.actionIdentifier === "REPLY") {
+ *             console.log("Reply text:", response.userText)
+ *         }
+ *     }
+ * })
+ * n.send()
+ * // Later, if needed:
+ * n.withdraw()
+ * ```
+ *
+ * ## Callback response object
+ *
+ * The `callback` function receives a single object with these properties:
+ *
+ * | Property | Type | Description |
+ * |----------|------|-------------|
+ * | `actionIdentifier` | string | `"DEFAULT"` when the user tapped the notification body; `"DISMISS"` when dismissed (if `.customDismissAction` is set); otherwise the action's `identifier` string |
+ * | `userText` | string? | Text entered in a `textInput` action; only present when applicable |
+ * | `userInfo` | object | The `userInfo` object originally passed to `create()`, if any |
+ * | `notificationId` | string | The notification's unique identifier |
+ *
+ * ## Options for `create()`
+ *
+ * | Key | Type | Default | Description |
+ * |-----|------|---------|-------------|
+ * | `title` | string | *(required)* | The bold heading line |
+ * | `subtitle` | string | — | A second line shown beneath the title |
+ * | `body` | string | — | The main message body |
+ * | `sound` | boolean \| string | `true` | `true` = default sound, `false` = no sound, string = named `.aiff` file |
+ * | `badge` | number | — | Value to show on the app icon badge |
+ * | `threadIdentifier` | string | — | Groups related notifications visually in Notification Center |
+ * | `userInfo` | object | `{}` | Arbitrary payload passed back to the callback |
+ * | `interruptionLevel` | string | `"active"` | `"passive"`, `"active"`, or `"timeSensitive"` — controls Focus/DND behaviour (macOS 12+) |
+ * | `trigger` | object | — | When to deliver the notification (see below). Omit for immediate delivery. |
+ * | `actions` | array | — | Action buttons (see below) |
+ * | `callback` | function | — | Invoked when the user interacts with the notification |
+ *
+ * ## Triggers
+ *
+ * Pass a `trigger` object in `create()`'s options to schedule the notification instead of delivering it
+ * **Time interval** — deliver after a fixed delay in seconds (minimum 60 s):
+ * ```js
+ * trigger: { type: "timeInterval", interval: 300 }
+ * ```
+ *
+ * **Calendar** — deliver at a specific date/time. Provide either a JS `Date` object or individual
+ * date-component keys; any omitted component matches every value:
+ * ```js
+ * // At a specific moment
+ * trigger: { type: "calendar", date: new Date("2026-06-01T09:00:00") }
+ *
+ * // At 09:00 on the next day that matches (e.g. next Monday, weekday 2)
+ * trigger: { type: "calendar", weekday: 2, hour: 9, minute: 0 }
+ * ```
+ * Supported component keys: `year`, `month`, `day`, `hour`, `minute`, `second`, `weekday`.
+ *
+ * ## Action objects
+ *
+ * | Key | Type | Default | Description |
+ * |-----|------|---------|-------------|
+ * | `identifier` | string | *(required)* | Unique identifier passed to the callback |
+ * | `title` | string | *(required)* | Button label |
+ * | `destructive` | boolean | `false` | Renders the title in a destructive (red) style |
+ * | `foreground` | boolean | `false` | Brings Hammerspoon to the foreground when tapped |
+ * | `textInput` | boolean | `false` | Converts this action to an inline text-reply button |
+ * | `textInputButtonTitle` | string | `"Send"` | Label on the reply send button (requires `textInput: true`) |
+ * | `textInputPlaceholder` | string | `""` | Placeholder shown in the text field (requires `textInput: true`) |
  */
 declare namespace hs.notify {
     /**
@@ -7083,8 +7775,9 @@ declare namespace hs.notify {
 
 /**
  * A notification created by `hs.notify.new()`.
-Call `.send()` to deliver it to macOS Notification Center. You can hold a reference
-to the object and call `.withdraw()` later to remove it.
+ *
+ * Call `.send()` to deliver it to macOS Notification Center. You can hold a reference
+ * to the object and call `.withdraw()` later to remove it.
  */
 declare class HSNotification {
     /**
@@ -7100,7 +7793,7 @@ declare class HSNotification {
 
     /**
      * The unique identifier assigned to this notification.
-Use it to correlate with system notification APIs if needed.
+     * Use it to correlate with system notification APIs if needed.
      */
     readonly identifier: string;
 
@@ -7108,28 +7801,37 @@ Use it to correlate with system notification APIs if needed.
 
 /**
  * Recognize text in images using Apple's Vision framework.
-`hs.ocr` provides access to on-device text recognition without requiring
-network access or any third-party dependencies. Pass a file path to
-`recognizeText()` and receive back an `HSOCRResult` containing the full
-recognized text and individual per-region observations with confidence
-scores and normalized bounding boxes.
+ *
+ * `hs.ocr` provides access to on-device text recognition without requiring
+ * network access or any third-party dependencies. Pass a file path to
+ * `recognizeText()` and receive back an `HSOCRResult` containing the full
+ * recognized text and individual per-region observations with confidence
+ * scores and normalized bounding boxes.
  */
 declare namespace hs.ocr {
     /**
      * Recognize text in the image at the given file path.
-Returns a Promise that resolves with an `HSOCRResult` containing all
-recognized text and per-region observations. The image must exist on
-disk; URLs and data buffers are not supported.
-Recognition is performed on a background thread; the main thread is
-not blocked during the operation.
-`"accurate"` uses a larger neural network for better results;
-`"fast"` trades accuracy for speed.
-Observations whose `confidence` is below this threshold are excluded
-from `result.observations` (and therefore from `result.text`).
-Hints Vision toward specific languages. Use `supportedLanguages()` to
-enumerate the available codes for the current device.
-When `true`, Vision selects recognition languages automatically.
-Overrides `languages` when set.
+     *
+     * Returns a Promise that resolves with an `HSOCRResult` containing all
+     * recognized text and per-region observations. The image must exist on
+     * disk; URLs and data buffers are not supported.
+     *
+     * Recognition is performed on a background thread; the main thread is
+     * not blocked during the operation.
+     *
+     * The optional `options` object may contain:
+     * - `recognitionLevel` (`"accurate"` | `"fast"`, default `"accurate"`):
+     *   `"accurate"` uses a larger neural network for better results;
+     *   `"fast"` trades accuracy for speed.
+     * - `minimumConfidence` (number 0–1, default `0`):
+     *   Observations whose `confidence` is below this threshold are excluded
+     *   from `result.observations` (and therefore from `result.text`).
+     * - `languages` (array of BCP-47 strings, e.g. `["en-US", "fr-FR"]`):
+     *   Hints Vision toward specific languages. Use `supportedLanguages()` to
+     *   enumerate the available codes for the current device.
+     * - `automaticallyDetectsLanguage` (boolean, default `false`):
+     *   When `true`, Vision selects recognition languages automatically.
+     *   Overrides `languages` when set.
      * @param path Absolute path to the image file.
      * @param options Optional configuration object (see description).
      * @returns Resolves with the recognition result.
@@ -7138,10 +7840,11 @@ Overrides `languages` when set.
 
     /**
      * Returns the BCP-47 language codes supported by the Vision text recognizer
-on this device.
-The set of languages varies between macOS versions and hardware. Call
-this at runtime to discover which codes are valid for the `languages`
-option passed to `recognizeText()`.
+     * on this device.
+     *
+     * The set of languages varies between macOS versions and hardware. Call
+     * this at runtime to discover which codes are valid for the `languages`
+     * option passed to `recognizeText()`.
      * @returns An array of BCP-47 language code strings (e.g. `["en-US", "fr-FR"]`).
      */
     function supportedLanguages(): string[];
@@ -7150,17 +7853,21 @@ option passed to `recognizeText()`.
 
 /**
  * A single region of text recognized in an image.
-Instances are delivered inside the `observations` array of an `HSOCRResult`.
-Each observation represents a discrete text run found in the source image,
-along with a confidence score and a normalized bounding box.
-`(0, 0)` is the top-left corner of the image and `(1, 1)` is the bottom-right.
-This matches the convention used by most image-processing tools and differs
-from Vision's internal bottom-left-origin system (the conversion is automatic).
+ *
+ * Instances are delivered inside the `observations` array of an `HSOCRResult`.
+ * Each observation represents a discrete text run found in the source image,
+ * along with a confidence score and a normalized bounding box.
+ *
+ * Bounding-box coordinates use a **normalized top-left-origin** system:
+ * `(0, 0)` is the top-left corner of the image and `(1, 1)` is the bottom-right.
+ * This matches the convention used by most image-processing tools and differs
+ * from Vision's internal bottom-left-origin system (the conversion is automatic).
  */
 declare class HSOCRObservation {
     /**
      * Returns a plain object describing this observation, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the observation's `text`, `confidence` and `bounds`
      */
     toJSON(): Record<string, any>;
@@ -7177,16 +7884,18 @@ declare class HSOCRObservation {
 
     /**
      * Recognition confidence in the range `0.0` (uncertain) to `1.0` (certain).
-Use `minimumConfidence` in the options passed to `recognizeText()` to
-pre-filter observations below a threshold rather than filtering here.
+     *
+     * Use `minimumConfidence` in the options passed to `recognizeText()` to
+     * pre-filter observations below a threshold rather than filtering here.
      */
     readonly confidence: number;
 
     /**
      * Normalized bounding box of this observation in the source image, as an `HSRect`.
-All values are in the range 0–1 with **top-left origin**
-(`(0, 0)` = top-left corner, `(1, 1)` = bottom-right corner).
-Use `bounds.x`, `bounds.y`, `bounds.w`, and `bounds.h` to access the components.
+     *
+     * All values are in the range 0–1 with **top-left origin**
+     * (`(0, 0)` = top-left corner, `(1, 1)` = bottom-right corner).
+     * Use `bounds.x`, `bounds.y`, `bounds.w`, and `bounds.h` to access the components.
      */
     readonly bounds: HSRect;
 
@@ -7194,14 +7903,16 @@ Use `bounds.x`, `bounds.y`, `bounds.w`, and `bounds.h` to access the components.
 
 /**
  * The result of a text recognition operation on an image.
-An `HSOCRResult` is returned by `hs.ocr.recognizeText()` and bundles the
-full recognized text together with an array of per-region observations,
-each carrying its own confidence score and bounding box.
+ *
+ * An `HSOCRResult` is returned by `hs.ocr.recognizeText()` and bundles the
+ * full recognized text together with an array of per-region observations,
+ * each carrying its own confidence score and bounding box.
  */
 declare class HSOCRResult {
     /**
      * Returns a plain object describing this result, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the result's `text` and `observations`
      */
     toJSON(): Record<string, any>;
@@ -7213,18 +7924,20 @@ declare class HSOCRResult {
 
     /**
      * The full recognized text from the image, with each observation's text
-joined by newlines in the order Vision returned them.
-Use this when you only need the raw text and don't care about bounding
-boxes or per-region confidence scores.
+     * joined by newlines in the order Vision returned them.
+     *
+     * Use this when you only need the raw text and don't care about bounding
+     * boxes or per-region confidence scores.
      */
     readonly text: string;
 
     /**
      * The individual text observations that make up this result.
-Each entry in the array is an `HSOCRObservation` with its own `text`,
-`confidence`, and `bounds` properties. Observations are returned in the
-order Vision produced them (typically top-to-bottom, left-to-right, but
-this is image-dependent).
+     *
+     * Each entry in the array is an `HSOCRObservation` with its own `text`,
+     * `confidence`, and `bounds` properties. Observations are returned in the
+     * order Vision produced them (typically top-to-bottom, left-to-right, but
+     * this is image-dependent).
      */
     readonly observations: HSOCRObservation[];
 
@@ -7232,88 +7945,113 @@ this is image-dependent).
 
 /**
  * Run AppleScript and OSA JavaScript from Hammerspoon scripts.
-Script execution is isolated in a separate XPC helper process
-(`HammerspoonOSAScriptHelper`). If a script crashes or deadlocks, only the
-helper is affected — the main app remains stable and the next call
-reconnects automatically.
-## Async API (Promise-based)
-Every async function returns a `Promise` that **always resolves** (never rejects)
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | `Boolean` | `true` if the script ran without error |
-| `result` | `any` | Parsed return value of the script, or `null` on failure |
-| `raw` | `String` | Raw string representation of the result, or the error message on failure |
-## Parallel execution
-Async scripts run **in parallel**, and their Promises resolve in whatever
-order the scripts finish, not the order they were started. A slow script
-(for example one waiting up to two minutes for an unresponsive application
-to answer an AppleEvent) does not hold up any other script.
-If your scripts must run in a strict order, chain them so that each one
-```javascript
-hs.osascript.applescript('tell application "Music" to pause')
-  .then(() => hs.osascript.applescript('tell application "Music" to set sound volume to 50'))
-  .then(() => hs.osascript.applescript('tell application "Music" to play'));
-```
-```javascript
-async function restartMusic() {
-  await hs.osascript.applescript('tell application "Music" to pause');
-  await hs.osascript.applescript('tell application "Music" to set sound volume to 50');
-  await hs.osascript.applescript('tell application "Music" to play');
-}
-```
-## Sync API
-The `*Sync` variants block until the script completes and return the same
-`{ success, result, raw }` object directly.
-**Warning:** while a sync call is running, Hammerspoon's main thread is
-blocked. Nothing else in Hammerspoon can run: no timers, hotkeys, event
-watchers, UI updates, or console. If the target application is slow to
-respond, Hammerspoon hangs until it does, or until the AppleEvent times out
-(two minutes by default). If the target application tries to talk back to
-Hammerspoon while it is blocked, both wait on each other until that timeout.
-Prefer the async API, and only use the `*Sync` variants for scripts that are
-known to finish quickly.
-The `result` field is typed based on what the script returned: strings,
-numbers, booleans, lists, and records are all mapped to their JavaScript
-equivalents. `null` is used for AppleScript's `missing value` and for any
-failure case.
-## Examples
-**Return a string (async):**
-```javascript
-hs.osascript.applescript('return "hello"')
-  .then(r => console.log(r.result));  // "hello"
-```
-**Return a string (sync):**
-```javascript
-const r = hs.osascript.applescriptSync('return "hello"');
-console.log(r.result);  // "hello"
-```
-**Interact with an application:**
-```javascript
-hs.osascript.applescript('tell application "Finder" to get name of home')
-  .then(r => console.log(r.result));  // e.g. "cmsj"
-```
-**Handle errors (the Promise never rejects — check `success`):**
-```javascript
-hs.osascript.applescript('this is not valid')
-  .then(r => {
-    if (!r.success) console.log("Error:", r.raw);
-  });
-```
-**OSA JavaScript:**
-```javascript
-hs.osascript.javascript('Application("Finder").name()')
-  .then(r => console.log(r.result));  // "Finder"
-```
-**Run a script from a file:**
-```javascript
-hs.osascript.applescriptFromFile('/Users/me/scripts/notify.applescript')
-  .then(r => console.log(r.success));
-```
+ *
+ * Script execution is isolated in a separate XPC helper process
+ * (`HammerspoonOSAScriptHelper`). If a script crashes or deadlocks, only the
+ * helper is affected — the main app remains stable and the next call
+ * reconnects automatically.
+ *
+ * ## Async API (Promise-based)
+ *
+ * Every async function returns a `Promise` that **always resolves** (never rejects)
+ * with an object containing three fields:
+ *
+ * | Field | Type | Description |
+ * |-------|------|-------------|
+ * | `success` | `Boolean` | `true` if the script ran without error |
+ * | `result` | `any` | Parsed return value of the script, or `null` on failure |
+ * | `raw` | `String` | Raw string representation of the result, or the error message on failure |
+ *
+ * ## Parallel execution
+ *
+ * Async scripts run **in parallel**, and their Promises resolve in whatever
+ * order the scripts finish, not the order they were started. A slow script
+ * (for example one waiting up to two minutes for an unresponsive application
+ * to answer an AppleEvent) does not hold up any other script.
+ *
+ * If your scripts must run in a strict order, chain them so that each one
+ * only starts once the previous one has finished:
+ *
+ * ```javascript
+ * hs.osascript.applescript('tell application "Music" to pause')
+ *   .then(() => hs.osascript.applescript('tell application "Music" to set sound volume to 50'))
+ *   .then(() => hs.osascript.applescript('tell application "Music" to play'));
+ * ```
+ *
+ * or, inside an `async` function:
+ *
+ * ```javascript
+ * async function restartMusic() {
+ *   await hs.osascript.applescript('tell application "Music" to pause');
+ *   await hs.osascript.applescript('tell application "Music" to set sound volume to 50');
+ *   await hs.osascript.applescript('tell application "Music" to play');
+ * }
+ * ```
+ *
+ * ## Sync API
+ *
+ * The `*Sync` variants block until the script completes and return the same
+ * `{ success, result, raw }` object directly.
+ *
+ * **Warning:** while a sync call is running, Hammerspoon's main thread is
+ * blocked. Nothing else in Hammerspoon can run: no timers, hotkeys, event
+ * watchers, UI updates, or console. If the target application is slow to
+ * respond, Hammerspoon hangs until it does, or until the AppleEvent times out
+ * (two minutes by default). If the target application tries to talk back to
+ * Hammerspoon while it is blocked, both wait on each other until that timeout.
+ * Prefer the async API, and only use the `*Sync` variants for scripts that are
+ * known to finish quickly.
+ *
+ * The `result` field is typed based on what the script returned: strings,
+ * numbers, booleans, lists, and records are all mapped to their JavaScript
+ * equivalents. `null` is used for AppleScript's `missing value` and for any
+ * failure case.
+ *
+ * ## Examples
+ *
+ * **Return a string (async):**
+ * ```javascript
+ * hs.osascript.applescript('return "hello"')
+ *   .then(r => console.log(r.result));  // "hello"
+ * ```
+ *
+ * **Return a string (sync):**
+ * ```javascript
+ * const r = hs.osascript.applescriptSync('return "hello"');
+ * console.log(r.result);  // "hello"
+ * ```
+ *
+ * **Interact with an application:**
+ * ```javascript
+ * hs.osascript.applescript('tell application "Finder" to get name of home')
+ *   .then(r => console.log(r.result));  // e.g. "cmsj"
+ * ```
+ *
+ * **Handle errors (the Promise never rejects — check `success`):**
+ * ```javascript
+ * hs.osascript.applescript('this is not valid')
+ *   .then(r => {
+ *     if (!r.success) console.log("Error:", r.raw);
+ *   });
+ * ```
+ *
+ * **OSA JavaScript:**
+ * ```javascript
+ * hs.osascript.javascript('Application("Finder").name()')
+ *   .then(r => console.log(r.result));  // "Finder"
+ * ```
+ *
+ * **Run a script from a file:**
+ * ```javascript
+ * hs.osascript.applescriptFromFile('/Users/me/scripts/notify.applescript')
+ *   .then(r => console.log(r.success));
+ * ```
  */
 declare namespace hs.osascript {
     /**
      * Run an AppleScript source string.
-Scripts run in parallel; chain Promises if they must run in order (see the module overview).
+     *
+     * Scripts run in parallel; chain Promises if they must run in order (see the module overview).
      * @param source The AppleScript source code to compile and execute.
      * @returns A `Promise` resolving to `{ success, result, raw }`.
      */
@@ -7321,10 +8059,12 @@ Scripts run in parallel; chain Promises if they must run in order (see the modul
 
     /**
      * Run an OSA JavaScript source string.
-OSA JavaScript is Apple's Open Scripting Architecture dialect of
-JavaScript, distinct from the JavaScriptCore engine that runs
-Hammerspoon scripts themselves.
-Scripts run in parallel; chain Promises if they must run in order (see the module overview).
+     *
+     * OSA JavaScript is Apple's Open Scripting Architecture dialect of
+     * JavaScript, distinct from the JavaScriptCore engine that runs
+     * Hammerspoon scripts themselves.
+     *
+     * Scripts run in parallel; chain Promises if they must run in order (see the module overview).
      * @param source The OSA JavaScript source code to compile and execute.
      * @returns A `Promise` resolving to `{ success, result, raw }`.
      */
@@ -7332,9 +8072,10 @@ Scripts run in parallel; chain Promises if they must run in order (see the modul
 
     /**
      * Read a file from disk and execute its contents as AppleScript.
-The file is read in the main process before being sent to the XPC
-helper. If the file cannot be read the promise resolves immediately
-with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
+     *
+     * The file is read in the main process before being sent to the XPC
+     * helper. If the file cannot be read the promise resolves immediately
+     * with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
      * @param path Absolute path to the AppleScript source file.
      * @returns A `Promise` resolving to `{ success, result, raw }`.
      */
@@ -7342,9 +8083,10 @@ with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
 
     /**
      * Read a file from disk and execute its contents as OSA JavaScript.
-The file is read in the main process before being sent to the XPC
-helper. If the file cannot be read the promise resolves immediately
-with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
+     *
+     * The file is read in the main process before being sent to the XPC
+     * helper. If the file cannot be read the promise resolves immediately
+     * with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
      * @param path Absolute path to the OSA JavaScript source file.
      * @returns A `Promise` resolving to `{ success, result, raw }`.
      */
@@ -7352,7 +8094,8 @@ with `{ success: false, result: null, raw: "Failed to read file: <path>" }`.
 
     /**
      * Low-level execution entry point used by the higher-level helpers.
-Prefer `applescript()` or `javascript()` over calling this directly.
+     *
+     * Prefer `applescript()` or `javascript()` over calling this directly.
      * @param source The script source code.
      * @param language The OSA language name — must be `"AppleScript"` or `"JavaScript"`.
      * @returns A `Promise` resolving to `{ success, result, raw }`.
@@ -7361,8 +8104,9 @@ Prefer `applescript()` or `javascript()` over calling this directly.
 
     /**
      * Run an AppleScript source string synchronously.
-**Warning:** blocks Hammerspoon's main thread until the script completes, so
-nothing else in Hammerspoon can run in the meantime. Prefer the async API.
+     *
+     * **Warning:** blocks Hammerspoon's main thread until the script completes, so
+     * nothing else in Hammerspoon can run in the meantime. Prefer the async API.
      * @param source The AppleScript source code to compile and execute.
      * @returns An object `{ success, result, raw }`, or `null` on XPC failure.
      */
@@ -7370,8 +8114,9 @@ nothing else in Hammerspoon can run in the meantime. Prefer the async API.
 
     /**
      * Run an OSA JavaScript source string synchronously.
-**Warning:** blocks Hammerspoon's main thread until the script completes, so
-nothing else in Hammerspoon can run in the meantime. Prefer the async API.
+     *
+     * **Warning:** blocks Hammerspoon's main thread until the script completes, so
+     * nothing else in Hammerspoon can run in the meantime. Prefer the async API.
      * @param source The OSA JavaScript source code to compile and execute.
      * @returns An object `{ success, result, raw }`, or `null` on XPC failure.
      */
@@ -7379,8 +8124,9 @@ nothing else in Hammerspoon can run in the meantime. Prefer the async API.
 
     /**
      * Read a file from disk and execute its contents as AppleScript synchronously.
-**Warning:** blocks Hammerspoon's main thread until the script completes, so
-nothing else in Hammerspoon can run in the meantime. Prefer the async API.
+     *
+     * **Warning:** blocks Hammerspoon's main thread until the script completes, so
+     * nothing else in Hammerspoon can run in the meantime. Prefer the async API.
      * @param path Absolute path to the AppleScript source file.
      * @returns An object `{ success, result, raw }`, or `null` on XPC failure.
      */
@@ -7388,8 +8134,9 @@ nothing else in Hammerspoon can run in the meantime. Prefer the async API.
 
     /**
      * Read a file from disk and execute its contents as OSA JavaScript synchronously.
-**Warning:** blocks Hammerspoon's main thread until the script completes, so
-nothing else in Hammerspoon can run in the meantime. Prefer the async API.
+     *
+     * **Warning:** blocks Hammerspoon's main thread until the script completes, so
+     * nothing else in Hammerspoon can run in the meantime. Prefer the async API.
      * @param path Absolute path to the OSA JavaScript source file.
      * @returns An object `{ success, result, raw }`, or `null` on XPC failure.
      */
@@ -7397,9 +8144,11 @@ nothing else in Hammerspoon can run in the meantime. Prefer the async API.
 
     /**
      * Low-level synchronous execution entry point.
-Prefer `applescriptSync()` or `javascriptSync()` over calling this directly.
-**Warning:** blocks Hammerspoon's main thread until the script completes, so
-nothing else in Hammerspoon can run in the meantime. Prefer the async API.
+     *
+     * Prefer `applescriptSync()` or `javascriptSync()` over calling this directly.
+     *
+     * **Warning:** blocks Hammerspoon's main thread until the script completes, so
+     * nothing else in Hammerspoon can run in the meantime. Prefer the async API.
      * @param source The script source code.
      * @param language The OSA language name — must be `"AppleScript"` or `"JavaScript"`.
      * @returns An object `{ success, result, raw }`, or `null` on XPC failure.
@@ -7410,89 +8159,111 @@ nothing else in Hammerspoon can run in the meantime. Prefer the async API.
 
 /**
  * Module for interacting with the macOS pasteboard (clipboard)
-The macOS pasteboard is "rich" — a single clipboard operation can carry multiple representations
-of the same content for different applications to consume. For example, text copied from a web
-browser may carry plain text, HTML, and RTF representations simultaneously.
-## Basic Usage
-```js
-// Read and write plain text
-const text = hs.pasteboard.readString()
-hs.pasteboard.writeString("Hello from Hammerspoon!")
-
-// Check what types are currently on the pasteboard
-const available = hs.pasteboard.types()
-
-// Write multiple representations at once
-hs.pasteboard.writeObjects({
-    "public.utf8-plain-text": "Hello",
-    "public.html": "<b>Hello</b>"
-})
-
-// Watch for pasteboard changes
-const handler = (changeCount) => {
-    console.log("Pasteboard changed, count:", changeCount)
-    console.log("New text:", hs.pasteboard.readString())
-}
-hs.pasteboard.on("change", handler)
-// Later: hs.pasteboard.off("change", handler)
-```
-## Pasteboard Conventions (nspasteboard.org)
-macOS has no built-in notification API for transient or confidential clipboard content, so a
-community convention has emerged (see [nspasteboard.org](https://nspasteboard.org)) around four
-`org.nspasteboard.*` UTI marker types. These markers carry no payload — their mere presence on
-the pasteboard signals intent to other applications.
-### Standard marker UTIs
-| UTI | Meaning |
-|-----|---------|
-| `org.nspasteboard.TransientType` | Content is temporary; it will be removed or overwritten shortly. Clipboard historians should **not** record this change. |
-| `org.nspasteboard.ConcealedType` | Content is sensitive (e.g. a password). Historians should obfuscate it if displayed and ideally encrypt it if stored. |
-| `org.nspasteboard.AutoGeneratedType` | Content was placed by an application without any user Copy action. Historians should generally skip recording it. |
-| `org.nspasteboard.source` | The bundle identifier of the application that placed the content. Use an empty string when the source is unknown. |
-### Legacy proprietary markers
-Several apps defined their own markers before the `org.nspasteboard.*` standard existed.
-| UTI | Application |
-|-----|-------------|
-| `de.petermaurer.TransientPasteboardType` | TextExpander, Butler |
-| `com.typeit4me.clipping` | TypeIt4Me |
-| `Pasteboard generator type` | Typinator |
-| `com.agilebits.onepassword` | 1Password (confidential) |
-| `com.apple.is-remote-clipboard` | macOS (remote content) |
-### For scripts that write to the pasteboard
-If your script temporarily commandeers the pasteboard (e.g. to trigger a paste), add
-```js
-hs.pasteboard.writeObjects({
-    "public.utf8-plain-text": "temporary value",
-    "org.nspasteboard.TransientType": ""
-})
-```
-```js
-hs.pasteboard.writeObjects({
-    "public.utf8-plain-text": "s3cr3t!",
-    "org.nspasteboard.ConcealedType": ""
-})
-```
-### For scripts that monitor the pasteboard
-If you are building a clipboard history tool with `on`, skip or obfuscate entries that
-```js
-const SKIP_TYPES = [
-    "org.nspasteboard.TransientType",
-    "org.nspasteboard.AutoGeneratedType",
-    "de.petermaurer.TransientPasteboardType",
-    "com.typeit4me.clipping",
-    "Pasteboard generator type",
-]
-const CONCEAL_TYPES = [
-    "org.nspasteboard.ConcealedType",
-    "com.agilebits.onepassword",
-]
-
-hs.pasteboard.on("change", (changeCount) => {
-    const types = hs.pasteboard.types()
-    if (SKIP_TYPES.some(t => types.includes(t))) return        // ignore transient
-    const conceal = CONCEAL_TYPES.some(t => types.includes(t)) // handle sensitively
-    // … record or display the pasteboard contents …
-})
-```
+ *
+ * The macOS pasteboard is "rich" — a single clipboard operation can carry multiple representations
+ * of the same content for different applications to consume. For example, text copied from a web
+ * browser may carry plain text, HTML, and RTF representations simultaneously.
+ *
+ * ## Basic Usage
+ *
+ * ```js
+ * // Read and write plain text
+ * const text = hs.pasteboard.readString()
+ * hs.pasteboard.writeString("Hello from Hammerspoon!")
+ *
+ * // Check what types are currently on the pasteboard
+ * const available = hs.pasteboard.types()
+ *
+ * // Write multiple representations at once
+ * hs.pasteboard.writeObjects({
+ *     "public.utf8-plain-text": "Hello",
+ *     "public.html": "<b>Hello</b>"
+ * })
+ *
+ * // Watch for pasteboard changes
+ * const handler = (changeCount) => {
+ *     console.log("Pasteboard changed, count:", changeCount)
+ *     console.log("New text:", hs.pasteboard.readString())
+ * }
+ * hs.pasteboard.on("change", handler)
+ * // Later: hs.pasteboard.off("change", handler)
+ * ```
+ *
+ * ## Pasteboard Conventions (nspasteboard.org)
+ *
+ * macOS has no built-in notification API for transient or confidential clipboard content, so a
+ * community convention has emerged (see [nspasteboard.org](https://nspasteboard.org)) around four
+ * `org.nspasteboard.*` UTI marker types. These markers carry no payload — their mere presence on
+ * the pasteboard signals intent to other applications.
+ *
+ * ### Standard marker UTIs
+ *
+ * | UTI | Meaning |
+ * |-----|---------|
+ * | `org.nspasteboard.TransientType` | Content is temporary; it will be removed or overwritten shortly. Clipboard historians should **not** record this change. |
+ * | `org.nspasteboard.ConcealedType` | Content is sensitive (e.g. a password). Historians should obfuscate it if displayed and ideally encrypt it if stored. |
+ * | `org.nspasteboard.AutoGeneratedType` | Content was placed by an application without any user Copy action. Historians should generally skip recording it. |
+ * | `org.nspasteboard.source` | The bundle identifier of the application that placed the content. Use an empty string when the source is unknown. |
+ *
+ * ### Legacy proprietary markers
+ *
+ * Several apps defined their own markers before the `org.nspasteboard.*` standard existed.
+ * Clipboard historians should also honour these for compatibility:
+ *
+ * | UTI | Application |
+ * |-----|-------------|
+ * | `de.petermaurer.TransientPasteboardType` | TextExpander, Butler |
+ * | `com.typeit4me.clipping` | TypeIt4Me |
+ * | `Pasteboard generator type` | Typinator |
+ * | `com.agilebits.onepassword` | 1Password (confidential) |
+ * | `com.apple.is-remote-clipboard` | macOS (remote content) |
+ *
+ * ### For scripts that write to the pasteboard
+ *
+ * If your script temporarily commandeers the pasteboard (e.g. to trigger a paste), add
+ * `org.nspasteboard.TransientType` so clipboard historians skip the entry:
+ *
+ * ```js
+ * hs.pasteboard.writeObjects({
+ *     "public.utf8-plain-text": "temporary value",
+ *     "org.nspasteboard.TransientType": ""
+ * })
+ * ```
+ *
+ * For sensitive content such as a generated password, use `org.nspasteboard.ConcealedType`:
+ *
+ * ```js
+ * hs.pasteboard.writeObjects({
+ *     "public.utf8-plain-text": "s3cr3t!",
+ *     "org.nspasteboard.ConcealedType": ""
+ * })
+ * ```
+ *
+ * ### For scripts that monitor the pasteboard
+ *
+ * If you are building a clipboard history tool with `on`, skip or obfuscate entries that
+ * carry any of the marker UTIs listed above:
+ *
+ * ```js
+ * const SKIP_TYPES = [
+ *     "org.nspasteboard.TransientType",
+ *     "org.nspasteboard.AutoGeneratedType",
+ *     "de.petermaurer.TransientPasteboardType",
+ *     "com.typeit4me.clipping",
+ *     "Pasteboard generator type",
+ * ]
+ * const CONCEAL_TYPES = [
+ *     "org.nspasteboard.ConcealedType",
+ *     "com.agilebits.onepassword",
+ * ]
+ *
+ * hs.pasteboard.on("change", (changeCount) => {
+ *     const types = hs.pasteboard.types()
+ *     if (SKIP_TYPES.some(t => types.includes(t))) return        // ignore transient
+ *     const conceal = CONCEAL_TYPES.some(t => types.includes(t)) // handle sensitively
+ *     // … record or display the pasteboard contents …
+ * })
+ * ```
  */
 declare namespace hs.pasteboard {
     /**
@@ -7527,7 +8298,7 @@ declare namespace hs.pasteboard {
 
     /**
      * Read raw data for a specific UTI type, returned as a base64-encoded string.
-Use this for types not covered by the convenience read methods.
+     * Use this for types not covered by the convenience read methods.
      * @param uti A UTI type string (e.g. "com.adobe.pdf")
      * @returns A base64-encoded string, or null if the type is not available
      */
@@ -7570,7 +8341,7 @@ Use this for types not covered by the convenience read methods.
 
     /**
      * Write raw base64-encoded data for a specific UTI type, replacing all current contents.
-Use this for types not covered by the convenience write methods.
+     * Use this for types not covered by the convenience write methods.
      * @param base64 The data encoded as a base64 string
      * @param uti A UTI type string (e.g. "com.adobe.pdf")
      * @returns true if the write succeeded
@@ -7579,8 +8350,8 @@ Use this for types not covered by the convenience write methods.
 
     /**
      * Write multiple type representations to the pasteboard atomically, replacing all current contents.
-Keys must be UTI type strings; values must be strings. This is how you provide both a plain-text
-fallback and a richer representation (such as HTML) in a single clipboard operation.
+     * Keys must be UTI type strings; values must be strings. This is how you provide both a plain-text
+     * fallback and a richer representation (such as HTML) in a single clipboard operation.
      * @param representations A JavaScript object whose keys are UTI strings and values are strings
      * @returns true if the write succeeded
      */
@@ -7606,8 +8377,8 @@ fallback and a richer representation (such as HTML) in a single clipboard operat
 
     /**
      * Register a listener that fires whenever the pasteboard contents change.
-Because macOS provides no pasteboard change notification API, this is implemented by
-polling `changeCount` at the interval specified by `watcherInterval`.
+     * Because macOS provides no pasteboard change notification API, this is implemented by
+     * polling `changeCount` at the interval specified by `watcherInterval`.
      * @param event The event to listen for (the only event this module emits)
      * @param listener Called with the new changeCount whenever the pasteboard changes
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -7631,13 +8402,13 @@ polling `changeCount` at the interval specified by `watcherInterval`.
 
     /**
      * The pasteboard change count. Increments each time any application writes to the pasteboard.
-Comparing a saved value to the current value is the standard way to detect external changes.
+     * Comparing a saved value to the current value is the standard way to detect external changes.
      */
     const changeCount: number;
 
     /**
      * The polling interval for the pasteboard watcher, in seconds. Defaults to 0.5.
-Changes take effect the next time a watcher is started (i.e. after removing and re-adding).
+     * Changes take effect the next time a watcher is started (i.e. after removing and re-adding).
      */
     let watcherInterval: number;
 
@@ -7696,17 +8467,19 @@ declare namespace hs.permissions {
 
     /**
      * Check if the app has permission to display notifications.
-The result is cached from the last request or check; the cache is refreshed asynchronously,
-so the very first call in a session may return `false` before the cached value is populated.
-Use `requestNotifications()` on first launch to ensure the result is accurate.
+     *
+     * The result is cached from the last request or check; the cache is refreshed asynchronously,
+     * so the very first call in a session may return `false` before the cached value is populated.
+     * Use `requestNotifications()` on first launch to ensure the result is accurate.
      * @returns true if notification permission is granted
      */
     function checkNotifications(): boolean;
 
     /**
      * Request notification permission (shows the system dialog if the user has not yet decided).
-It is safe to call this on every launch — the dialog only appears once; subsequent calls
-resolve immediately with the previously granted or denied state.
+     *
+     * It is safe to call this on every launch — the dialog only appears once; subsequent calls
+     * resolve immediately with the previously granted or denied state.
      * @returns A Promise that resolves to true if granted, false if denied
      */
     function requestNotifications(): Promise<boolean>;
@@ -7725,8 +8498,9 @@ resolve immediately with the previously granted or denied state.
 
     /**
      * Check if the app has Input Monitoring permission.
-Input Monitoring is required for `hs.keyboard` to query and control CapsLock state and LEDs on a
-per-keyboard basis.
+     *
+     * Input Monitoring is required for `hs.keyboard` to query and control CapsLock state and LEDs on a
+     * per-keyboard basis.
      * @returns true if permission is granted, false otherwise
      */
     function checkInputMonitoring(): boolean;
@@ -7752,16 +8526,27 @@ per-keyboard basis.
 
 /**
  * Module for reading and writing macOS property list (plist) files.
-Property lists are a structured data format used extensively on Apple platforms
-for storing configuration, preferences, and serialized data. This module supports
-both XML and binary plist formats.
+ *
+ * Property lists are a structured data format used extensively on Apple platforms
+ * for storing configuration, preferences, and serialized data. This module supports
+ * both XML and binary plist formats.
+ *
+ * JavaScript ↔ plist type mapping:
+ * - JavaScript strings ↔ plist strings
+ * - JavaScript numbers ↔ plist integers and reals
+ * - JavaScript booleans ↔ plist true/false
+ * - JavaScript arrays ↔ plist arrays
+ * - JavaScript objects ↔ plist dictionaries
+ * - JavaScript null is not supported by the plist format and will cause write operations to fail
+ * - Plist Date and Data values are returned as opaque objects and may not be directly usable in JavaScript
  */
 declare namespace hs.plist {
     /**
      * Read a plist file and return its contents as a JavaScript value.
-Supports both XML and binary plist formats. Returns a JavaScript object for
-dictionary-rooted plists, an array for array-rooted plists, or a string or
-number for scalar-rooted plists.
+     *
+     * Supports both XML and binary plist formats. Returns a JavaScript object for
+     * dictionary-rooted plists, an array for array-rooted plists, or a string or
+     * number for scalar-rooted plists.
      * @param path Path to the plist file
      * @returns The plist contents, or null if the file could not be read or parsed
      */
@@ -7776,9 +8561,10 @@ number for scalar-rooted plists.
 
     /**
      * Write a JavaScript object to a plist file on disk.
-Keys must be strings. Values may be strings, numbers, booleans, arrays, or
-nested objects. JavaScript null values are not plist-compatible and will cause
-the write to fail.
+     *
+     * Keys must be strings. Values may be strings, numbers, booleans, arrays, or
+     * nested objects. JavaScript null values are not plist-compatible and will cause
+     * the write to fail.
      * @param path Destination file path
      * @param data A JavaScript object to serialize as a property list
      * @param binary If true, write binary plist format; if false (default), write XML plist format
@@ -7788,9 +8574,10 @@ the write to fail.
 
     /**
      * Serialize a JavaScript object to a plist string.
-With binary set to false (default), returns an XML plist string suitable for
-storing in text files or passing to `readString`. With binary set to true,
-returns a base64-encoded binary plist string.
+     *
+     * With binary set to false (default), returns an XML plist string suitable for
+     * storing in text files or passing to `readString`. With binary set to true,
+     * returns a base64-encoded binary plist string.
      * @param data A JavaScript object to serialize as a property list
      * @param binary If true, produce base64-encoded binary plist output; if false (default), produce an XML string
      * @returns The serialized plist string, or null if serialization failed
@@ -7801,33 +8588,38 @@ returns a base64-encoded binary plist string.
 
 /**
  * Monitor and control system power: prevent sleep, read battery state, respond to
-power events, and lock or sleep the machine.
-## Preventing sleep
-```js
-// Prevent the display from sleeping while a task runs
-hs.power.preventSleep("display")
-// ... do work ...
-hs.power.allowSleep("display")
-```
-## Watching for system events
-```js
-hs.power.on("screensDidLock", () => console.log("Screen locked!"))
-```
-## Reading battery state
-```js
-const info = hs.power.batteryInfo()
-if (info) {
-    console.log(`Battery: ${info.percentage}%, ${info.timeRemaining} minutes remaining`)
-}
-```
+ * power events, and lock or sleep the machine.
+ *
+ * ## Preventing sleep
+ *
+ * ```js
+ * // Prevent the display from sleeping while a task runs
+ * hs.power.preventSleep("display")
+ * // ... do work ...
+ * hs.power.allowSleep("display")
+ * ```
+ *
+ * ## Watching for system events
+ *
+ * ```js
+ * hs.power.on("screensDidLock", () => console.log("Screen locked!"))
+ * ```
+ *
+ * ## Reading battery state
+ *
+ * ```js
+ * const info = hs.power.batteryInfo()
+ * if (info) {
+ *     console.log(`Battery: ${info.percentage}%, ${info.timeRemaining} minutes remaining`)
+ * }
+ * ```
  */
 declare namespace hs.power {
     /**
      * Prevents the specified type of system sleep.
-Creates an IOKit power assertion that stops macOS from allowing the specified
-type of sleep. Call `allowSleep` with the same type to release the assertion.
-idle sleep), `"systemIdle"` (prevent system idle sleep), `"system"` (prevent
-all system sleep, including from power button or lid close).
+     *
+     * Creates an IOKit power assertion that stops macOS from allowing the specified
+     * type of sleep. Call `allowSleep` with the same type to release the assertion.
      * @param type The sleep type to prevent. One of: `"display"` (prevent display
      * @returns `true` if the assertion was created successfully.
      */
@@ -7849,7 +8641,8 @@ all system sleep, including from power button or lid close).
 
     /**
      * Simulates user activity, briefly resetting the display idle timer.
-Equivalent to moving the mouse — does not create a persistent assertion.
+     *
+     * Equivalent to moving the mouse — does not create a persistent assertion.
      */
     function declareActivity(): void;
 
@@ -7861,7 +8654,8 @@ Equivalent to moving the mouse — does not create a persistent assertion.
 
     /**
      * Puts the system to sleep immediately.
-Requires the Automation permission for System Events.
+     *
+     * Requires the Automation permission for System Events.
      */
     function systemSleep(): void;
 
@@ -7878,6 +8672,25 @@ Requires the Automation permission for System Events.
 
     /**
      * Returns a snapshot of all available battery information, or `null` if no battery is present.
+     *
+     * The returned object contains (values may be `null` if unavailable on the current hardware):
+     * - `percentage` — charge level 0–100
+     * - `isCharging` — whether charging
+     * - `isCharged` — whether fully charged
+     * - `source` — `"ac"`, `"battery"`, `"ups"`, or `"unknown"`
+     * - `health` — health string, e.g. `"Good"`
+     * - `healthCondition` — health condition detail, or `null`
+     * - `cycleCount` — charge cycle count
+     * - `capacity` — current capacity in mAh
+     * - `maxCapacity` — current maximum capacity in mAh
+     * - `designCapacity` — original design capacity in mAh
+     * - `voltage` — voltage in millivolts
+     * - `amperage` — current in milliamps (negative when discharging)
+     * - `watts` — power in watts (negative when discharging)
+     * - `temperature` — temperature in °C
+     * - `timeRemaining` — estimated minutes remaining, or `null` if calculating
+     * - `timeToFullCharge` — estimated minutes to full charge, or `null` if not applicable
+     * - `serial` — battery serial number
      * @returns An object with battery fields, or `null` if no battery is present.
      */
     function batteryInfo(): Record<string, any> | null;
@@ -7912,14 +8725,16 @@ Requires the Automation permission for System Events.
 
     /**
      * Whether the battery is currently charging.
-Returns `false` when no battery is present.
+     *
+     * Returns `false` when no battery is present.
      */
     const isCharging: boolean;
 
     /**
      * The current power source.
-Returns `"ac"` when plugged in, `"battery"` when on battery power, `"ups"` when
-powered by a UPS, or `"unknown"` if the source cannot be determined.
+     *
+     * Returns `"ac"` when plugged in, `"battery"` when on battery power, `"ups"` when
+     * powered by a UPS, or `"unknown"` if the source cannot be determined.
      */
     const powerSource: string;
 
@@ -7930,7 +8745,8 @@ powered by a UPS, or `"unknown"` if the source cannot be determined.
 
     /**
      * The current thermal state of the system.
-Returns one of: `"nominal"`, `"fair"`, `"serious"`, `"critical"`.
+     *
+     * Returns one of: `"nominal"`, `"fair"`, `"serious"`, `"critical"`.
      */
     const thermalState: string;
 
@@ -7938,36 +8754,95 @@ Returns one of: `"nominal"`, `"fair"`, `"serious"`, `"critical"`.
 
 /**
  * Inspect and control the displays attached to the system.
-## Obtaining screens
-```javascript
-const all    = hs.screen.all();   // [HSScreen, ...]
-const main   = hs.screen.main();   // screen containing the focused window
-const primary = hs.screen.primary(); // screen with the global menu bar
-```
-## Navigation
-```javascript
-const right = hs.screen.main().toEast();
-if (right) console.log("Screen to the right:", right.name);
-```
-## Display modes
-```javascript
-const s = hs.screen.primary();
-console.log(s.mode);
-// → { width: 1440, height: 900, scale: 2, frequency: 60 }
-
-s.setMode(1920, 1080, 1, 60);
-```
-## Screenshots
-```javascript
-const img = await hs.screen.main().snapshot();
-img.saveToFile("/tmp/screen.png");
-```
-## Watching for display changes
-```javascript
-hs.screen.on('change', () => {
-    console.log("Display configuration changed:", hs.screen.all().length, "screens");
-});
-```
+ *
+ * ## Obtaining screens
+ *
+ * ```javascript
+ * const all    = hs.screen.all();   // [HSScreen, ...]
+ * const main   = hs.screen.main();   // screen containing the focused window
+ * const primary = hs.screen.primary(); // screen with the global menu bar
+ * ```
+ *
+ * ## Navigation
+ *
+ * ```javascript
+ * const right = hs.screen.main().toEast();
+ * if (right) console.log("Screen to the right:", right.name);
+ * ```
+ *
+ * ## Display modes
+ *
+ * ```javascript
+ * const s = hs.screen.primary();
+ * console.log(s.mode);
+ * // → { width: 1440, height: 900, scale: 2, frequency: 60 }
+ *
+ * s.setMode(1920, 1080, 1, 60);
+ * ```
+ *
+ * ## Screenshots
+ *
+ * ```javascript
+ * hs.screen.main().snapshot()
+ *     .then(img => img.saveToFile("/tmp/screen.png"));
+ * ```
+ *
+ * ## Watching for display changes
+ *
+ * ```javascript
+ * hs.screen.on('change', () => {
+ *     console.log("Display configuration changed:", hs.screen.all().length, "screens");
+ * });
+ * ```
+ *
+ * ## Spaces
+ *
+ * Each screen has its own ordered list of spaces (Mission Control's desktops and fullscreen
+ * apps), and shows one of them at a time: its *current* space. Every space belongs to exactly
+ * one screen. The *focused* space is the current space of whichever screen has keyboard focus.
+ * So a screen has `spaces` and a `currentSpace`, every `HSSpace` knows its `screen`, and a
+ * window knows its `spaces` and can `moveToSpace()`.
+ *
+ * This relies on "Displays have separate Spaces" being turned on in System Settings → Desktop &
+ * Dock, which is macOS's default. If it's off, macOS treats all your screens as one, so every
+ * screen reports the same spaces, which belong to the primary screen.
+ *
+ * Spaces are identified by numeric IDs, which last as long as the space does. Each space also
+ * has a UUID, which macOS keeps across logins, so to find the same space in a later session,
+ * save its `uuid` and look it up with `hs.screen.spaceForUUID()`.
+ *
+ * > Warning: macOS has no public API for Spaces. Hammerspoon uses private functions from
+ * > Apple's SkyLight framework, which Apple can change or remove in any macOS update without
+ * > notice. If that happens, Spaces features may stop working or return wrong results.
+ * > `hs.screen.spacesAvailable()` reports whether the private functions could be found at all,
+ * > but it can't detect one whose behaviour has changed.
+ *
+ * Adding, removing, and switching spaces works by briefly opening Mission Control and clicking
+ * its buttons through the Accessibility API, since only macOS itself can make those changes.
+ * These need Accessibility permission, return Promises, and visibly open Mission Control. They
+ * depend on Mission Control's undocumented internal UI, so they can break in a macOS update too.
+ * Moving a window to another space doesn't need Mission Control.
+ *
+ * ```javascript
+ * // Switch the main screen to its next space
+ * const spaces = hs.screen.main().spaces
+ * const index = spaces.findIndex(s => s.isCurrent)
+ * spaces[(index + 1) % spaces.length].goto()
+ *
+ * // Add a desktop, then remove it again
+ * hs.screen.main().addSpace()
+ *     .then(space => space.remove())
+ *     .catch(err => console.error(err))
+ *
+ * // Send the focused window to the main screen's last desktop
+ * const desktops = hs.screen.main().spaces.filter(s => s.type === "desktop")
+ * hs.window.focusedWindow().moveToSpace(desktops[desktops.length - 1])
+ *
+ * // Watch for screens switching space
+ * hs.screen.on('spaceChange', ({ screen, from, to }) => {
+ *     console.log(screen.name + " switched to space " + to.id)
+ * })
+ * ```
  */
 declare namespace hs.screen {
     /**
@@ -7978,7 +8853,7 @@ declare namespace hs.screen {
 
     /**
      * The screen that currently contains the focused window, or the screen
-with the keyboard focus if no window is focused.
+     * with the keyboard focus if no window is focused.
      * @returns An HSScreen object or `null` if no main screen can be determined.
      */
     function main(): HSScreen | null;
@@ -7990,53 +8865,149 @@ with the keyboard focus if no window is focused.
     function primary(): HSScreen | null;
 
     /**
-     * Register a listener that fires whenever the display configuration changes — monitors
-connected/disconnected displays, resolution or arrangement changes, or the menu bar moving
-to a different display.
-     * @param event The event to listen for (the only event this module emits)
-     * @param listener Called with no arguments when the display configuration changes; call all()/main()/primary() inside it to inspect the new configuration
-     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     * Whether the private macOS functions Spaces support relies on could be found. If this is
+     * `false`, every Spaces property and function returns an empty or failure result.
+     *
+     * A `true` result does not guarantee every function works - it only means none of them
+     * have been removed. Apple can still change how they behave.
+     * @returns `true` if the private SkyLight functions are available, otherwise `false`
      */
-    function on(event: "change", listener: () => void): void;
+    function spacesAvailable(): boolean;
 
     /**
-     * Remove a previously registered display-configuration listener.
+     * Whether each screen has its own spaces ("Displays have separate Spaces" in System
+     * Settings → Desktop & Dock). Hammerspoon expects it to be on, which is macOS's default. If
+     * it's off, all screens share one set of spaces.
+     * @returns `true` if each screen has its own spaces
+     */
+    function screensHaveSeparateSpaces(): boolean;
+
+    /**
+     * Every space on every screen, screen by screen, each in Mission Control's order. Screens
+     * are in the order macOS lists them, which is also the order Mission Control numbers
+     * desktops in.
+     * @returns An array of HSSpace objects
+     */
+    function allSpaces(): HSSpace[];
+
+    /**
+     * The focused space: the space showing on the screen with keyboard focus
+     * @returns The focused HSSpace, or `null` if it can't be found
+     */
+    function focusedSpace(): HSSpace | null;
+
+    /**
+     * Finds a space by its ID
+     * @param id The space's ID
+     * @returns The HSSpace, or `null` if there's no space with that ID
+     */
+    function spaceForID(id: number): HSSpace | null;
+
+    /**
+     * Finds a space by its UUID. Unlike IDs, macOS keeps space UUIDs across logins, so this
+     * is how to find a space you saved in an earlier session.
+     * @param uuid The space's UUID
+     * @returns The HSSpace, or `null` if there's no space with that UUID
+     */
+    function spaceForUUID(uuid: string): HSSpace | null;
+
+    /**
+     * The names Mission Control shows for each space, such as "Desktop 2" or "Safari". This
+     * opens Mission Control briefly to read them, and needs Accessibility permission. For a
+     * desktop's number without opening Mission Control, use `HSSpace.desktopNumber`.
+     * @returns A Promise that resolves to an object mapping
+     */
+    function missionControlNames(): Promise<Record<string, string>>;
+
+    /**
+     * Opens Mission Control, and keeps it open until `closeMissionControl()`, even across other
+     * Spaces operations that use it. Needs Accessibility permission.
+     * @returns A Promise that resolves once Mission Control is fully open, or
+     */
+    function openMissionControl(): Promise<void>;
+
+    /**
+     * Closes Mission Control, if it's open. Needs Accessibility permission.
+     * @returns A Promise that resolves once Mission Control has fully closed,
+     */
+    function closeMissionControl(): Promise<void>;
+
+    /**
+     * Toggles Mission Control, like pressing its key. This returns straight away; use
+     * `openMissionControl()` or `closeMissionControl()` to know when it has finished.
+     */
+    function toggleMissionControl(): void;
+
+    /**
+     * Toggles App Exposé (the current app's windows, on every space), like its trackpad gesture
+     */
+    function toggleAppExpose(): void;
+
+    /**
+     * Toggles Launchpad
+     */
+    function toggleLaunchpad(): void;
+
+    /**
+     * Toggles Show Desktop, which moves every window aside to reveal the desktop
+     */
+    function toggleShowDesktop(): void;
+
+    /**
+     * Register a listener for screen events.
+     *
+     * `"change"` fires whenever the display configuration changes — monitors connected/disconnected, resolution or arrangement changes, or the menu bar moving to a different display. The listener gets no arguments; call all()/main()/primary() inside it to inspect the new configuration.
+     *
+     * `"spaceChange"` fires whenever a screen switches to a different space. If several screens switch at once, it fires once for each. The listener gets an object with the `screen` that switched (`null` if it has just been disconnected), the space it was showing before (`from`, `null` for a screen that has just been connected), and the space it's showing now (`to`).
+     * @param event The event to listen for
+     * @param listener Called when the event happens; see above for its argument
+     * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
+     */
+    function on(event: "change" | "spaceChange", listener: (change?: {screen: HSScreen | null, from: HSSpace | null, to: HSSpace}) => void): void;
+
+    /**
+     * Remove a previously registered screen event listener.
      * @param event The event the listener was registered for
      * @param listener The function originally passed to `on`
      */
-    function off(event: "change", listener: () => void): void;
+    function off(event: "change" | "spaceChange", listener: (change?: {screen: HSScreen | null, from: HSSpace | null, to: HSSpace}) => void): void;
 
     /**
-     * Register a listener that fires at most once, the next time the display configuration changes.
+     * Register a listener that fires at most once, the next time a screen event happens. See `on()` for the events.
      * @param event The event to listen for
      * @param listener Called once, then automatically removed
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
-    function once(event: "change", listener: () => void): void;
+    function once(event: "change" | "spaceChange", listener: (change?: {screen: HSScreen | null, from: HSSpace | null, to: HSSpace}) => void): void;
 
 }
 
 /**
  * An object representing a single display attached to the system.
-## Coordinate system
-All geometry is returned in **Hammerspoon screen coordinates**: the origin `(0, 0)`
-is at the top-left of the primary display, and `y` increases downward.
-This matches Hammerspoon v1 and is the inverse of the raw macOS/CoreGraphics convention.
-## Examples
-```javascript
-const s = hs.screen.main();
-console.log(s.name);               // e.g. "Built-in Retina Display"
-console.log(s.frame.w);            // usable width in points
-
-console.log(s.mode.width, s.mode.scale); // e.g. 1440, 2
-
-s.desktopImage = "/Users/me/wallpaper.jpg";
-```
+ *
+ * ## Coordinate system
+ *
+ * All geometry is returned in **Hammerspoon screen coordinates**: the origin `(0, 0)`
+ * is at the top-left of the primary display, and `y` increases downward.
+ * This matches Hammerspoon v1 and is the inverse of the raw macOS/CoreGraphics convention.
+ *
+ * ## Examples
+ *
+ * ```javascript
+ * const s = hs.screen.main();
+ * console.log(s.name);               // e.g. "Built-in Retina Display"
+ * console.log(s.frame.w);            // usable width in points
+ *
+ * console.log(s.mode.width, s.mode.scale); // e.g. 1440, 2
+ *
+ * s.desktopImage = "/Users/me/wallpaper.jpg";
+ * ```
  */
 declare class HSScreen {
     /**
      * Switch to the given display mode.
-Pass `0` for `scale` or `frequency` to match any value.
+     *
+     * Pass `0` for `scale` or `frequency` to match any value.
      * @param width Horizontal resolution in pixels.
      * @param height Vertical resolution in pixels.
      * @param scale Backing scale factor (e.g. `2` for HiDPI, `1` for non-HiDPI). Pass `0` to ignore.
@@ -8047,7 +9018,8 @@ Pass `0` for `scale` or `frequency` to match any value.
 
     /**
      * Capture the current contents of this screen as an image.
-Requires **Screen Recording** permission.
+     *
+     * Requires **Screen Recording** permission.
      * @returns Resolves with the captured image, or rejects if the capture fails (e.g. permission denied).
      */
     snapshot(): Promise<HSImage>;
@@ -8117,7 +9089,8 @@ Requires **Screen Recording** permission.
 
     /**
      * Convert a rect in global Hammerspoon coordinates to coordinates local to this screen.
-The result origin is relative to this screen's top-left corner.
+     *
+     * The result origin is relative to this screen's top-left corner.
      * @param rect An `HSRect` in global Hammerspoon coordinates.
      * @returns The rect offset to be relative to this screen's top-left, or `null` if the input is invalid.
      */
@@ -8133,8 +9106,9 @@ The result origin is relative to this screen's top-left corner.
 
     /**
      * The current brightness of this display, from `0.0` (darkest) to `1.0` (brightest).
-Returns `null` if the display does not support software brightness control (e.g.
-most third-party monitors, which are controlled via DDC rather than software).
+     *
+     * Returns `null` if the display does not support software brightness control (e.g.
+     * most third-party monitors, which are controlled via DDC rather than software).
      * @returns A number from `0.0` to `1.0`, or `null` if unsupported.
      */
     getBrightness(): number | null;
@@ -8147,8 +9121,16 @@ most third-party monitors, which are controlled via DDC rather than software).
     setBrightness(brightness: number): boolean;
 
     /**
+     * Adds a desktop to the end of this screen's spaces, by opening Mission Control and
+     * clicking its add button. Needs Accessibility permission.
+     * @returns A Promise that resolves to the new desktop, or rejects with
+     */
+    addSpace(): Promise<HSSpace>;
+
+    /**
      * Returns a plain object describing this screen, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the screen's `id`, `name`, `uuid`, `frame`, `fullFrame`, `position`, `mode` and `rotation`
      */
     toJSON(): Record<string, any>;
@@ -8185,44 +9167,169 @@ most third-party monitors, which are controlled via DDC rather than software).
 
     /**
      * The currently active display mode.
-An object with keys: `width`, `height`, `scale`, `frequency`.
+     *
+     * An object with keys: `width`, `height`, `scale`, `frequency`.
      */
     readonly mode: Record<string, any>;
 
     /**
      * All display modes supported by this screen.
-Each element has keys: `width`, `height`, `scale`, `frequency`.
+     *
+     * Each element has keys: `width`, `height`, `scale`, `frequency`.
      */
     readonly availableModes: Record<string, any>[];
 
     /**
      * The current screen rotation in degrees (0, 90, 180, or 270).
-Assign one of `0`, `90`, `180`, or `270` to rotate the display.
+     *
+     * Assign one of `0`, `90`, `180`, or `270` to rotate the display.
      */
     rotation: number;
 
     /**
      * The URL string of the current desktop background image for this screen, or `null`.
-Assign a new absolute file path or `file://` URL string to change the wallpaper.
+     *
+     * Assign a new absolute file path or `file://` URL string to change the wallpaper.
      */
     desktopImage: string | null;
 
     /**
      * The ambient light level measured by this display's built-in sensor, in lux.
-Returns `null` if the display does not have an ambient light sensor or if the
-reading is currently unavailable.
+     *
+     * Returns `null` if the display does not have an ambient light sensor or if the
+     * reading is currently unavailable.
      */
     readonly ambientLight: number | null;
+
+    /**
+     * The screen's spaces (its desktops and fullscreen apps), in the order Mission Control shows
+     * them. Empty if Spaces are unavailable (see `hs.screen.spacesAvailable()`).
+     *
+     * This relies on "Displays have separate Spaces" being turned on in System Settings →
+     * Desktop & Dock, which is macOS's default. If it's off, all screens share one set of
+     * spaces, so every screen reports the same ones.
+     */
+    readonly spaces: HSSpace[];
+
+    /**
+     * The space the screen is showing, or `null` if Spaces are unavailable
+     */
+    readonly currentSpace: HSSpace | null;
+
+}
+
+/**
+ * One space (a desktop, or a fullscreen app's space) on a screen.
+ *
+ * Get these from a screen (`screen.spaces`, `screen.currentSpace`), a window (`window.spaces`)
+ * or `hs.screen` (e.g. `hs.screen.focusedSpace()`); don't create them yourself. An `HSSpace`
+ * always reports the space's current state, so there's no need to fetch it again after
+ * something changes. If the space is removed, `exists` becomes `false`, its other properties
+ * become `null`, and its methods reject.
+ *
+ * To move a window to a space, use the window's `moveToSpace()`.
+ *
+ * Compare spaces by `id`, not with `===`: two lookups of the same space give two different objects.
+ */
+declare class HSSpace {
+    /**
+     * The IDs of the windows on this space, front to back. Only ordinary windows are
+     * included (not menus, panels, the menu bar, etc). Windows set to appear on every space are
+     * included for every space. Hammerspoon can't make `HSWindow` objects for windows on other
+     * spaces, which is why these are IDs.
+     * @returns An array of window IDs, empty if the space no longer exists
+     */
+    windowIDs(): number[];
+
+    /**
+     * Switches this space's screen to this space, by opening Mission Control and clicking it.
+     * Needs Accessibility permission.
+     * @returns A Promise that resolves once the screen is showing this space
+     */
+    goto(): Promise<void>;
+
+    /**
+     * Removes this desktop, by opening Mission Control and clicking its close button. Any
+     * windows on it move to another desktop on the same screen. Needs Accessibility permission.
+     *
+     * Only desktops can be removed - not fullscreen spaces - and macOS won't remove a screen's
+     * only desktop, or the desktop the screen is currently showing.
+     * @returns A Promise that resolves once the desktop has gone, or rejects
+     */
+    remove(): Promise<void>;
+
+    /**
+     * A summary of the space, for `JSON.stringify()` and the Console
+     * @returns An object with the space's `id`, `uuid`, `type`, `screen` (its UUID),
+     */
+    toJSON(): Record<string, any>;
+
+    /**
+     * The space's ID. macOS assigns these, and they last until the space is removed, so a
+     * removed and re-added space gets a new ID. They may change when you log out or restart:
+     * use `uuid` (with `hs.screen.spaceForUUID()`) to find a space again in a later session.
+     */
+    readonly id: number;
+
+    /**
+     * The space's UUID, which macOS keeps across logins (it's how it remembers which space
+     * is which). `null` if the space no longer exists, or if macOS hasn't given it one, which
+     * it doesn't for the first desktop of a new user account.
+     */
+    readonly uuid: string | null;
+
+    /**
+     * Whether the space still exists
+     */
+    readonly exists: boolean;
+
+    /**
+     * What kind of space this is: `"desktop"` for an ordinary desktop, `"fullscreen"` for a
+     * fullscreen app (or two apps in Split View), or `"unknown"` for a kind of space this
+     * version of Hammerspoon doesn't recognise. `null` if the space no longer exists.
+     */
+    readonly type: string | null;
+
+    /**
+     * The screen the space belongs to. Every space belongs to exactly one screen. `null` if
+     * the space no longer exists, or its screen has been disconnected.
+     *
+     * If "Displays have separate Spaces" is turned off, all screens share one set of spaces,
+     * which macOS attributes to the primary screen.
+     */
+    readonly screen: HSScreen | null;
+
+    /**
+     * The "Desktop N" number Mission Control shows for this desktop. Mission Control only
+     * numbers desktops, and numbers them across all displays in turn, so a second display's
+     * first desktop can be "Desktop 3". (When there's only one desktop, Mission Control calls
+     * it just "Desktop", but this is still 1.) `null` for a fullscreen space, or if the space
+     * no longer exists.
+     */
+    readonly desktopNumber: number | null;
+
+    /**
+     * Whether this is the space its screen is currently showing. Each screen shows one
+     * space at a time, so with several screens, several spaces are current.
+     */
+    readonly isCurrent: boolean;
+
+    /**
+     * Whether this is the focused space: the current space of the screen with keyboard focus
+     */
+    readonly isFocused: boolean;
 
 }
 
 /**
  * Communicate with devices connected to serial ports (RS-232, USB-serial adapters, etc).
-IMPORTANT NOTE: This module is not currently very well tested with real hardware. Please provide feedback
-(positive or negative!) via GitHub Issues.
-Enumerate available ports with `availablePortNames()`/`availablePortPaths()`, then create a
-port object with `createPortNamed()`/`createPortAtPath()`. The returned object is not open
-until you call `open()` on it.
+ *
+ * IMPORTANT NOTE: This module is not currently very well tested with real hardware. Please provide feedback
+ * (positive or negative!) via GitHub Issues.
+ *
+ * Enumerate available ports with `availablePortNames()`/`availablePortPaths()`, then create a
+ * port object with `createPortNamed()`/`createPortAtPath()`. The returned object is not open
+ * until you call `open()` on it.
  */
 declare namespace hs.serial {
     /**
@@ -8252,8 +9359,9 @@ declare namespace hs.serial {
 
     /**
      * Creates a serial port object for an arbitrary device path.
-Unlike `createPortNamed()`, the path does not need to correspond to a port
-currently discoverable via IOKit — it is only validated when you call `open()`.
+     *
+     * Unlike `createPortNamed()`, the path does not need to correspond to a port
+     * currently discoverable via IOKit — it is only validated when you call `open()`.
      * @param path The device path (e.g. `"/dev/cu.usbserial-1420"`)
      * @returns A new `HSSerialPort`
      */
@@ -8286,9 +9394,11 @@ currently discoverable via IOKit — it is only validated when you call `open()`
 
 /**
  * A serial port, created via `hs.serial.createPortNamed()` or `hs.serial.createPortAtPath()`.
-The port is not open until you call `open()`. Configure it (baud rate, data bits, etc.)
-either before or after opening — configuration changes made while open are applied immediately.
-Received data, and lifecycle events, are delivered via the callback registered with `setCallback()`.
+ *
+ * The port is not open until you call `open()`. Configure it (baud rate, data bits, etc.)
+ * either before or after opening — configuration changes made while open are applied immediately.
+ *
+ * Received data, and lifecycle events, are delivered via the callback registered with `setCallback()`.
  */
 declare class HSSerialPort {
     /**
@@ -8306,9 +9416,10 @@ declare class HSSerialPort {
 
     /**
      * Sends data through the port.
-The string is transmitted as raw bytes: each character's code point (0–255) becomes
-one byte on the wire. This lets you round-trip arbitrary binary data — build the string
-with `String.fromCharCode()` for non-text payloads.
+     *
+     * The string is transmitted as raw bytes: each character's code point (0–255) becomes
+     * one byte on the wire. This lets you round-trip arbitrary binary data — build the string
+     * with `String.fromCharCode()` for non-text payloads.
      * @param value The data to send
      * @returns self, for chaining
      */
@@ -8316,7 +9427,13 @@ with `String.fromCharCode()` for non-text payloads.
 
     /**
      * Sets the callback invoked for port lifecycle events and received data.
-The callback receives two arguments: an event type string and a data string.
+     *
+     * The callback receives two arguments: an event type string and a data string.
+     * - `"opened"` — the port was opened; data is empty
+     * - `"closed"` — the port was closed; data is empty
+     * - `"received"` — data arrived; data holds the received bytes (see `sendData()` for encoding)
+     * - `"removed"` — the underlying device disappeared; the port is closed automatically
+     * - `"error"` — an error occurred; data holds a description
      * @param fn Called on port events
      * @returns self, for chaining
      */
@@ -8349,9 +9466,10 @@ The callback receives two arguments: an event type string and a data string.
 
     /**
      * The baud rate, in bits per second. Default is `115200`.
-Setting a non-standard value (i.e. not one of 300, 1200, 2400, 4800, 9600, 14400,
-19200, 28800, 38400, 57600, 115200, 230400) is rejected unless `allowNonStandardBaudRates`
-is `true`.
+     *
+     * Setting a non-standard value (i.e. not one of 300, 1200, 2400, 4800, 9600, 14400,
+     * 19200, 28800, 38400, 57600, 115200, 230400) is rejected unless `allowNonStandardBaudRates`
+     * is `true`.
      */
     baudRate: number;
 
@@ -8397,7 +9515,7 @@ is `true`.
 
     /**
      * Whether data sent with `sendData()` is also delivered back to the callback
-as a `"received"` event, simulating local echo. Default is `false`.
+     * as a `"received"` event, simulating local echo. Default is `false`.
      */
     shouldEchoReceivedData: boolean;
 
@@ -8405,31 +9523,40 @@ as a `"received"` event, simulating local echo. Default is `false`.
 
 /**
  * Share data with other people and apps via macOS sharing services (Mail, Messages,
-AirDrop, and more).
-`hs.sharing` wraps `NSSharingService`. Some services from older macOS/Hammerspoon
-Aperture (discontinued in 2015) and the built-in Facebook/Twitter/Sina Weibo/Tencent
-Weibo/LinkedIn posting and profile-image services (removed in macOS 10.14).
-Items to share can be plain strings — treated as a web/mailto URL if they parse as
-one, a file path if they start with `/` or `~` and the file exists, otherwise plain
-text — or `HSImage` objects.
-## Quick start
-```js
-hs.sharing.createShare(hs.sharing.builtinServices.mail)
-    .setCallback((event) => {
-        if (event === 'didShare') console.log('Sent!')
-    })
-    .shareItems(['Check this out', 'https://www.hammerspoon.org'])
-```
-## Sharing a file via AirDrop
-```js
-hs.sharing.createShare(hs.sharing.builtinServices.airdrop)
-    .shareItems(['~/Desktop/photo.jpg'])
-```
-## Discovering what can handle an item
-```js
-const services = hs.sharing.servicesFor(['https://www.hammerspoon.org'])
-services.forEach(s => console.log(s.title))
-```
+ * AirDrop, and more).
+ *
+ * `hs.sharing` wraps `NSSharingService`. Some services from older macOS/Hammerspoon
+ * versions are no longer offered here because Apple removed them from the system:
+ * Aperture (discontinued in 2015) and the built-in Facebook/Twitter/Sina Weibo/Tencent
+ * Weibo/LinkedIn posting and profile-image services (removed in macOS 10.14).
+ *
+ * Items to share can be plain strings — treated as a web/mailto URL if they parse as
+ * one, a file path if they start with `/` or `~` and the file exists, otherwise plain
+ * text — or `HSImage` objects.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * hs.sharing.createShare(hs.sharing.builtinServices.mail)
+ *     .setCallback((event) => {
+ *         if (event === 'didShare') console.log('Sent!')
+ *     })
+ *     .shareItems(['Check this out', 'https://www.hammerspoon.org'])
+ * ```
+ *
+ * ## Sharing a file via AirDrop
+ *
+ * ```js
+ * hs.sharing.createShare(hs.sharing.builtinServices.airdrop)
+ *     .shareItems(['~/Desktop/photo.jpg'])
+ * ```
+ *
+ * ## Discovering what can handle an item
+ *
+ * ```js
+ * const services = hs.sharing.servicesFor(['https://www.hammerspoon.org'])
+ * services.forEach(s => console.log(s.title))
+ * ```
  */
 declare namespace hs.sharing {
     /**
@@ -8441,7 +9568,7 @@ declare namespace hs.sharing {
 
     /**
      * Finds every sharing service — built-in and third-party (e.g. Notes, Reminders,
-installed apps' Share Extensions) — that can handle the given items.
+     * installed apps' Share Extensions) — that can handle the given items.
      * @remarks This uses functionality that was deprecated in macOS 13, it may be removed in a future release
      * @param items The items to find services for
      * @returns An array of ready-to-use `HSSharingService` objects
@@ -8450,15 +9577,16 @@ installed apps' Share Extensions) — that can handle the given items.
 
     /**
      * A table of shortcut names for the sharing services that are still functional on
-modern macOS, mapped to the raw service identifiers `createShare()` expects.
-| Key | Service |
-|-----|---------|
-| `mail` | Compose an email in Mail |
-| `message` | Compose a message in Messages |
-| `airdrop` | Send via AirDrop |
-| `safariReadingList` | Add to Safari's Reading List |
-| `photos` | Add to the Photos library |
-| `desktopPicture` | Use as the desktop picture |
+     * modern macOS, mapped to the raw service identifiers `createShare()` expects.
+     *
+     * | Key | Service |
+     * |-----|---------|
+     * | `mail` | Compose an email in Mail |
+     * | `message` | Compose a message in Messages |
+     * | `airdrop` | Send via AirDrop |
+     * | `safariReadingList` | Add to Safari's Reading List |
+     * | `photos` | Add to the Photos library |
+     * | `desktopPicture` | Use as the desktop picture |
      */
     const builtinServices: Record<string, string>;
 
@@ -8466,16 +9594,18 @@ modern macOS, mapped to the raw service identifiers `createShare()` expects.
 
 /**
  * A configured sharing service, wrapping `NSSharingService`.
-Create instances via `hs.sharing.createShare()` or `hs.sharing.servicesFor()`.
-Configure with `setCallback()`, `recipients`, and `subject` as needed, then call
-`shareItems()`.
+ *
+ * Create instances via `hs.sharing.createShare()` or `hs.sharing.servicesFor()`.
+ * Configure with `setCallback()`, `recipients`, and `subject` as needed, then call
+ * `shareItems()`.
  */
 declare class HSSharingService {
     /**
      * Checks whether this service can share the given items.
-Items may be strings (treated as a web/mailto URL if they parse as one, a file
-path if they start with `/` or `~` and the file exists, otherwise plain text) or
-`HSImage` objects.
+     *
+     * Items may be strings (treated as a web/mailto URL if they parse as one, a file
+     * path if they start with `/` or `~` and the file exists, otherwise plain text) or
+     * `HSImage` objects.
      * @remarks Unsupported items will be ignored
      * @param items The items to check
      * @returns true if this service can share all of the given items
@@ -8484,9 +9614,10 @@ path if they start with `/` or `~` and the file exists, otherwise plain text) or
 
     /**
      * Attempts to share the given items with this service.
-If the service cannot handle the items, this logs a warning and returns `false`
-without doing anything further. Otherwise the share is started; it is asynchronous
-— use `setCallback()` to find out when it completes.
+     *
+     * If the service cannot handle the items, this logs a warning and returns `false`
+     * without doing anything further. Otherwise the share is started; it is asynchronous
+     * — use `setCallback()` to find out when it completes.
      * @remarks Unsupported items will be ignored. A share that has started, and its callback, stay alive until it succeeds or fails, even if you don't keep a reference to it
      * @param items The items to share
      * @returns true if the share was started
@@ -8495,6 +9626,11 @@ without doing anything further. Otherwise the share is started; it is asynchrono
 
     /**
      * Registers a callback for share lifecycle events.
+     *
+     * The callback is called with:
+     * - `event` (string): one of `"willShare"`, `"didShare"`, `"didFail"`
+     * - `items` (array): the items involved
+     * - `error` (string, `"didFail"` only): a description of the failure
      * @param fn Called with the lifecycle event name, items, and optional error message
      * @returns this share object, for chaining
      */
@@ -8537,19 +9673,19 @@ without doing anything further. Otherwise the share is started; it is asynchrono
 
     /**
      * A permanent link to the shared content, if the service provides one. Populated once
-the share is in progress; otherwise null.
+     * the share is in progress; otherwise null.
      */
     readonly permanentLink: string | null;
 
     /**
      * The account name used to perform the share, if applicable. Populated once the share
-is in progress; otherwise null.
+     * is in progress; otherwise null.
      */
     readonly accountName: string | null;
 
     /**
      * File paths of any attachments included in the share, populated once the share
-completes. Empty until then.
+     * completes. Empty until then.
      */
     readonly attachments: string[];
 
@@ -8557,37 +9693,45 @@ completes. Empty until then.
 
 /**
  * Run and interact with macOS Shortcuts from JavaScript.
-This module bridges to the Shortcuts app, letting you enumerate available
-shortcuts and run them from your Hammerspoon configuration.
-## Listing shortcuts
-```js
-const all = hs.shortcuts.list()
-all.forEach(s => console.log(s.name + " (accepts input: " + s.acceptsInput + ")"))
-```
-## Running a shortcut
-```js
-hs.shortcuts.run("My Shortcut").then(output => {
-    if (output) console.log("Output: " + output)
-}).catch(err => console.log("Error: " + err))
-```
-## Opening a shortcut for editing
-```js
-hs.shortcuts.open("My Shortcut")
-```
+ *
+ * This module bridges to the Shortcuts app, letting you enumerate available
+ * shortcuts and run them from your Hammerspoon configuration.
+ *
+ * ## Listing shortcuts
+ * ```js
+ * const all = hs.shortcuts.list()
+ * all.forEach(s => console.log(s.name + " (accepts input: " + s.acceptsInput + ")"))
+ * ```
+ *
+ * ## Running a shortcut
+ * ```js
+ * hs.shortcuts.run("My Shortcut").then(output => {
+ *     if (output) console.log("Output: " + output)
+ * }).catch(err => console.log("Error: " + err))
+ * ```
+ *
+ * ## Opening a shortcut for editing
+ * ```js
+ * hs.shortcuts.open("My Shortcut")
+ * ```
  */
 declare namespace hs.shortcuts {
     /**
      * Returns an array of all available shortcuts.
-| Key | Type | Description |
-|-----|------|-------------|
-| `name` | `string` | The display name of the shortcut |
-| `id` | `string` | A UUID uniquely identifying the shortcut |
-| `acceptsInput` | `boolean` | Whether the shortcut expects input when run |
-| `actionCount` | `number` | How many actions the shortcut contains |
-The shortcuts are read from Shortcuts Events, so Hammerspoon needs the Automation
-permission for it; macOS asks the first time. An empty array means there are no
-shortcuts: when they can't be read (the permission is denied, or nobody answers its
-prompt within 2 minutes), `list()` throws instead.
+     *
+     * Each entry is a plain object with the following keys:
+     *
+     * | Key | Type | Description |
+     * |-----|------|-------------|
+     * | `name` | `string` | The display name of the shortcut |
+     * | `id` | `string` | A UUID uniquely identifying the shortcut |
+     * | `acceptsInput` | `boolean` | Whether the shortcut expects input when run |
+     * | `actionCount` | `number` | How many actions the shortcut contains |
+     *
+     * The shortcuts are read from Shortcuts Events, so Hammerspoon needs the Automation
+     * permission for it; macOS asks the first time. An empty array means there are no
+     * shortcuts: when they can't be read (the permission is denied, or nobody answers its
+     * prompt within 2 minutes), `list()` throws instead.
      * @returns An array of shortcut descriptor objects.
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
@@ -8595,11 +9739,12 @@ prompt within 2 minutes), `list()` throws instead.
 
     /**
      * Runs a Shortcuts shortcut by name and returns any output.
-Executes the shortcut in the background via the `shortcuts` CLI tool.
-If the shortcut produces output (via a "Stop and Output" action), the
-Promise resolves with that string. If the shortcut produces no output,
-the Promise resolves with `null`. The Promise rejects if the shortcut
-cannot be found or exits with a non-zero status.
+     *
+     * Executes the shortcut in the background via the `shortcuts` CLI tool.
+     * If the shortcut produces output (via a "Stop and Output" action), the
+     * Promise resolves with that string. If the shortcut produces no output,
+     * the Promise resolves with `null`. The Promise rejects if the shortcut
+     * cannot be found or exits with a non-zero status.
      * @param name The exact display name of the shortcut to run.
      * @returns A Promise resolving to the shortcut output string, or `null` if the shortcut produced no output.
      */
@@ -8607,8 +9752,9 @@ cannot be found or exits with a non-zero status.
 
     /**
      * Opens a shortcut in the Shortcuts app for viewing or editing.
-Uses the `shortcuts://open-shortcut` URL scheme to bring Shortcuts to
-the foreground and navigate directly to the named shortcut.
+     *
+     * Uses the `shortcuts://open-shortcut` URL scheme to bring Shortcuts to
+     * the foreground and navigate directly to the named shortcut.
      * @param name The display name of the shortcut to open.
      */
     function open(name: string): void;
@@ -8617,39 +9763,60 @@ the foreground and navigate directly to the named shortcut.
 
 /**
  * Module for communicating over raw TCP, UDP and Unix domain sockets.
-`hs.socket.create()` makes a stream socket, which can connect to a TCP server or Unix domain
-socket (optionally over TLS), or listen for incoming connections. `hs.socket.createUDP()`
-makes a UDP socket, which can send and receive datagrams, including broadcasts.
-Sockets report everything through a single callback, set with `setCallback()`. Received data
-is delivered as a `Uint8Array`; `hs.socket.decodeText()` turns it into a string.
-## TCP client
-```js
-hs.socket.create().setCallback((event, sock, data) => {
-    if (event === "connected") sock.write("GET / HTTP/1.0\r\nHost: example.com\r\n\r\n").readUntil("\r\n\r\n")
-    if (event === "data") console.log(hs.socket.decodeText(data))
-    if (event === "error") console.error(data)
-}).connect("example.com", 80)
-```
-## TCP server
-Each connection a listening socket accepts arrives as a new socket, with the same callback.
-```js
-const server = hs.socket.create().setCallback((event, sock, data) => {
-    if (event === "connection") data.readUntil("\n")
-    if (event === "data") sock.write("You said: " + hs.socket.decodeText(data)).readUntil("\n")
-}).listen(9000)
-```
-## UDP
-```js
-const udp = hs.socket.createUDP().setCallback((event, sock, data, address) => {
-    if (event === "data") console.log(address.host + ": " + hs.socket.decodeText(data))
-}).bind(9999).receive()
-udp.send("hello", "127.0.0.1", 9999)
-```
+ *
+ * `hs.socket.create()` makes a stream socket, which can connect to a TCP server or Unix domain
+ * socket (optionally over TLS), or listen for incoming connections. `hs.socket.createUDP()`
+ * makes a UDP socket, which can send and receive datagrams, including broadcasts.
+ * `hs.socket.createUnixDatagram()` makes a Unix domain datagram socket, which exchanges
+ * datagrams with other programs on this Mac through a socket file.
+ *
+ * Sockets report everything through a single callback, set with `setCallback()`. Received data
+ * is delivered as a `Uint8Array`; `hs.socket.decodeText()` turns it into a string.
+ *
+ * ## TCP client
+ *
+ * ```js
+ * hs.socket.create().setCallback((event, sock, data) => {
+ *     if (event === "connected") sock.write("GET / HTTP/1.0\r\nHost: example.com\r\n\r\n").readUntil("\r\n\r\n")
+ *     if (event === "data") console.log(hs.socket.decodeText(data))
+ *     if (event === "error") console.error(data)
+ * }).connect("example.com", 80)
+ * ```
+ *
+ * ## TCP server
+ *
+ * Each connection a listening socket accepts arrives as a new socket, with the same callback.
+ *
+ * ```js
+ * const server = hs.socket.create().setCallback((event, sock, data) => {
+ *     if (event === "connection") data.readUntil("\n")
+ *     if (event === "data") sock.write("You said: " + hs.socket.decodeText(data)).readUntil("\n")
+ * }).listen(9000)
+ * ```
+ *
+ * ## UDP
+ *
+ * ```js
+ * const udp = hs.socket.createUDP().setCallback((event, sock, data, address) => {
+ *     if (event === "data") console.log(address.host + ": " + hs.socket.decodeText(data))
+ * }).bind(9999).receive()
+ * udp.send("hello", "127.0.0.1", 9999)
+ * ```
+ *
+ * ## Unix domain datagrams
+ *
+ * For example, to receive messages from Karabiner-Elements' `send_user_command`:
+ *
+ * ```js
+ * globalThis.karabiner = hs.socket.createUnixDatagram().setCallback((event, sock, data) => {
+ *     if (event === "data") console.log(JSON.parse(hs.socket.decodeText(data)))
+ * }).bind("/tmp/hammerspoon-karabiner.sock").receive()
+ * ```
  */
 declare namespace hs.socket {
     /**
      * Creates a TCP or Unix domain stream socket. It does nothing until you connect it or make
-it listen.
+     * it listen.
      * @returns A new `HSSocket`.
      */
     function create(): HSSocket;
@@ -8661,11 +9828,18 @@ it listen.
     function createUDP(): HSUDPSocket;
 
     /**
+     * Creates a Unix domain datagram socket.
+     * @returns A new `HSUnixDatagramSocket`.
+     */
+    function createUnixDatagram(): HSUnixDatagramSocket;
+
+    /**
      * Decodes bytes as UTF-8 text.
-Data from `readBytes()` or `readAvailable()` can end part-way through a multi-byte
-character, whose remaining bytes arrive in the next read. Such bytes aren't valid UTF-8 on
-their own, so join the reads' bytes before decoding them, or use `readUntil()` with a
-delimiter, whose data always ends with a complete character.
+     *
+     * Data from `readBytes()` or `readAvailable()` can end part-way through a multi-byte
+     * character, whose remaining bytes arrive in the next read. Such bytes aren't valid UTF-8 on
+     * their own, so join the reads' bytes before decoding them, or use `readUntil()` with a
+     * delimiter, whose data always ends with a complete character.
      * @param bytes The bytes to decode, e.g. the data from a `"data"` event.
      * @param lossy `true` to replace invalid or incomplete UTF-8 with the replacement character (U+FFFD) instead of returning `null`. Defaults to `false`.
      * @returns The text, or `null` if the bytes aren't valid UTF-8 (including when they end part-way through a character) and `lossy` isn't `true`.
@@ -8674,13 +9848,13 @@ delimiter, whose data always ends with a complete character.
 
     /**
      * The connect timeout, in seconds, that new stream sockets start with (see
-`HSSocket.connectTimeout`). 0 means no timeout, which is the default.
+     * `HSSocket.connectTimeout`). 0 means no timeout, which is the default.
      */
     let connectTimeout: number;
 
     /**
      * The read timeout, in seconds, that new stream sockets start with (see
-`HSSocket.readTimeout`). 0 means no timeout, which is the default.
+     * `HSSocket.readTimeout`). 0 means no timeout, which is the default.
      */
     let readTimeout: number;
 
@@ -8688,36 +9862,50 @@ delimiter, whose data always ends with a complete character.
 
 /**
  * A TCP or Unix domain stream socket, created by `hs.socket.create()`.
-A socket can either connect to a server (`connect()`/`connectUnix()`) or listen for incoming
-connections (`listen()`/`listenUnix()`). Each connection a listening socket accepts is handed
-to its callback as a new `HSSocket`, which inherits the listening socket's callback.
-Reading is request-driven: queue a read with `readUntil()`, `readBytes()` or
-`readAvailable()`, and the callback receives a `"data"` event once that read can be
-satisfied. Data that arrives before you ask for it is buffered. Reads can be queued before
-the socket connects, and each one carries an optional numeric tag that is passed back to the
-callback, so a single callback can tell a protocol's reads apart (e.g. a header and a body).
-Received data is delivered as a `Uint8Array`. Use `hs.socket.decodeText()` to turn it into a
-string.
-Do not instantiate `HSSocket` directly - use `hs.socket.create()`.
+ *
+ * A socket can either connect to a server (`connect()`/`connectUnix()`) or listen for incoming
+ * connections (`listen()`/`listenUnix()`). Each connection a listening socket accepts is handed
+ * to its callback as a new `HSSocket`, which inherits the listening socket's callback.
+ *
+ * Reading is request-driven: queue a read with `readUntil()`, `readBytes()` or
+ * `readAvailable()`, and the callback receives a `"data"` event once that read can be
+ * satisfied. Data that arrives before you ask for it is buffered. Reads can be queued before
+ * the socket connects, and each one carries an optional numeric tag that is passed back to the
+ * callback, so a single callback can tell a protocol's reads apart (e.g. a header and a body).
+ *
+ * Received data is delivered as a `Uint8Array`. Use `hs.socket.decodeText()` to turn it into a
+ * string.
+ *
+ * Do not instantiate `HSSocket` directly - use `hs.socket.create()`.
  */
 declare class HSSocket {
     /**
      * Sets the callback that receives this socket's events.
-`HSSocket`, which has the same callback. Queue a read on it to start receiving.
-read's tag.
-connection, a `"disconnected"` event follows.
-reason, including calling `disconnect()`. Data received that no read had asked for yet
-is discarded.
-An `"error"` event on its own never changes the socket's state: errors such as calling
-`connect()` on a socket that is already connecting, or writing to an idle socket, leave it
-as it was. Every connection that ends, and every listening socket that stops, gets a
-`"disconnected"` event, after the `"error"` that caused it, if any. So reconnecting belongs
-in the `"disconnected"` handler, not the `"error"` one.
-When the peer closes the connection, data already received for the first queued read is
-delivered to it in a last `"data"` event, before `"disconnected"`, even though the read
-isn't satisfied: it may be missing its delimiter, or be shorter than asked for. This is
-how to receive the end of a stream that the peer ends by closing, such as an HTTP/1.0
-response body.
+     *
+     * The callback receives the event name, the socket, and event-specific arguments:
+     * - `"connected"` - `connect()`/`connectUnix()` succeeded.
+     * - `"listening"` - `listen()`/`listenUnix()` succeeded, and `localPort` is now set.
+     * - `"connection"` - a listening socket accepted a connection; the third argument is the new
+     *   `HSSocket`, which has the same callback. Queue a read on it to start receiving.
+     * - `"data"` - a read completed; the third argument is a `Uint8Array` and the fourth is the
+     *   read's tag.
+     * - `"error"` - something went wrong; the third argument is a description. If it ended the
+     *   connection, a `"disconnected"` event follows.
+     * - `"disconnected"` - the connection closed, or the socket stopped listening, for any
+     *   reason, including calling `disconnect()`. Data received that no read had asked for yet
+     *   is discarded.
+     *
+     * An `"error"` event on its own never changes the socket's state: errors such as calling
+     * `connect()` on a socket that is already connecting, or writing to an idle socket, leave it
+     * as it was. Every connection that ends, and every listening socket that stops, gets a
+     * `"disconnected"` event, after the `"error"` that caused it, if any. So reconnecting belongs
+     * in the `"disconnected"` handler, not the `"error"` one.
+     *
+     * When the peer closes the connection, data already received for the first queued read is
+     * delivered to it in a last `"data"` event, before `"disconnected"`, even though the read
+     * isn't satisfied: it may be missing its delimiter, or be shorter than asked for. This is
+     * how to receive the end of a stream that the peer ends by closing, such as an HTTP/1.0
+     * response body.
      * @param callback The event handler, or `null` to remove it.
      * @returns The socket, for chaining.
      */
@@ -8725,7 +9913,7 @@ response body.
 
     /**
      * Connects to a TCP server. The callback receives `"connected"` once the connection is
-ready, or `"error"` if it fails.
+     * ready, or `"error"` if it fails.
      * @remarks A connected socket, and its callback, stay alive until it disconnects, even if you don't keep a reference to it
      * @param host The host name or IP address to connect to.
      * @param port The TCP port to connect to.
@@ -8735,7 +9923,7 @@ ready, or `"error"` if it fails.
 
     /**
      * Connects to a Unix domain socket. The callback receives `"connected"` once the connection
-is ready, or `"error"` if it fails.
+     * is ready, or `"error"` if it fails.
      * @remarks A connected socket, and its callback, stay alive until it disconnects, even if you don't keep a reference to it
      * @param path The path of the Unix domain socket.
      * @returns The socket, for chaining.
@@ -8744,14 +9932,15 @@ is ready, or `"error"` if it fails.
 
     /**
      * Listens for incoming TCP connections. The callback receives `"listening"` once the socket
-is ready, then `"connection"` for each client that connects.
-By default the socket listens on all network interfaces. Pass one of this Mac's IP
-addresses to accept connections only on that address (and so only on the interface that
-has it), e.g. `"127.0.0.1"` to accept connections only from this Mac. Use
-`hs.network.addresses()` to find an interface's addresses.
-If the interface's address can change (e.g. it comes from DHCP), watch
-`State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and listen again
-when it does.
+     * is ready, then `"connection"` for each client that connects.
+     *
+     * By default the socket listens on all network interfaces. Pass one of this Mac's IP
+     * addresses to accept connections only on that address (and so only on the interface that
+     * has it), e.g. `"127.0.0.1"` to accept connections only from this Mac. Use
+     * `hs.network.addresses()` to find an interface's addresses.
+     * If the interface's address can change (e.g. it comes from DHCP), watch
+     * `State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and listen again
+     * when it does.
      * @remarks A listening socket, and its callback, stay alive until it stops listening, even if you don't keep a reference to it
      * @param port The TCP port to listen on, or 0 to let the system choose one (see `localPort`).
      * @param address A local IPv4 or IPv6 address to listen on. Defaults to all addresses.
@@ -8761,7 +9950,7 @@ when it does.
 
     /**
      * Listens for incoming connections on a Unix domain socket. A stale socket file left at
-`path` is replaced, and the file is removed when the socket stops listening.
+     * `path` is replaced, and the file is removed when the socket stops listening.
      * @remarks A listening socket, and its callback, stay alive until it stops listening, even if you don't keep a reference to it
      * @param path The path to create the Unix domain socket at.
      * @returns The socket, for chaining.
@@ -8770,7 +9959,7 @@ when it does.
 
     /**
      * Makes the next `connect()` use TLS. The server's certificate is checked against the
-system's trusted certificates and against `peerName`, or the host passed to `connect()`.
+     * system's trusted certificates and against `peerName`, or the host passed to `connect()`.
      * @param peerName The name the server's certificate must match, if it differs from the host you connect to.
      * @param allowUntrusted `true` to accept any certificate, e.g. a self-signed one. This makes the connection vulnerable to interception, so only use it for testing.
      * @returns The socket, for chaining.
@@ -8779,10 +9968,11 @@ system's trusted certificates and against `peerName`, or the host passed to `con
 
     /**
      * Makes the next `listen()` use TLS, presenting the certificate and private key stored in a
-PKCS#12 (`.p12`) file. If the file can't be loaded, `listen()` reports an error instead of
-listening without encryption.
-A PKCS#12 file can be exported from Keychain Access, or made from a certificate and key
-with `openssl pkcs12 -export -in cert.pem -inkey key.pem -out server.p12`.
+     * PKCS#12 (`.p12`) file. If the file can't be loaded, `listen()` reports an error instead of
+     * listening without encryption.
+     *
+     * A PKCS#12 file can be exported from Keychain Access, or made from a certificate and key
+     * with `openssl pkcs12 -export -in cert.pem -inkey key.pem -out server.p12`.
      * @remarks TLS isn't supported on Unix domain sockets, so `listenUnix()` reports an error if this has been called
      * @param path The path to the PKCS#12 file.
      * @param passphrase The passphrase protecting the file. Defaults to an empty passphrase.
@@ -8792,9 +9982,9 @@ with `openssl pkcs12 -export -in cert.pem -inkey key.pem -out server.p12`.
 
     /**
      * Makes the next `listen()` use TLS, presenting a certificate and private key (an identity)
-from the keychain. The identity is found by its certificate's name, as Keychain Access
-shows it (usually the certificate's common name). If no identity has that name, `listen()`
-reports an error instead of listening without encryption.
+     * from the keychain. The identity is found by its certificate's name, as Keychain Access
+     * shows it (usually the certificate's common name). If no identity has that name, `listen()`
+     * reports an error instead of listening without encryption.
      * @remarks macOS may ask for permission to use the private key the first time a client connects TLS isn't supported on Unix domain sockets, so `listenUnix()` reports an error if this has been called
      * @param name The name of the certificate, e.g. `"myhost.local"`.
      * @returns The socket, for chaining.
@@ -8803,7 +9993,7 @@ reports an error instead of listening without encryption.
 
     /**
      * Queues a read that completes once `delimiter` arrives. The callback receives the data up
-to and including the delimiter.
+     * to and including the delimiter.
      * @param delimiter The text that ends the read, e.g. `"\n"`. It is matched as UTF-8 bytes.
      * @param tag A number passed back to the callback with the data. Defaults to 0.
      * @returns The socket, for chaining.
@@ -8827,7 +10017,7 @@ to and including the delimiter.
 
     /**
      * Sends text over the connection, encoded as UTF-8. Writes are sent in order, and can be
-made before the connection is ready.
+     * made before the connection is ready.
      * @param text The text to send.
      * @returns The socket, for chaining.
      */
@@ -8842,9 +10032,10 @@ made before the connection is ready.
 
     /**
      * Closes the connection after sending any data already written, or stops listening. A
-listening socket also disconnects every client it accepted. Queued reads, and data received
-that no read has asked for yet, are discarded.
-The socket can be connected or listen again afterwards.
+     * listening socket also disconnects every client it accepted. Queued reads, and data received
+     * that no read has asked for yet, are discarded.
+     *
+     * The socket can be connected or listen again afterwards.
      * @remarks The callback receives `"disconnected"` (for this socket, and for each client of a listening socket) before `disconnect()` returns, so update any state the handler relies on before calling it
      * @returns The socket, for chaining.
      */
@@ -8852,7 +10043,7 @@ The socket can be connected or listen again afterwards.
 
     /**
      * Disconnects the socket and releases its callback. Unlike `disconnect()`, the callback isn't
-called.
+     * called.
      */
     destroy(): void;
 
@@ -8898,13 +10089,13 @@ called.
 
     /**
      * The local port of the connection, or the port a listening socket is listening on. 0 if
-neither applies, including while a listener is still starting up.
+     * neither applies, including while a listener is still starting up.
      */
     readonly localPort: number;
 
     /**
      * The path of the Unix domain socket this socket is connected to or listening on, or
-`null` if it isn't using a Unix domain socket.
+     * `null` if it isn't using a Unix domain socket.
      */
     readonly unixPath: string | null;
 
@@ -8915,17 +10106,17 @@ neither applies, including while a listener is still starting up.
 
     /**
      * How long, in seconds, connecting may take, including any TLS handshake. When it expires,
-the callback receives an `"error"` event and the socket disconnects. 0 (or any negative
-number) means no timeout. Defaults to `hs.socket.connectTimeout`.
+     * the callback receives an `"error"` event and the socket disconnects. 0 (or any negative
+     * number) means no timeout. Defaults to `hs.socket.connectTimeout`.
      */
     connectTimeout: number;
 
     /**
      * How long, in seconds, a queued read may wait with no data arriving. The timer runs only
-while a read is queued, and restarts whenever data arrives, so a slow but steady transfer
-doesn't time out, and nor does a connection that's quiet while no read is queued. When it
-expires, the callback receives an `"error"` event and the socket disconnects. 0 (or any
-negative number) means no timeout. Defaults to `hs.socket.readTimeout`.
+     * while a read is queued, and restarts whenever data arrives, so a slow but steady transfer
+     * doesn't time out, and nor does a connection that's quiet while no read is queued. When it
+     * expires, the callback receives an `"error"` event and the socket disconnects. 0 (or any
+     * negative number) means no timeout. Defaults to `hs.socket.readTimeout`.
      * @remarks Protocols where the peer can stay quiet for a long time while a read is queued (e.g. waiting for the next line of a notification stream) usually want no read timeout
      */
     readTimeout: number;
@@ -8934,16 +10125,24 @@ negative number) means no timeout. Defaults to `hs.socket.readTimeout`.
 
 /**
  * A UDP socket, created by `hs.socket.createUDP()`.
-A UDP socket can send datagrams to any host, or be connected to a single peer, and can
-receive datagrams once it has a local port: either one chosen with `bind()`, or one the system
-assigns when it first connects or sends.
-IPv4 and IPv6 are both supported, using a separate system socket for each.
-Do not instantiate `HSUDPSocket` directly - use `hs.socket.createUDP()`.
+ *
+ * A UDP socket can send datagrams to any host, or be connected to a single peer, and can
+ * receive datagrams once it has a local port: either one chosen with `bind()`, or one the system
+ * assigns when it first connects or sends.
+ *
+ * IPv4 and IPv6 are both supported, using a separate system socket for each.
+ *
+ * Do not instantiate `HSUDPSocket` directly - use `hs.socket.createUDP()`.
  */
 declare class HSUDPSocket {
     /**
      * Sets the callback that receives this socket's events.
-sender's address, as `{host, port, family}`, where family is `"ipv4"` or `"ipv6"`.
+     *
+     * The callback receives the event name, the socket, and event-specific arguments:
+     * - `"data"` - a datagram arrived; the third argument is a `Uint8Array` and the fourth is the
+     *   sender's address, as `{host, port, family}`, where family is `"ipv4"` or `"ipv6"`.
+     * - `"connected"` - `connect()` succeeded; the fourth argument is the peer's address.
+     * - `"error"` - something went wrong; the third argument is a description.
      * @param callback The event handler, or `null` to remove it.
      * @returns The socket, for chaining.
      */
@@ -8951,13 +10150,14 @@ sender's address, as `{host, port, family}`, where family is `"ipv4"` or `"ipv6"
 
     /**
      * Binds the socket to a local port, so it can receive datagrams sent to that port. Call it
-before `connect()` or sending.
-By default the socket binds on all network interfaces. Pass one of this Mac's IP addresses
-to bind only to that address (and so only to the interface that has it). Use
-`hs.network.addresses()` to find an interface's addresses.
-If the interface's address can change (e.g. it comes from DHCP), watch
-`State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and bind again
-when it does.
+     * before `connect()` or sending.
+     *
+     * By default the socket binds on all network interfaces. Pass one of this Mac's IP addresses
+     * to bind only to that address (and so only to the interface that has it). Use
+     * `hs.network.addresses()` to find an interface's addresses.
+     * If the interface's address can change (e.g. it comes from DHCP), watch
+     * `State:/Network/Interface/<name>/IPv4` with `hs.network.configurationWatcher()` and bind again
+     * when it does.
      * @remarks A socket bound to an address only uses that address's family (IPv4 or IPv6), and doesn't receive broadcasts
      * @param port The UDP port to bind to, or 0 to let the system choose one (see `localPort`).
      * @param address A local IPv4 or IPv6 address to bind to, e.g. `"127.0.0.1"` or `"192.168.1.20"`. Defaults to all addresses.
@@ -8967,8 +10167,8 @@ when it does.
 
     /**
      * Connects the socket to a single peer. Afterwards, `send()` needs no host and port, and only
-datagrams from that peer are received. The callback receives `"connected"` once the host
-has been looked up.
+     * datagrams from that peer are received. The callback receives `"connected"` once the host
+     * has been looked up.
      * @param host The host name or IP address of the peer.
      * @param port The peer's UDP port.
      * @returns The socket, for chaining.
@@ -8995,7 +10195,7 @@ has been looked up.
 
     /**
      * Starts delivering every datagram that arrives to the callback, until `pause()` or
-`close()`. The socket must have a local port first (see `bind()`).
+     * `close()`. The socket must have a local port first (see `bind()`).
      * @remarks A receiving socket, and its callback, stay alive until it stops receiving, even if you don't keep a reference to it
      * @returns The socket, for chaining.
      */
@@ -9010,14 +10210,14 @@ has been looked up.
 
     /**
      * Stops receiving datagrams. Datagrams that arrive meanwhile are queued by the system (up to
-its buffer size) and delivered once you receive again.
+     * its buffer size) and delivered once you receive again.
      * @returns The socket, for chaining.
      */
     pause(): HSUDPSocket;
 
     /**
      * Closes the socket immediately, discarding any sends still waiting for a host lookup. The
-socket can be bound, connected or used to send again afterwards.
+     * socket can be bound, connected or used to send again afterwards.
      * @returns The socket, for chaining.
      */
     close(): HSUDPSocket;
@@ -9054,27 +10254,154 @@ socket can be bound, connected or used to send again afterwards.
 
     /**
      * Whether the socket may send to broadcast addresses (e.g. `255.255.255.255`). Defaults to
-`false`. Broadcasts are IPv4 only.
+     * `false`. Broadcasts are IPv4 only.
      */
     broadcast: boolean;
 
     /**
      * Whether other sockets may bind to the same port, e.g. so several programs can receive the
-same broadcasts. Defaults to `false`. Set it before calling `bind()`.
+     * same broadcasts. Defaults to `false`. Set it before calling `bind()`.
      */
     reusePort: boolean;
 
     /**
      * Whether the socket uses IPv4. Defaults to `true`. Set it before the socket binds,
-connects or sends.
+     * connects or sends.
      */
     ipv4Enabled: boolean;
 
     /**
      * Whether the socket uses IPv6. Defaults to `true`. Set it before the socket binds,
-connects or sends.
+     * connects or sends.
      */
     ipv6Enabled: boolean;
+
+}
+
+/**
+ * A Unix domain datagram socket, created by `hs.socket.createUnixDatagram()`.
+ *
+ * A Unix domain datagram socket exchanges messages with other programs on this Mac through a
+ * socket file. Each message arrives whole, as one `"data"` event. Other programs can only send
+ * to it once it has been bound to a path with `bind()`, which creates the socket file there.
+ *
+ * This is what tools such as Karabiner-Elements' `send_user_command` send to.
+ *
+ * Do not instantiate `HSUnixDatagramSocket` directly - use `hs.socket.createUnixDatagram()`.
+ */
+declare class HSUnixDatagramSocket {
+    /**
+     * Sets the callback that receives this socket's events.
+     *
+     * The callback receives the event name, the socket, and event-specific arguments:
+     * - `"data"` - a datagram arrived; the third argument is a `Uint8Array` and the fourth is the
+     *   sender's address, as `{path}`, or `null` if the sender's socket isn't bound to a path
+     *   (so it can't be replied to).
+     * - `"connected"` - `connect()` succeeded; the fourth argument is the peer's address.
+     * - `"error"` - something went wrong; the third argument is a description.
+     * @param callback The event handler, or `null` to remove it.
+     * @returns The socket, for chaining.
+     */
+    setCallback(callback: ((event: "data" | "connected" | "error", socket: HSUnixDatagramSocket, data?: Uint8Array | string | null, address?: {path: string} | null) => void) | null): HSUnixDatagramSocket;
+
+    /**
+     * Binds the socket to a path, creating a socket file there that other programs can send
+     * datagrams to. Call it before `connect()` or sending.
+     *
+     * A stale socket file left at the path by a socket that has gone is replaced, but binding
+     * fails if another socket is still using it. `close()` removes the socket file.
+     * @param path The path to create the socket file at, at most 103 bytes long, e.g. `"/tmp/hammerspoon.sock"`.
+     * @returns The socket, for chaining.
+     */
+    bind(path: string): HSUnixDatagramSocket;
+
+    /**
+     * Connects the socket to a single peer. Afterwards, `send()` needs no path, and only
+     * datagrams from that peer are received. The callback receives `"connected"` straight away.
+     * @param path The path of the peer's socket file.
+     * @returns The socket, for chaining.
+     */
+    connect(path: string): HSUnixDatagramSocket;
+
+    /**
+     * Sends text, encoded as UTF-8, as one datagram.
+     * @param text The text to send.
+     * @param path The path of the socket file to send to. Omit it if the socket is connected.
+     * @returns The socket, for chaining.
+     */
+    send(text: string, path?: string | null): HSUnixDatagramSocket;
+
+    /**
+     * Sends raw bytes as one datagram.
+     * @param bytes The bytes to send. Any typed array is accepted.
+     * @param path The path of the socket file to send to. Omit it if the socket is connected.
+     * @returns The socket, for chaining.
+     */
+    sendBytes(bytes: Uint8Array | ArrayBuffer, path?: string | null): HSUnixDatagramSocket;
+
+    /**
+     * Starts delivering every datagram that arrives to the callback, until `pause()` or
+     * `close()`. The socket must be bound first (see `bind()`).
+     * @remarks A receiving socket, and its callback, stay alive until it stops receiving, even if you don't keep a reference to it
+     * @returns The socket, for chaining.
+     */
+    receive(): HSUnixDatagramSocket;
+
+    /**
+     * Delivers the next datagram that arrives to the callback, then stops receiving.
+     * @remarks A receiving socket, and its callback, stay alive until it stops receiving, even if you don't keep a reference to it
+     * @returns The socket, for chaining.
+     */
+    receiveOne(): HSUnixDatagramSocket;
+
+    /**
+     * Stops receiving datagrams. Datagrams that arrive meanwhile are queued by the system (up to
+     * its buffer size) and delivered once you receive again.
+     * @returns The socket, for chaining.
+     */
+    pause(): HSUnixDatagramSocket;
+
+    /**
+     * Closes the socket immediately, and removes its socket file if it's bound. The socket can
+     * be bound, connected or used to send again afterwards.
+     * @returns The socket, for chaining.
+     */
+    close(): HSUnixDatagramSocket;
+
+    /**
+     * Closes the socket and releases its callback.
+     */
+    destroy(): void;
+
+    /**
+     * A unique identifier for this socket (UUID string).
+     */
+    readonly identifier: string;
+
+    /**
+     * Whether the socket has been bound to a path with `bind()`.
+     */
+    readonly isBound: boolean;
+
+    /**
+     * Whether the socket is connected to a single peer with `connect()`.
+     */
+    readonly isConnected: boolean;
+
+    /**
+     * Whether the socket is currently receiving datagrams.
+     */
+    readonly isReceiving: boolean;
+
+    /**
+     * The path the socket is bound to, or `null` if it isn't bound.
+     */
+    readonly localPath: string | null;
+
+    /**
+     * The path of the peer the socket is connected to, or `null` if it isn't connected.
+     */
+    readonly peerPath: string | null;
 
 }
 
@@ -9084,7 +10411,7 @@ connects or sends.
 declare namespace hs.sound {
     /**
      * Loads an audio file from the given path and returns a sound object.
-Returns `null` if the file cannot be loaded.
+     * Returns `null` if the file cannot be loaded.
      * @param path The absolute path to an audio file (AIFF, WAV, MP3, CAF, etc.).
      * @returns An `HSSound` object, or `null` on failure.
      */
@@ -9092,8 +10419,8 @@ Returns `null` if the file cannot be loaded.
 
     /**
      * Creates a sound object for a built-in system sound by name.
-Returns `null` if no sound with that name can be found.
-Use `hs.sound.systemSounds()` to discover available names.
+     * Returns `null` if no sound with that name can be found.
+     * Use `hs.sound.systemSounds()` to discover available names.
      * @param name The name of a system sound, e.g. `"Basso"` or `"Glass"`.
      * @returns An `HSSound` object, or `null` on failure.
      */
@@ -9101,8 +10428,8 @@ Use `hs.sound.systemSounds()` to discover available names.
 
     /**
      * Returns a sorted array of all available system sound names.
-These names can be passed directly to `hs.sound.named()`.
-Scans `/System/Library/Sounds`, `/Library/Sounds`, and `~/Library/Sounds`.
+     * These names can be passed directly to `hs.sound.named()`.
+     * Scans `/System/Library/Sounds`, `/Library/Sounds`, and `~/Library/Sounds`.
      * @returns A sorted array of sound name strings.
      */
     function systemSounds(): string[];
@@ -9111,7 +10438,7 @@ Scans `/System/Library/Sounds`, `/Library/Sounds`, and `~/Library/Sounds`.
 
 /**
  * An object representing an audio sound that can be played, paused, and stopped.
-Create instances using `hs.sound.fromFile()` or `hs.sound.named()`.
+ * Create instances using `hs.sound.fromFile()` or `hs.sound.named()`.
  */
 declare class HSSound {
     /**
@@ -9141,8 +10468,8 @@ declare class HSSound {
 
     /**
      * Sets a function to be called when playback finishes.
-The callback receives two arguments: the sound object and a boolean — `true` if the
-sound completed naturally, `false` if it was stopped before finishing.
+     * The callback receives two arguments: the sound object and a boolean — `true` if the
+     * sound completed naturally, `false` if it was stopped before finishing.
      * @param callback A function called when playback ends.
      * @returns This sound object, for chaining.
      */
@@ -9156,7 +10483,7 @@ sound completed naturally, `false` if it was stopped before finishing.
 
     /**
      * Stops playback and releases all resources held by this sound.
-After calling `destroy()` the sound object should not be used.
+     * After calling `destroy()` the sound object should not be used.
      */
     destroy(): void;
 
@@ -9199,63 +10526,87 @@ After calling `destroy()` the sound object should not be used.
 
 /**
  * Load, install and update Spoons - packaged, reusable pieces of configuration.
-Spoons live in the `Spoons` directory inside your config directory. Every Spoon you load is
-also available on `hs.spoons` under its name, so `hs.spoons.load("Greeter")` makes
-`hs.spoons.Greeter` available to the rest of your config. That's why a Spoon can't be named
-after one of this module's own methods or properties.
-Spoons can be installed from any GitHub repository (`"owner/repo"`), or from a zip file at any
-`https://` URL. There's no central list of Spoons: you choose where each one comes from, so
-only install Spoons from sources you trust. Pin the version you install with `ref` (a GitHub
-tag or commit) or `sha256` (for a zip URL), and nothing changes until you choose to.
-## Quick start
-```js
-// Installs Greeter the first time this runs, then loads it, configures it and starts it
-hs.spoons.use("Greeter", {
-    source: "jane/hs2-spoons",
-    ref: "v1.2.0",
-    config: { message: "Time for a break!" },
-    start: true
-})
-```
+ *
+ * Spoons live in the `Spoons` directory inside your config directory. Every Spoon you load is
+ * also available on `hs.spoons` under its name, so `hs.spoons.load("Greeter")` makes
+ * `hs.spoons.Greeter` available to the rest of your config. That's why a Spoon can't be named
+ * after one of this module's own methods or properties.
+ *
+ * Spoons can be installed from any GitHub repository (`"owner/repo"`), or from a zip file at any
+ * `https://` URL. There's no central list of Spoons: you choose where each one comes from, so
+ * only install Spoons from sources you trust. Pin the version you install with `ref` (a GitHub
+ * tag or commit) or `sha256` (for a zip URL), and nothing changes until you choose to.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * // Installs Greeter the first time this runs, then loads it, configures it and starts it
+ * hs.spoons.use("Greeter", {
+ *     source: "jane/hs2-spoons",
+ *     ref: "v1.2.0",
+ *     config: { message: "Time for a break!" },
+ *     start: true
+ * })
+ * ```
  */
 declare namespace hs.spoons {
     /**
-     * Load an installed Spoon by name. A Spoon must contain a well-formed `spoon.json` (with
-non-empty `name`, `author`, `version`, and `description` fields) and an `init.js`, or
-loading fails with an exception. `init.js` is loaded through the same `require()` used for
-the rest of your config, so it can itself `require()` further files from within the
-Spoon's own directory using relative paths. On success, the Spoon is also stored on
-`hs.spoons` under its name, so other code can reach it without loading it again.
-`init.js` must set `module.exports` to an object (or a function, since functions are
-objects too) - loading fails with an exception otherwise. Its `author`, `description`,
-and `version` properties are then set from `spoon.json`, overwriting any of the same
-name the Spoon's own `init.js` set, so that information is always present and always
-reflects what's on disk. If the resulting object has an `init()` method, it's called
-automatically (with `this` bound to the object) before `load()` returns - matching
-Hammerspoon 1's behavior. An exception thrown from `init()` fails the load: nothing is
-stored on `hs.spoons`, and `load()` throws. Unlike `init.js` itself (which `require()`
-only ever evaluates once), `init()` runs again on every `load()` call for the same Spoon,
-since the same cached object is returned each time - write it to be safe to call more
-than once, or do one-time setup at `init.js`'s top level instead.
-The exception's `code` is `ENOTINSTALLED` if there's no such Spoon, `EINVALIDARG` if the name
-can't be a Spoon's, or `EINVALIDSPOON` if the Spoon is malformed. An exception thrown by the
-Spoon's own code is passed on as it is.
-     * @param name The Spoon's name, matching its directory name under `Spoons/`
+     * Load an installed Spoon by name, or a Spoon from any directory with the `path` option. A
+     * Spoon must contain a well-formed `spoon.json` (with
+     * non-empty `name`, `author`, `version`, and `description` fields) and an `init.js`, or
+     * loading fails with an exception. `init.js` is loaded through the same `require()` used for
+     * the rest of your config, so it can itself `require()` further files from within the
+     * Spoon's own directory using relative paths. On success, the Spoon is also stored on
+     * `hs.spoons` under its name, so other code can reach it without loading it again.
+     *
+     * `init.js` must set `module.exports` to an object (not a function) - loading fails with an
+     * exception otherwise. Its `name`, `author`,
+     * `description`, and `version` properties are then set from `spoon.json`, overwriting any
+     * of the same name the Spoon's own `init.js` set, so that information is always present and
+     * always reflects what's on disk (a warning is logged if `spoon.json`'s `name` doesn't
+     * match the Spoon's directory name). If the resulting object has an `init()` method, it's called
+     * automatically (with `this` bound to the object) before `load()` returns - matching
+     * Hammerspoon 1's behavior. An exception thrown from `init()` fails the load: nothing is
+     * stored on `hs.spoons`, and `load()` throws. Unlike `init.js` itself (which `require()`
+     * only ever evaluates once), `init()` runs again on every `load()` call for the same Spoon,
+     * since the same cached object is returned each time - write it to be safe to call more
+     * than once, or do one-time setup at `init.js`'s top level instead.
+     *
+     * If the object has a `bindings` object (its actions, keyed by name), it's given a generic
+     * `bindHotkeys(mapping)` before `init()` runs, which binds the hotkeys in `mapping` (e.g.
+     * `{ show: [["cmd", "alt"], "g"] }`) to those actions. This replaces any `bindHotkeys()` the
+     * Spoon exports itself. A Spoon without `bindings` keeps its own `bindHotkeys()`, if it has
+     * one. See the Spoons guide for the details.
+     *
+     * `path` is for developing a Spoon: it loads the Spoon straight from that directory (such as
+     * a `.spoon2` bundle in your own checkout of its repository), instead of from `Spoons/`, so
+     * reloading your config picks up your changes. Nothing is installed or copied, and a Spoon
+     * of the same name that's installed is ignored. A warning is logged each time, so a config
+     * that still points at a development copy doesn't go unnoticed.
+     *
+     * The exception's `code` is `ENOTINSTALLED` if there's no such Spoon, `ENOTFOUND` if `path`
+     * isn't a directory, `EINVALIDARG` if the name can't be a Spoon's or an option is malformed,
+     * or `EINVALIDSPOON` if the Spoon is malformed. An exception thrown by the Spoon's own code is
+     * passed on as it is.
+     * @param name The Spoon's name, matching its directory name under `Spoons/`. It's also the name it's stored under on `hs.spoons`.
+     * @param options `path` is a directory to load the Spoon from instead of `Spoons/`. A relative path is relative to your config directory, and `~` is your home directory.
      * @returns Whatever the Spoon's `init.js` assigned to `module.exports`
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
      */
-    function load(name: string): Object;
+    function load(name: string, options?: {path?: string}): Object;
 
     /**
      * Download a Spoon and install it into the `Spoons` directory. It isn't loaded: call
-`hs.spoons.load()` (or use `hs.spoons.use()`, which does both) once it's installed.
-The source is downloaded as a zip file. Its Spoons are every `*.spoon2` directory at its top
-level or in a `Spoons` directory, or, if there are none, the whole archive, if it's a single
-Spoon. An archive that holds a single directory, as a repository's does, is looked inside.
-The Promise rejects with an `Error` whose `code` says what went wrong: `EINVALIDARG`,
-`ENOTFOUND` (no such repository, ref, URL, or Spoon in the archive), `ENETWORK`,
-`EINTEGRITY` (the download didn't match `sha256`), `EINVALIDSPOON`, `EEXISTS`, or `EIO` (for
-anything else, such as failing to write the Spoon to disk).
+     * `hs.spoons.load()` (or use `hs.spoons.use()`, which does both) once it's installed.
+     *
+     * The source is downloaded as a zip file. Its Spoons are every `*.spoon2` directory at its top
+     * level or in a `Spoons` directory, or, if there are none, the whole archive, if it's a single
+     * Spoon. An archive that holds a single directory, as a repository's does, is looked inside.
+     *
+     * The Promise rejects with an `Error` whose `code` says what went wrong: `EINVALIDARG`,
+     * `ENOTFOUND` (no such repository, ref, URL, or Spoon in the archive), `ENETWORK`,
+     * `EINTEGRITY` (the download didn't match `sha256`), `EINVALIDSPOON`, `EEXISTS`, or `EIO` (for
+     * anything else, such as failing to write the Spoon to disk).
      * @param name The name of the Spoon to install
      * @param options `source` is a GitHub repository (`"owner/repo"` or its `https://github.com/...` URL) or the `https://` URL of a zip file. `ref` is a branch, tag or commit to install from (GitHub only; the default branch if omitted). `sha256` is the expected SHA-256 of the download. `force: true` replaces a Spoon that's already installed, rather than failing.
      * @returns Resolves with the installed Spoon's details
@@ -9272,13 +10623,14 @@ anything else, such as failing to write the Spoon to disk).
 
     /**
      * Update an installed Spoon: download it again from where it was installed from (the same
-source, ref and URL), and reinstall it if its version has changed. A Spoon installed from
-a pinned tag, commit or versioned URL doesn't change; install the newer one with
-`install(name, { ..., force: true })` instead.
-Besides the codes `install()` uses, the Promise rejects with `ENOTINSTALLED`, `ENOSOURCE`
-for a Spoon that wasn't installed by `install()` (or was since replaced some other way, such
-as by opening a `.spoon2` file), or `ECANCELED` if the Spoon was reinstalled while the
-update was downloading.
+     * source, ref and URL), and reinstall it if its version has changed. A Spoon installed from
+     * a pinned tag, commit or versioned URL doesn't change; install the newer one with
+     * `install(name, { ..., force: true })` instead.
+     *
+     * Besides the codes `install()` uses, the Promise rejects with `ENOTINSTALLED`, `ENOSOURCE`
+     * for a Spoon that wasn't installed by `install()` (or was since replaced some other way, such
+     * as by opening a `.spoon2` file), or `ECANCELED` if the Spoon was reinstalled while the
+     * update was downloading.
      * @param name The name of the installed Spoon
      * @returns Resolves with true if the Spoon was updated, or false if it was already up to date
      */
@@ -9286,7 +10638,7 @@ update was downloading.
 
     /**
      * Remove an installed Spoon. If it's already loaded, it keeps running until your config is
-reloaded, so stop it first if it has a `stop()` method.
+     * reloaded, so stop it first if it has a `stop()` method.
      * @param name The name of the installed Spoon
      * @returns true if the Spoon was removed, or false if it wasn't installed
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -9301,108 +10653,129 @@ reloaded, so stop it first if it has a `stop()` method.
 
     /**
      * Load and configure a Spoon in one step, installing it first if it isn't installed yet - the
-built-in equivalent of Hammerspoon 1's SpoonInstall:andUse().
-If the Spoon is already installed, it's loaded and configured before `use()` returns, so
-`hs.spoons.<name>` can be used on the very next line, and nothing is downloaded. If it isn't
-installed and `source` is given, it's installed in the background (see `hs.spoons.install()`),
-then loaded and configured, and a notification says so; put anything that needs the Spoon in
-call `hs.spoons.update()` for that.
-each property of `config` is set on the Spoon's object, exactly as if you'd assigned it
-yourself, `hotkeys` is passed to its `bindHotkeys()` method, `fn` is called with the Spoon,
-and finally `start()` is called if `start` is true.
-The Promise rejects with an `Error` with a `code`, as `hs.spoons.install()`'s does, plus
-`ENOTINSTALLED` if the Spoon isn't installed and no `source` was given, or the error thrown by
-loading or configuring the Spoon.
+     * built-in equivalent of Hammerspoon 1's SpoonInstall:andUse().
+     *
+     * If the Spoon is already installed, it's loaded and configured before `use()` returns, so
+     * `hs.spoons.<name>` can be used on the very next line, and nothing is downloaded. If it isn't
+     * installed and `source` is given, it's installed in the background (see `hs.spoons.install()`),
+     * then loaded and configured, and a notification says so; put anything that needs the Spoon in
+     * `fn`, or after the returned Promise resolves. An installed Spoon is never updated by `use()`:
+     * call `hs.spoons.update()` for that.
+     *
+     * `path` loads the Spoon from a directory of your own instead, as `hs.spoons.load()` does, for
+     * developing a Spoon: nothing is installed, and an installed copy is ignored. It takes precedence
+     * over `source`, `ref` and `sha256`, which are ignored while it's given, so a config can keep its
+     * `source` for everyone else and add `path` while you work on the Spoon.
+     *
+     * Configuration is applied after the Spoon is loaded (and its `init()` has run), in this order:
+     * each property of `config` is set on the Spoon's object, exactly as if you'd assigned it
+     * yourself, `hotkeys` is passed to its `bindHotkeys()` method, `fn` is called with the Spoon,
+     * and finally `start()` is called if `start` is true.
+     *
+     * The Promise rejects with an `Error` with a `code`, as `hs.spoons.install()`'s does, plus
+     * `ENOTINSTALLED` if the Spoon isn't installed and no `source` was given, or the error thrown by
+     * loading or configuring the Spoon.
      * @param name The name of the Spoon
-     * @param options `source`, `ref` and `sha256` say where to install the Spoon from, as for `hs.spoons.install()`. `config` holds properties to set on the Spoon's object; which ones it reads is up to the Spoon. `hotkeys` is passed to the Spoon's `bindHotkeys()`, or `"default"` passes its `defaultHotkeys`. `fn` is called with the Spoon after it's configured. `start: true` calls its `start()`. `disable: true` does nothing at all, which is easier than commenting the call out.
+     * @param options `source`, `ref` and `sha256` say where to install the Spoon from, as for `hs.spoons.install()`. `path` loads it from a directory instead (relative to your config directory), as for `hs.spoons.load()`, and takes precedence over `source`. `config` holds properties to set on the Spoon's object; which ones it reads is up to the Spoon. `hotkeys` is passed to the Spoon's `bindHotkeys()`, or `"default"` passes its `defaultHotkeys`. `fn` is called with the Spoon after it's configured. `start: true` calls its `start()`. `disable: true` does nothing at all, which is easier than commenting the call out.
      * @returns Resolves with the Spoon once it's loaded and configured, or null if `disable` is true
      */
-    function use(name: string, options: {source?: string, ref?: string, sha256?: string, config?: Record<string, any>, hotkeys?: Record<string, any> | "default", fn?: (spoon: Object) => void, start?: boolean, disable?: boolean}): Promise<Object | null>;
+    function use(name: string, options: {source?: string, ref?: string, sha256?: string, path?: string, config?: Record<string, any>, hotkeys?: Record<string, any> | "default", fn?: (spoon: Object) => void, start?: boolean, disable?: boolean}): Promise<Object | null>;
 
 }
 
 /**
  * Query the macOS Spotlight metadata database.
-`hs.spotlight` wraps `NSMetadataQuery` to let you search for files and other
-metadata objects indexed by Spotlight. Queries use `NSPredicate` syntax with
-`kMDItem*` attribute keys (see `hs.spotlight.attribute` for common shortcuts).
-## Quick start
-```js
-// Find all PDFs in the home directory and log their paths
-const q = hs.spotlight.create()
-q.setQuery("kMDItemContentType == 'com.adobe.pdf'")
- .setScopes([hs.spotlight.scope.home])
- .setCallback((event) => {
-     if (event === 'didFinish') {
-         console.log('Found ' + q.count + ' PDFs')
-         q.results().forEach(item =>
-             console.log(item.valueForAttribute(hs.spotlight.attribute.path))
-         )
-         q.stop()
-     }
- })
- .start()
-```
-## One-shot search convenience
-```js
-const q = hs.spotlight.search(
-    "kMDItemDisplayName BEGINSWITH 'Invoice'",
-    (event) => {
-        if (event === 'didFinish') {
-            console.log('Found ' + q.count + ' invoices')
-            q.stop()
-        }
-    }
-)
-```
-## Grouping results by attribute
-```js
-const q = hs.spotlight.create()
-q.setQuery("kMDItemContentTypeTree == 'public.image'")
- .setScopes([hs.spotlight.scope.home])
- .setGroupingAttributes([hs.spotlight.attribute.kind])
- .setCallback((event) => {
-     if (event === 'didFinish') {
-         q.groups().forEach(g =>
-             console.log(g.value() + ': ' + g.count + ' images')
-         )
-         q.stop()
-     }
- })
- .start()
-```
-## Monitoring for live changes
-```js
-// Keep the query running to receive live-update events
-const q = hs.spotlight.create()
-q.setQuery("kMDItemContentType == 'com.apple.application-bundle'")
- .setScopes(['/Applications'])
- .setCallback((event, update) => {
-     if (event === 'didFinish') {
-         console.log('Initial scan: ' + q.count + ' apps')
-     } else if (event === 'didUpdate') {
-         console.log('App list changed — now ' + q.count + ' apps')
-         if (update) console.log('Added: ' + update.added.length)
-     }
- })
- .start()
-// Call q.stop() when you no longer want live updates
-```
+ *
+ * `hs.spotlight` wraps `NSMetadataQuery` to let you search for files and other
+ * metadata objects indexed by Spotlight. Queries use `NSPredicate` syntax with
+ * `kMDItem*` attribute keys (see `hs.spotlight.attribute` for common shortcuts).
+ *
+ * ## Quick start
+ *
+ * ```js
+ * // Find all PDFs in the home directory and log their paths
+ * const q = hs.spotlight.create()
+ * q.setQuery("kMDItemContentType == 'com.adobe.pdf'")
+ *  .setScopes([hs.spotlight.scope.home])
+ *  .setCallback((event) => {
+ *      if (event === 'didFinish') {
+ *          console.log('Found ' + q.count + ' PDFs')
+ *          q.results().forEach(item =>
+ *              console.log(item.valueForAttribute(hs.spotlight.attribute.path))
+ *          )
+ *          q.stop()
+ *      }
+ *  })
+ *  .start()
+ * ```
+ *
+ * ## One-shot search convenience
+ *
+ * ```js
+ * const q = hs.spotlight.search(
+ *     "kMDItemDisplayName BEGINSWITH 'Invoice'",
+ *     (event) => {
+ *         if (event === 'didFinish') {
+ *             console.log('Found ' + q.count + ' invoices')
+ *             q.stop()
+ *         }
+ *     }
+ * )
+ * ```
+ *
+ * ## Grouping results by attribute
+ *
+ * ```js
+ * const q = hs.spotlight.create()
+ * q.setQuery("kMDItemContentTypeTree == 'public.image'")
+ *  .setScopes([hs.spotlight.scope.home])
+ *  .setGroupingAttributes([hs.spotlight.attribute.kind])
+ *  .setCallback((event) => {
+ *      if (event === 'didFinish') {
+ *          q.groups().forEach(g =>
+ *              console.log(g.value() + ': ' + g.count + ' images')
+ *          )
+ *          q.stop()
+ *      }
+ *  })
+ *  .start()
+ * ```
+ *
+ * ## Monitoring for live changes
+ *
+ * ```js
+ * // Keep the query running to receive live-update events
+ * const q = hs.spotlight.create()
+ * q.setQuery("kMDItemContentType == 'com.apple.application-bundle'")
+ *  .setScopes(['/Applications'])
+ *  .setCallback((event, update) => {
+ *      if (event === 'didFinish') {
+ *          console.log('Initial scan: ' + q.count + ' apps')
+ *      } else if (event === 'didUpdate') {
+ *          console.log('App list changed — now ' + q.count + ' apps')
+ *          if (update) console.log('Added: ' + update.added.length)
+ *      }
+ *  })
+ *  .start()
+ * // Call q.stop() when you no longer want live updates
+ * ```
  */
 declare namespace hs.spotlight {
     /**
      * Creates and returns a new, unconfigured Spotlight query.
-Configure it with `setQuery()`, `setScopes()`, and `setCallback()`, then call `start()`.
-The query is automatically stopped and released when the module shuts down.
+     *
+     * Configure it with `setQuery()`, `setScopes()`, and `setCallback()`, then call `start()`.
+     * The query is automatically stopped and released when the module shuts down.
      * @returns A new `HSSpotlightQuery`
      */
     function create(): HSSpotlightQuery;
 
     /**
      * Convenience helper that creates, configures, and starts a query in one call.
-Equivalent to `create().setQuery(predicate).setCallback(callback).start()`.
-Call `q.stop()` from inside `callback` (when `event === 'didFinish'`) to end
-the search once you have what you need.
+     *
+     * Equivalent to `create().setQuery(predicate).setCallback(callback).start()`.
+     * Call `q.stop()` from inside `callback` (when `event === 'didFinish'`) to end
+     * the search once you have what you need.
      * @param predicate An NSPredicate-format query string
      * @param callback A function called with lifecycle event name and optional update data
      * @returns The `HSSpotlightQuery` object (use to stop the search early)
@@ -9411,43 +10784,46 @@ the search once you have what you need.
 
     /**
      * Predefined search scope constants for use with `HSSpotlightQuery.setScopes()`.
-| Key | Description |
-|-----|-------------|
-| `home` | The current user's home directory |
-| `computer` | All locally mounted volumes |
-| `network` | Network-mounted volumes |
-| `applications` | Common locations for .app bundles |
-| `icloud` | iCloud Documents |
-| `icloudData` | iCloud Data (non-document ubiquitous files) |
+     *
+     * | Key | Description |
+     * |-----|-------------|
+     * | `home` | The current user's home directory |
+     * | `computer` | All locally mounted volumes |
+     * | `network` | Network-mounted volumes |
+     * | `applications` | Common locations for .app bundles |
+     * | `icloud` | iCloud Documents |
+     * | `icloudData` | iCloud Data (non-document ubiquitous files) |
      */
     const scope: Record<string, string[]>;
 
     /**
      * Common Spotlight metadata attribute key shortcuts.
-These are plain `kMDItem*` string values — using them is equivalent to typing
-the raw key name, but they provide autocomplete and avoid typos.
-| Key | Attribute | Description |
-|-----|-----------|-------------|
-| `path` | `kMDItemPath` | Absolute filesystem path |
-| `displayName` | `kMDItemDisplayName` | User-visible display name |
-| `fsName` | `kMDItemFSName` | Filename on disk |
-| `contentType` | `kMDItemContentType` | UTI content type |
-| `contentTypeTree` | `kMDItemContentTypeTree` | Full UTI conformance tree |
-| `kind` | `kMDItemKind` | Finder "Kind" string |
-| `fileSize` | `kMDItemFSSize` | File size in bytes |
-| `creationDate` | `kMDItemFSCreationDate` | Filesystem creation date |
-| `modifiedDate` | `kMDItemFSContentChangeDate` | Last content modification date |
-| `lastUsedDate` | `kMDItemLastUsedDate` | Last time the item was opened |
-| `useCount` | `kMDItemUseCount` | Number of times opened |
-| `authors` | `kMDItemAuthors` | Document authors |
-| `title` | `kMDItemTitle` | Document title |
-| `comment` | `kMDItemComment` | User comment |
-| `keywords` | `kMDItemKeywords` | Tags/keywords |
-| `durationSeconds` | `kMDItemDurationSeconds` | Media duration in seconds |
-| `pixelWidth` | `kMDItemPixelWidth` | Image/video width in pixels |
-| `pixelHeight` | `kMDItemPixelHeight` | Image/video height in pixels |
-| `whereFroms` | `kMDItemWhereFroms` | Download source URLs |
-| `bundleIdentifier` | `kMDItemCFBundleIdentifier` | App bundle identifier |
+     *
+     * These are plain `kMDItem*` string values — using them is equivalent to typing
+     * the raw key name, but they provide autocomplete and avoid typos.
+     *
+     * | Key | Attribute | Description |
+     * |-----|-----------|-------------|
+     * | `path` | `kMDItemPath` | Absolute filesystem path |
+     * | `displayName` | `kMDItemDisplayName` | User-visible display name |
+     * | `fsName` | `kMDItemFSName` | Filename on disk |
+     * | `contentType` | `kMDItemContentType` | UTI content type |
+     * | `contentTypeTree` | `kMDItemContentTypeTree` | Full UTI conformance tree |
+     * | `kind` | `kMDItemKind` | Finder "Kind" string |
+     * | `fileSize` | `kMDItemFSSize` | File size in bytes |
+     * | `creationDate` | `kMDItemFSCreationDate` | Filesystem creation date |
+     * | `modifiedDate` | `kMDItemFSContentChangeDate` | Last content modification date |
+     * | `lastUsedDate` | `kMDItemLastUsedDate` | Last time the item was opened |
+     * | `useCount` | `kMDItemUseCount` | Number of times opened |
+     * | `authors` | `kMDItemAuthors` | Document authors |
+     * | `title` | `kMDItemTitle` | Document title |
+     * | `comment` | `kMDItemComment` | User comment |
+     * | `keywords` | `kMDItemKeywords` | Tags/keywords |
+     * | `durationSeconds` | `kMDItemDurationSeconds` | Media duration in seconds |
+     * | `pixelWidth` | `kMDItemPixelWidth` | Image/video width in pixels |
+     * | `pixelHeight` | `kMDItemPixelHeight` | Image/video height in pixels |
+     * | `whereFroms` | `kMDItemWhereFroms` | Download source URLs |
+     * | `bundleIdentifier` | `kMDItemCFBundleIdentifier` | App bundle identifier |
      */
     const attribute: Record<string, string>;
 
@@ -9455,15 +10831,18 @@ the raw key name, but they provide autocomplete and avoid typos.
 
 /**
  * A grouped set of Spotlight results that share a common metadata attribute value.
-Groups are returned by `HSSpotlightQuery.groups()` when grouping attributes have been
-configured with `setGroupingAttributes()`. Do not instantiate `HSSpotlightGroup` directly.
-When multiple grouping attributes are specified, groups nest: each group has `subgroups()`
-containing the next level of grouping.
+ *
+ * Groups are returned by `HSSpotlightQuery.groups()` when grouping attributes have been
+ * configured with `setGroupingAttributes()`. Do not instantiate `HSSpotlightGroup` directly.
+ *
+ * When multiple grouping attributes are specified, groups nest: each group has `subgroups()`
+ * containing the next level of grouping.
  */
 declare class HSSpotlightGroup {
     /**
      * The shared value of the grouping attribute for all results in this group.
-Returns `null` only in the unlikely case that the underlying value cannot be bridged.
+     *
+     * Returns `null` only in the unlikely case that the underlying value cannot be bridged.
      * @returns The attribute value (string, number, Date, etc.) or null
      */
     value(): any | null;
@@ -9476,7 +10855,8 @@ Returns `null` only in the unlikely case that the underlying value cannot be bri
 
     /**
      * Returns nested subgroups when multiple grouping attributes were specified.
-Returns an empty array if no subgroups exist for this group.
+     *
+     * Returns an empty array if no subgroups exist for this group.
      * @returns An array of `HSSpotlightGroup` objects
      */
     subgroups(): HSSpotlightGroup[];
@@ -9500,26 +10880,30 @@ Returns an empty array if no subgroups exist for this group.
 
 /**
  * An individual result returned by a Spotlight query.
-Instances are returned by `HSSpotlightQuery.results()` and related methods.
-Do not instantiate `HSSpotlightItem` directly.
-Metadata values are read via `valueForAttribute()` using standard `kMDItem*` keys.
-Call `attributes()` to discover which keys are populated on a particular item.
-Common attribute key shortcuts live in `hs.spotlight.attribute`.
+ *
+ * Instances are returned by `HSSpotlightQuery.results()` and related methods.
+ * Do not instantiate `HSSpotlightItem` directly.
+ *
+ * Metadata values are read via `valueForAttribute()` using standard `kMDItem*` keys.
+ * Call `attributes()` to discover which keys are populated on a particular item.
+ * Common attribute key shortcuts live in `hs.spotlight.attribute`.
  */
 declare class HSSpotlightItem {
     /**
      * Returns the list of metadata attribute names present on this item.
-The list is typically not exhaustive — some attributes (such as `kMDItemPath`)
-may be readable via `valueForAttribute()` even when absent from this list.
+     *
+     * The list is typically not exhaustive — some attributes (such as `kMDItemPath`)
+     * may be readable via `valueForAttribute()` even when absent from this list.
      * @returns An array of attribute name strings
      */
     attributes(): string[];
 
     /**
      * Returns the value for a specific metadata attribute, or `null` if absent.
-The return type depends on the attribute: common types include strings, numbers,
-dates, and arrays of strings. `NSURL`-typed values are automatically converted
-to their string representation.
+     *
+     * The return type depends on the attribute: common types include strings, numbers,
+     * dates, and arrays of strings. `NSURL`-typed values are automatically converted
+     * to their string representation.
      * @param key An attribute key such as `"kMDItemPath"` or `hs.spotlight.attribute.path`
      * @returns The attribute value, or null
      */
@@ -9534,19 +10918,23 @@ to their string representation.
 
 /**
  * A configurable Spotlight search query that can be started, stopped, and queried for results.
-Create instances via `hs.spotlight.create()` or the convenience helper `hs.spotlight.search()`.
-Configure the query with chainable setter methods, register a callback, then call `start()`.
-Results accumulate during the initial gathering phase (`"didStart"` → `"inProgress"` → `"didFinish"`)
-and continue to update during the live-monitoring phase (`"didUpdate"`). Stop explicitly
-with `stop()` when you no longer need live updates.
+ *
+ * Create instances via `hs.spotlight.create()` or the convenience helper `hs.spotlight.search()`.
+ * Configure the query with chainable setter methods, register a callback, then call `start()`.
+ *
+ * Results accumulate during the initial gathering phase (`"didStart"` → `"inProgress"` → `"didFinish"`)
+ * and continue to update during the live-monitoring phase (`"didUpdate"`). Stop explicitly
+ * with `stop()` when you no longer need live updates.
  */
 declare class HSSpotlightQuery {
     /**
      * Sets the NSPredicate query string for this search.
-The string must be a valid `NSPredicate` format expression using `kMDItem*` attribute
-keys and MDQuery operators (`==`, `!=`, `<`, `>`, `BEGINSWITH`, `CONTAINS`, etc.).
-If the query is already running when this is called, it is stopped and restarted
-automatically.
+     *
+     * The string must be a valid `NSPredicate` format expression using `kMDItem*` attribute
+     * keys and MDQuery operators (`==`, `!=`, `<`, `>`, `BEGINSWITH`, `CONTAINS`, etc.).
+     *
+     * If the query is already running when this is called, it is stopped and restarted
+     * automatically.
      * @param predicate An NSPredicate-format query string
      * @returns this query, for chaining
      */
@@ -9554,10 +10942,12 @@ automatically.
 
     /**
      * Sets the search scopes that restrict where Spotlight looks.
-Pass an array of predefined scope strings from `hs.spotlight.scope`, absolute
-directory paths, or a mix of both. Paths beginning with `~` are expanded to the
-user's home directory.
-When not set, the query defaults to `hs.spotlight.scope.computer`.
+     *
+     * Pass an array of predefined scope strings from `hs.spotlight.scope`, absolute
+     * directory paths, or a mix of both. Paths beginning with `~` are expanded to the
+     * user's home directory.
+     *
+     * When not set, the query defaults to `hs.spotlight.scope.computer`.
      * @param scopes An array of scope-constant strings or absolute directory paths
      * @returns this query, for chaining
      */
@@ -9565,6 +10955,10 @@ When not set, the query defaults to `hs.spotlight.scope.computer`.
 
     /**
      * Sets sort descriptors that control the order of results.
+     *
+     * Pass an array of objects, each with:
+     * - `attribute` (string): a `kMDItem*` key to sort on
+     * - `ascending` (boolean): `true` for ascending order (optional, defaults to `true`)
      * @param descriptors An array of sort descriptor objects
      * @returns this query, for chaining
      */
@@ -9572,9 +10966,10 @@ When not set, the query defaults to `hs.spotlight.scope.computer`.
 
     /**
      * Sets the attributes by which results will be grouped.
-When grouping attributes are set, use `groups()` to retrieve results organised into
-`HSSpotlightGroup` objects. Specifying multiple attributes creates nested subgroups
-accessible via `group.subgroups()`.
+     *
+     * When grouping attributes are set, use `groups()` to retrieve results organised into
+     * `HSSpotlightGroup` objects. Specifying multiple attributes creates nested subgroups
+     * accessible via `group.subgroups()`.
      * @param attrs An array of attribute name strings
      * @returns this query, for chaining
      */
@@ -9582,8 +10977,9 @@ accessible via `group.subgroups()`.
 
     /**
      * Sets the attributes for which aggregate value-list summaries are computed.
-After the query finishes, `valueLists()` returns aggregate data for each specified
-attribute: distinct values and the number of results carrying each value.
+     *
+     * After the query finishes, `valueLists()` returns aggregate data for each specified
+     * attribute: distinct values and the number of results carrying each value.
      * @param attrs An array of attribute name strings
      * @returns this query, for chaining
      */
@@ -9591,7 +10987,11 @@ attribute: distinct values and the number of results carrying each value.
 
     /**
      * Registers a callback that receives query lifecycle events.
-of `HSSpotlightItem` objects describing what changed in this update cycle
+     *
+     * The callback is called with:
+     * - `event` (string): one of `"didStart"`, `"inProgress"`, `"didFinish"`, `"didUpdate"`
+     * - `update` (object, `"didUpdate"` only): `{ added, changed, removed }` — each an array
+     *   of `HSSpotlightItem` objects describing what changed in this update cycle
      * @param fn Called with lifecycle event name and optional update data containing added/changed/removed item arrays
      * @returns this query, for chaining
      */
@@ -9599,8 +10999,9 @@ of `HSSpotlightItem` objects describing what changed in this update cycle
 
     /**
      * Starts the query.
-The query must have a predicate set (via `setQuery()`) before calling `start()`.
-Calling `start()` on an already-running query is a no-op.
+     *
+     * The query must have a predicate set (via `setQuery()`) before calling `start()`.
+     * Calling `start()` on an already-running query is a no-op.
      * @remarks A started query, and its callback, stay alive until it's stopped, even if you don't keep a reference to it
      * @returns this query, for chaining
      */
@@ -9608,30 +11009,38 @@ Calling `start()` on an already-running query is a no-op.
 
     /**
      * Stops the query while preserving accumulated results.
-After stopping, `results()`, `count`, `groups()`, and `valueLists()` continue to
-return the last gathered data. Call `start()` again to resume.
+     *
+     * After stopping, `results()`, `count`, `groups()`, and `valueLists()` continue to
+     * return the last gathered data. Call `start()` again to resume.
      * @returns this query, for chaining
      */
     stop(): HSSpotlightQuery;
 
     /**
      * Returns the current results as an array of `HSSpotlightItem` objects.
-The result set is briefly frozen during access to ensure consistency. Safe to call
-from within a query callback.
+     *
+     * The result set is briefly frozen during access to ensure consistency. Safe to call
+     * from within a query callback.
      * @returns An array of `HSSpotlightItem` objects (may be empty if the query has not run)
      */
     results(): HSSpotlightItem[];
 
     /**
      * Returns grouped results when grouping attributes have been configured.
-Returns an empty array if `setGroupingAttributes()` was not called.
+     *
+     * Returns an empty array if `setGroupingAttributes()` was not called.
      * @returns An array of `HSSpotlightGroup` objects
      */
     groups(): HSSpotlightGroup[];
 
     /**
      * Returns aggregate value-list summaries for attributes set via `setValueListAttributes()`.
-Returns an empty array if `setValueListAttributes()` was not called.
+     *
+     * Each entry is a plain object with:
+     * - `attribute` (string): the attribute name
+     * - `values` (array): objects with `value` and `count` keys for each distinct value
+     *
+     * Returns an empty array if `setValueListAttributes()` was not called.
      * @returns An array of summary objects
      */
     valueLists(): Record<string, any>[];
@@ -9653,7 +11062,8 @@ Returns an empty array if `setValueListAttributes()` was not called.
 
     /**
      * Whether the query is in the initial gathering phase.
-`true` from `"didStart"` until `"didFinish"`; `false` thereafter while live-monitoring.
+     *
+     * `true` from `"didStart"` until `"didFinish"`; `false` thereafter while live-monitoring.
      */
     readonly isGathering: boolean;
 
@@ -9661,26 +11071,32 @@ Returns an empty array if `setValueListAttributes()` was not called.
 
 /**
  * Direct hardware control of Elgato Stream Deck devices — buttons, encoders, and the
-LCD touch strip on the Stream Deck Plus.
-## Enumerating devices
-```javascript
-const decks = hs.streamdeck.all()
-decks.forEach(d => console.log(d.deckType + " — " + d.serialNumber))
-```
-## Watching for connect / disconnect events
-```javascript
-hs.streamdeck.on("connected", device => console.log("Connected: " + device.deckType))
-hs.streamdeck.on("disconnected", device => console.log("Disconnected: " + device.deckType))
-```
-## Driving a device
-```javascript
-const deck = hs.streamdeck.all()[0]
-deck.setBrightness(50)
-deck.setButtonColor(1, HSColor.named("red"))
-deck.onButton((device, button, isDown) => {
-    console.log("button " + button + (isDown ? " down" : " up"))
-})
-```
+ * LCD touch strip on the Stream Deck Plus.
+ *
+ * ## Enumerating devices
+ *
+ * ```javascript
+ * const decks = hs.streamdeck.all()
+ * decks.forEach(d => console.log(d.deckType + " — " + d.serialNumber))
+ * ```
+ *
+ * ## Watching for connect / disconnect events
+ *
+ * ```javascript
+ * hs.streamdeck.on("connected", device => console.log("Connected: " + device.deckType))
+ * hs.streamdeck.on("disconnected", device => console.log("Disconnected: " + device.deckType))
+ * ```
+ *
+ * ## Driving a device
+ *
+ * ```javascript
+ * const deck = hs.streamdeck.all()[0]
+ * deck.setBrightness(50)
+ * deck.setButtonColor(1, HSColor.named("red"))
+ * deck.onButton((device, button, isDown) => {
+ *     console.log("button " + button + (isDown ? " down" : " up"))
+ * })
+ * ```
  */
 declare namespace hs.streamdeck {
     /**
@@ -9723,7 +11139,7 @@ declare namespace hs.streamdeck {
 
 /**
  * A Stream Deck device, obtained via `hs.streamdeck.all()` or a discovery watcher — do
-not instantiate directly.
+ * not instantiate directly.
  */
 declare class HSStreamDeckDevice {
     /**
@@ -9765,7 +11181,8 @@ declare class HSStreamDeckDevice {
 
     /**
      * Sets the callback for button press/release events. Replaces any previously set callback.
-The callback receives: this device, the button number, and whether it is now pressed.
+     *
+     * The callback receives: this device, the button number, and whether it is now pressed.
      * @param fn The function to call on button events
      * @returns self, for chaining
      */
@@ -9773,9 +11190,10 @@ The callback receives: this device, the button number, and whether it is now pre
 
     /**
      * Sets the callback for encoder press/release/rotation events (Stream Deck Plus only).
-Replaces any previously set callback.
-The callback receives: this device, the encoder number, whether it is now pressed,
-and two booleans indicating rotation direction (at most one is `true` per call).
+     * Replaces any previously set callback.
+     *
+     * The callback receives: this device, the encoder number, whether it is now pressed,
+     * and two booleans indicating rotation direction (at most one is `true` per call).
      * @param fn The function to call on encoder events
      * @returns self, for chaining
      */
@@ -9783,9 +11201,10 @@ and two booleans indicating rotation direction (at most one is `true` per call).
 
     /**
      * Sets the callback for LCD touch-screen events (Stream Deck Plus only). Replaces any
-previously set callback.
-The callback receives: this device, the event type (`"shortPress"`, `"longPress"`, or
-`"swipe"`), and the start/end X/Y coordinates (end coordinates are `0` unless swiping).
+     * previously set callback.
+     *
+     * The callback receives: this device, the event type (`"shortPress"`, `"longPress"`, or
+     * `"swipe"`), and the start/end X/Y coordinates (end coordinates are `0` unless swiping).
      * @param fn The function to call on screen events
      * @returns self, for chaining
      */
@@ -9793,7 +11212,7 @@ The callback receives: this device, the event type (`"shortPress"`, `"longPress"
 
     /**
      * Stops delivering events and releases all callbacks. Called automatically when the
-device is disconnected or the module shuts down.
+     * device is disconnected or the module shuts down.
      */
     destroy(): void;
 
@@ -10236,39 +11655,49 @@ declare class HSTimer {
 
 /**
  * Translate text between languages using the macOS on-device Translation framework.
-Language identifiers use BCP-47 format (e.g. `"en"`, `"fr"`, `"zh-Hans"`).
-Call `hs.translation.supportedLanguages()` to list every language the framework
-recognises, and `hs.translation.status()` to check whether a specific pair is
-installed and ready for offline use.
-Language packs are downloaded through
-**System Settings → General → Language & Region → Translation Languages**.
-`hs.translation` cannot trigger downloads programmatically; `session()` returns
-`null` when the requested pair is not yet installed.
-## Quick start
-```js
-hs.translation.status("en", "fr").then(s => {
-    if (s === "installed") {
-        const session = hs.translation.session("en", "fr")
-        session.translate("Good morning").then(r => console.log(r))
-    } else {
-        console.log("Install en→fr in System Settings → Language & Region → Translation Languages")
-    }
-})
-```
+ *
+ * Language identifiers use BCP-47 format (e.g. `"en"`, `"fr"`, `"zh-Hans"`).
+ * Call `hs.translation.supportedLanguages()` to list every language the framework
+ * recognises, and `hs.translation.status()` to check whether a specific pair is
+ * installed and ready for offline use.
+ *
+ * Language packs are downloaded through
+ * **System Settings → General → Language & Region → Translation Languages**.
+ * `hs.translation` cannot trigger downloads programmatically; `session()` returns
+ * `null` when the requested pair is not yet installed.
+ *
+ * ## Quick start
+ *
+ * ```js
+ * hs.translation.status("en", "fr").then(s => {
+ *     if (s === "installed") {
+ *         const session = hs.translation.session("en", "fr")
+ *         session.translate("Good morning").then(r => console.log(r))
+ *     } else {
+ *         console.log("Install en→fr in System Settings → Language & Region → Translation Languages")
+ *     }
+ * })
+ * ```
  */
 declare namespace hs.translation {
     /**
      * All language codes supported by the on-device translation engine.
-Resolves to an array of BCP-47 identifiers (e.g. `["ar", "de", "en", "es", "fr"]`).
-This covers every language the framework knows about, regardless of whether
-the packs are installed locally. Use `status()` to distinguish installed
-pairs from merely supported ones.
+     *
+     * Resolves to an array of BCP-47 identifiers (e.g. `["ar", "de", "en", "es", "fr"]`).
+     * This covers every language the framework knows about, regardless of whether
+     * the packs are installed locally. Use `status()` to distinguish installed
+     * pairs from merely supported ones.
      * @returns Resolves to an array of BCP-47 language code strings.
      */
     function supportedLanguages(): Promise<string[]>;
 
     /**
      * Check the installation status of a language pair.
+     *
+     * Resolves to one of three strings:
+     * - `"installed"` — downloaded and ready for offline translation.
+     * - `"supported"` — available but not yet downloaded.
+     * - `"unsupported"` — not available on this system.
      * @param sourceLanguage BCP-47 code of the source language (e.g. `"en"`).
      * @param targetLanguage BCP-47 code of the target language (e.g. `"fr"`).
      * @returns Resolves to `"installed"`, `"supported"`, or `"unsupported"`.
@@ -10277,8 +11706,9 @@ pairs from merely supported ones.
 
     /**
      * Create a translation session for a language pair.
-Returns an `HSTranslationSession`, or `null` if the system is running macOS
-older than 26.0.
+     *
+     * Returns an `HSTranslationSession`, or `null` if the system is running macOS
+     * older than 26.0.
      * @param sourceLanguage BCP-47 code of the source language (e.g. `"en"`).
      * @param targetLanguage BCP-47 code of the target language (e.g. `"fr"`).
      * @returns An `HSTranslationSession`, or `null` on unsupported versions of macOS.
@@ -10317,231 +11747,261 @@ declare class HSTranslationSession {
 
 /**
  * # hs.ui
-**Create custom user interfaces, alerts, dialogs, and file pickers**
-The `hs.ui` module provides a set of tools for creating custom user interfaces
-in Hammerspoon with SwiftUI-like declarative syntax.
-## Key Features
-then call `.replaceWithColor()` or `.replaceWithHex()` on it from any callback to re-render the canvas automatically
-then call `.set()` on it to update the displayed content live
-to swap the image without rebuilding the window
-## Basic Examples
-### Simple Alert
-```javascript
-hs.ui.alert("Task completed!")
-    .duration(3)
-    .show();
-```
-### Dialog with Buttons
-```javascript
-hs.ui.dialog("Save changes?")
-    .informativeText("Your document has unsaved changes.")
-    .buttons(["Save", "Don't Save", "Cancel"])
-    .onButton((index) => {
-        if (index === 0) console.log("Saving...");
-    })
-    .show();
-```
-### Text Input Prompt
-```javascript
-hs.ui.textPrompt("Enter your name")
-    .defaultText("John Doe")
-    .onButton((buttonIndex, text) => {
-        console.log("User entered: " + text);
-    })
-    .show();
-```
-### File Picker
-```javascript
-hs.ui.filePicker()
-    .message("Choose a file")
-    .allowedFileTypes(["txt", "md"])
-    .onSelection((path) => {
-        if (path) console.log("Selected: " + path);
-    })
-    .show();
-```
-### Custom Window
-```javascript
-hs.ui.window({x: 100, y: 100, w: 300, h: 200})
-    .vstack()
-        .spacing(10)
-        .padding(20)
-        .text("Hello, World!")
-            .font(HSFont.title())
-            .foregroundColor("#FFFFFF")
-        .rectangle()
-            .fill("#4A90E2")
-            .cornerRadius(10)
-            .frame({w: "100%", h: 60})
-    .end()
-    .backgroundColor("#2C3E50")
-    .show();
-```
-### Reactive Color on Hover
-```javascript
-// Create a mutable color, then mutate it inside the hover callback
-const btnColor = HSColor.hex("#4A90E2");
-
-hs.ui.window({x: 100, y: 100, w: 160, h: 60})
-    .rectangle()
-        .fill(btnColor)
-        .cornerRadius(8)
-        .frame({w: "100%", h: "100%"})
-        .onHover((isHovered) => {
-            btnColor.replaceWithHex(isHovered ? "#E24A4A" : "#4A90E2");
-        })
-    .show();
-```
-### Reactive Text on Hover
-```javascript
-// Create a mutable string, then mutate it inside the hover callback
-const label = hs.ui.string("Move your mouse here");
-
-hs.ui.window({x: 100, y: 200, w: 220, h: 50})
-    .text(label)
-        .font(HSFont.body())
-        .foregroundColor("#FFFFFF")
-        .onHover((isHovered) => {
-            label.set(isHovered ? "You're hovering!" : "Move your mouse here");
-        })
-    .show();
-```
-### Reactive Image on Click
-```javascript
-// Toggle between two system icons on each click
-const icon = HSImage.fromName("NSStatusAvailable");
-
-hs.ui.window({x: 100, y: 300, w: 80, h: 80})
-    .image(icon)
-        .resizable()
-        .aspectRatio("fit")
-        .frame({w: 64, h: 64})
-        .onClick(() => {
-            const next = (icon.name === "NSStatusAvailable")
-                ? HSImage.fromName("NSStatusUnavailable")
-                : HSImage.fromName("NSStatusAvailable");
-            icon.replaceWithImage(next);
-        })
-    .show();
-```
-## Complete Example: Status Dashboard
-Here's a more complex example showing how to build an interactive status dashboard
-```javascript
-// Create a status dashboard window
-const statusWindow = hs.ui.window({x: 100, y: 100, w: 400, h: 500})
-    .vstack()
-        .spacing(15)
-        .padding(20)
-
-        // Header
-        .text("System Status Dashboard")
-            .font(HSFont.largeTitle())
-            .foregroundColor("#FFFFFF")
-
-        // Status cards
-        .hstack()
-            .spacing(10)
-            .vstack()
-                .spacing(5)
-                .rectangle()
-                    .fill("#4CAF50")
-                    .cornerRadius(8)
-                    .frame({w: 180, h: 100})
-                .text("CPU: 45%")
-                    .font(HSFont.headline())
-                    .foregroundColor("#FFFFFF")
-            .end()
-            .vstack()
-                .spacing(5)
-                .rectangle()
-                    .fill("#2196F3")
-                    .cornerRadius(8)
-                    .frame({w: 180, h: 100})
-                .text("Memory: 8.2GB")
-                    .font(HSFont.headline())
-                    .foregroundColor("#FFFFFF")
-            .end()
-        .end()
-
-        // Activity indicator with image
-        .hstack()
-            .spacing(10)
-            .image(HSImage.fromName("NSComputer"))
-                .resizable()
-                .aspectRatio("fit")
-                .frame({w: 64, h: 64})
-            .vstack()
-                .text("System Running")
-                    .font(HSFont.title())
-                .text("All services operational")
-                    .font(HSFont.caption())
-                    .foregroundColor("#A0A0A0")
-            .end()
-        .end()
-
-        // Circle status indicators
-        .hstack()
-            .spacing(20)
-            .circle()
-                .fill("#4CAF50")
-                .frame({w: 30, h: 30})
-            .circle()
-                .fill("#FFC107")
-                .frame({w: 30, h: 30})
-            .circle()
-                .fill("#F44336")
-                .frame({w: 30, h: 30})
-        .end()
-    .end()
-    .backgroundColor("#2C3E50");
-
-// Show the dashboard
-statusWindow.show();
-
-// Later, interact with dialogs
-hs.ui.dialog("Shutdown system?")
-    .informativeText("This will close all applications.")
-    .buttons(["Shutdown", "Cancel"])
-    .onButton((index) => {
-        if (index === 0) {
-            hs.ui.alert("Shutting down...")
-                .duration(3)
-                .show();
-        }
-    })
-    .show();
-```
-## Complete Example: Reactive Hover Card
-Demonstrates reactive colors and reactive text together — a single `.onHover()`
-```javascript
-const cardColor = HSColor.hex("#3498DB");
-const cardLabel = hs.ui.string("Hover the card");
-
-hs.ui.window({x: 100, y: 100, w: 220, h: 120})
-    .vstack()
-        .spacing(12)
-        .padding(16)
-        .rectangle()
-            .fill(cardColor)
-            .cornerRadius(10)
-            .frame({w: "100%", h: 60})
-            .onHover((isHovered) => {
-                cardColor.replaceWithHex(isHovered ? "#E74C3C" : "#3498DB");
-                cardLabel.set(isHovered ? "You found it!" : "Hover the card");
-            })
-        .text(cardLabel)
-            .font(HSFont.headline())
-            .foregroundColor("#FFFFFF")
-    .end()
-    .backgroundColor("#1A252F")
-    .show();
-```
+ *
+ * **Create custom user interfaces, alerts, dialogs, and file pickers**
+ *
+ * The `hs.ui` module provides a set of tools for creating custom user interfaces
+ * in Hammerspoon with SwiftUI-like declarative syntax.
+ *
+ * ## Key Features
+ *
+ * - **Custom Windows**: Build custom UI windows with shapes, text, and layouts
+ * - **Alerts**: Display temporary on-screen notifications
+ * - **Dialogs**: Show modal dialogs with custom buttons and callbacks
+ * - **Text Input**: Prompt users for text input
+ * - **File Pickers**: Let users select files or directories
+ * - **Reactive Colors**: Pass an `HSColor` object to `.fill()`, `.stroke()`, or `.foregroundColor()`,
+ *   then call `.replaceWithColor()` or `.replaceWithHex()` on it from any callback to re-render the canvas automatically
+ * - **Reactive Text**: Create a string with `hs.ui.string()`, pass it to `.text()`,
+ *   then call `.set()` on it to update the displayed content live
+ * - **Reactive Images**: Pass an `HSImage` object to `.image()`, then call `.replaceWithImage()` or `.replaceFromFile()` on it
+ *   to swap the image without rebuilding the window
+ *
+ * ## Basic Examples
+ *
+ * ### Simple Alert
+ * ```javascript
+ * hs.ui.alert("Task completed!")
+ *     .duration(3)
+ *     .show();
+ * ```
+ *
+ * ### Dialog with Buttons
+ * ```javascript
+ * hs.ui.dialog("Save changes?")
+ *     .informativeText("Your document has unsaved changes.")
+ *     .buttons(["Save", "Don't Save", "Cancel"])
+ *     .onButton((index) => {
+ *         if (index === 0) console.log("Saving...");
+ *     })
+ *     .show();
+ * ```
+ *
+ * ### Text Input Prompt
+ * ```javascript
+ * hs.ui.textPrompt("Enter your name")
+ *     .defaultText("John Doe")
+ *     .onButton((buttonIndex, text) => {
+ *         console.log("User entered: " + text);
+ *     })
+ *     .show();
+ * ```
+ *
+ * ### File Picker
+ * ```javascript
+ * hs.ui.filePicker()
+ *     .message("Choose a file")
+ *     .allowedFileTypes(["txt", "md"])
+ *     .onSelection((path) => {
+ *         if (path) console.log("Selected: " + path);
+ *     })
+ *     .show();
+ * ```
+ *
+ * ### Custom Window
+ * ```javascript
+ * hs.ui.window({x: 100, y: 100, w: 300, h: 200})
+ *     .vstack()
+ *         .spacing(10)
+ *         .padding(20)
+ *         .text("Hello, World!")
+ *             .font(HSFont.title())
+ *             .foregroundColor("#FFFFFF")
+ *         .rectangle()
+ *             .fill("#4A90E2")
+ *             .cornerRadius(10)
+ *             .frame({w: "100%", h: 60})
+ *     .end()
+ *     .backgroundColor("#2C3E50")
+ *     .show();
+ * ```
+ *
+ * ### Reactive Color on Hover
+ * ```javascript
+ * // Create a mutable color, then mutate it inside the hover callback
+ * const btnColor = HSColor.hex("#4A90E2");
+ *
+ * hs.ui.window({x: 100, y: 100, w: 160, h: 60})
+ *     .rectangle()
+ *         .fill(btnColor)
+ *         .cornerRadius(8)
+ *         .frame({w: "100%", h: "100%"})
+ *         .onHover((isHovered) => {
+ *             btnColor.replaceWithHex(isHovered ? "#E24A4A" : "#4A90E2");
+ *         })
+ *     .show();
+ * ```
+ *
+ * ### Reactive Text on Hover
+ * ```javascript
+ * // Create a mutable string, then mutate it inside the hover callback
+ * const label = hs.ui.string("Move your mouse here");
+ *
+ * hs.ui.window({x: 100, y: 200, w: 220, h: 50})
+ *     .text(label)
+ *         .font(HSFont.body())
+ *         .foregroundColor("#FFFFFF")
+ *         .onHover((isHovered) => {
+ *             label.set(isHovered ? "You're hovering!" : "Move your mouse here");
+ *         })
+ *     .show();
+ * ```
+ *
+ * ### Reactive Image on Click
+ * ```javascript
+ * // Toggle between two system icons on each click
+ * const icon = HSImage.fromName("NSStatusAvailable");
+ *
+ * hs.ui.window({x: 100, y: 300, w: 80, h: 80})
+ *     .image(icon)
+ *         .resizable()
+ *         .aspectRatio("fit")
+ *         .frame({w: 64, h: 64})
+ *         .onClick(() => {
+ *             const next = (icon.name === "NSStatusAvailable")
+ *                 ? HSImage.fromName("NSStatusUnavailable")
+ *                 : HSImage.fromName("NSStatusAvailable");
+ *             icon.replaceWithImage(next);
+ *         })
+ *     .show();
+ * ```
+ *
+ * ## Complete Example: Status Dashboard
+ *
+ * Here's a more complex example showing how to build an interactive status dashboard
+ * that combines multiple UI elements:
+ *
+ * ```javascript
+ * // Create a status dashboard window
+ * const statusWindow = hs.ui.window({x: 100, y: 100, w: 400, h: 500})
+ *     .vstack()
+ *         .spacing(15)
+ *         .padding(20)
+ *
+ *         // Header
+ *         .text("System Status Dashboard")
+ *             .font(HSFont.largeTitle())
+ *             .foregroundColor("#FFFFFF")
+ *
+ *         // Status cards
+ *         .hstack()
+ *             .spacing(10)
+ *             .vstack()
+ *                 .spacing(5)
+ *                 .rectangle()
+ *                     .fill("#4CAF50")
+ *                     .cornerRadius(8)
+ *                     .frame({w: 180, h: 100})
+ *                 .text("CPU: 45%")
+ *                     .font(HSFont.headline())
+ *                     .foregroundColor("#FFFFFF")
+ *             .end()
+ *             .vstack()
+ *                 .spacing(5)
+ *                 .rectangle()
+ *                     .fill("#2196F3")
+ *                     .cornerRadius(8)
+ *                     .frame({w: 180, h: 100})
+ *                 .text("Memory: 8.2GB")
+ *                     .font(HSFont.headline())
+ *                     .foregroundColor("#FFFFFF")
+ *             .end()
+ *         .end()
+ *
+ *         // Activity indicator with image
+ *         .hstack()
+ *             .spacing(10)
+ *             .image(HSImage.fromName("NSComputer"))
+ *                 .resizable()
+ *                 .aspectRatio("fit")
+ *                 .frame({w: 64, h: 64})
+ *             .vstack()
+ *                 .text("System Running")
+ *                     .font(HSFont.title())
+ *                 .text("All services operational")
+ *                     .font(HSFont.caption())
+ *                     .foregroundColor("#A0A0A0")
+ *             .end()
+ *         .end()
+ *
+ *         // Circle status indicators
+ *         .hstack()
+ *             .spacing(20)
+ *             .circle()
+ *                 .fill("#4CAF50")
+ *                 .frame({w: 30, h: 30})
+ *             .circle()
+ *                 .fill("#FFC107")
+ *                 .frame({w: 30, h: 30})
+ *             .circle()
+ *                 .fill("#F44336")
+ *                 .frame({w: 30, h: 30})
+ *         .end()
+ *     .end()
+ *     .backgroundColor("#2C3E50");
+ *
+ * // Show the dashboard
+ * statusWindow.show();
+ *
+ * // Later, interact with dialogs
+ * hs.ui.dialog("Shutdown system?")
+ *     .informativeText("This will close all applications.")
+ *     .buttons(["Shutdown", "Cancel"])
+ *     .onButton((index) => {
+ *         if (index === 0) {
+ *             hs.ui.alert("Shutting down...")
+ *                 .duration(3)
+ *                 .show();
+ *         }
+ *     })
+ *     .show();
+ * ```
+ *
+ * ## Complete Example: Reactive Hover Card
+ *
+ * Demonstrates reactive colors and reactive text together — a single `.onHover()`
+ * callback updates both the fill color of a shape and the content of a text label:
+ *
+ * ```javascript
+ * const cardColor = HSColor.hex("#3498DB");
+ * const cardLabel = hs.ui.string("Hover the card");
+ *
+ * hs.ui.window({x: 100, y: 100, w: 220, h: 120})
+ *     .vstack()
+ *         .spacing(12)
+ *         .padding(16)
+ *         .rectangle()
+ *             .fill(cardColor)
+ *             .cornerRadius(10)
+ *             .frame({w: "100%", h: 60})
+ *             .onHover((isHovered) => {
+ *                 cardColor.replaceWithHex(isHovered ? "#E74C3C" : "#3498DB");
+ *                 cardLabel.set(isHovered ? "You found it!" : "Hover the card");
+ *             })
+ *         .text(cardLabel)
+ *             .font(HSFont.headline())
+ *             .foregroundColor("#FFFFFF")
+ *     .end()
+ *     .backgroundColor("#1A252F")
+ *     .show();
+ * ```
  */
 declare namespace hs.ui {
     /**
      * Create a custom UI window
-Creates a borderless window that can contain custom UI elements built using a declarative,
-SwiftUI-like syntax with shapes, text, and layout containers.
+     *
+     * Creates a borderless window that can contain custom UI elements built using a declarative,
+     * SwiftUI-like syntax with shapes, text, and layout containers.
      * @param dict Dictionary with keys: `x`, `y`, `w`, `h` (all numbers)
      * @returns An `HSUIWindow` object for chaining
      */
@@ -10549,8 +12009,9 @@ SwiftUI-like syntax with shapes, text, and layout containers.
 
     /**
      * Create a temporary on-screen alert
-Displays a temporary notification that automatically dismisses after the specified duration.
-Similar to the old `hs.alert` module but with more features.
+     *
+     * Displays a temporary notification that automatically dismisses after the specified duration.
+     * Similar to the old `hs.alert` module but with more features.
      * @param message The message text to display
      * @returns An `HSUIAlert` object for chaining
      */
@@ -10558,8 +12019,9 @@ Similar to the old `hs.alert` module but with more features.
 
     /**
      * Create a modal dialog with buttons
-Shows a blocking dialog with customizable message, informative text, and buttons.
-Use the callback to handle button presses.
+     *
+     * Shows a blocking dialog with customizable message, informative text, and buttons.
+     * Use the callback to handle button presses.
      * @param message The main message text
      * @returns An `HSUIDialog` object for chaining
      */
@@ -10567,8 +12029,9 @@ Use the callback to handle button presses.
 
     /**
      * Create a text input prompt
-Shows a modal dialog with a text input field. The callback receives the button index
-and the entered text.
+     *
+     * Shows a modal dialog with a text input field. The callback receives the button index
+     * and the entered text.
      * @param message The prompt message
      * @returns An `HSUITextPrompt` object for chaining
      */
@@ -10576,8 +12039,9 @@ and the entered text.
 
     /**
      * Create a reactive string for binding text element content to a dynamic value
-An `HSString` is a reactive value container. When passed to `.text()`,
-the canvas automatically re-renders whenever `.set()` is called from JavaScript.
+     *
+     * An `HSString` is a reactive value container. When passed to `.text()`,
+     * the canvas automatically re-renders whenever `.set()` is called from JavaScript.
      * @param initialValue The starting string value
      * @returns An `HSString` object whose value can be updated with `.set()`
      */
@@ -10585,17 +12049,19 @@ the canvas automatically re-renders whenever `.set()` is called from JavaScript.
 
     /**
      * Create a file or directory picker
-Shows a standard macOS file picker dialog. Can be configured to select files,
-directories, or both, with support for file type filtering and multiple selection.
+     *
+     * Shows a standard macOS file picker dialog. Can be configured to select files,
+     * directories, or both, with support for file type filtering and multiple selection.
      * @returns An `HSUIFilePicker` object for chaining
      */
     function filePicker(): HSUIFilePicker;
 
     /**
      * Create a web browser element for embedding in `hs.ui.window` (macOS 26+)
-Returns a `UIWebView` element that you configure and then embed in any `hs.ui.window`
-via `.webview(element)`. The element fills the available space inside the window layout.
-Keep a reference to call navigation methods after the window is shown.
+     *
+     * Returns a `UIWebView` element that you configure and then embed in any `hs.ui.window`
+     * via `.webview(element)`. The element fills the available space inside the window layout.
+     * Keep a reference to call navigation methods after the window is shown.
      * @returns A `UIWebView` element for configuration and embedding
      */
     function webview(): UIWebView;
@@ -10604,49 +12070,69 @@ Keep a reference to call navigation methods after the window is shown.
 
 /**
  * # HSUIWindow
-**A custom window with declarative UI building**
-`HSUIWindow` allows you to create custom windows with a SwiftUI-like
-declarative syntax. Build interfaces using shapes, text, images, and layout containers.
-** Note: ** A shown window stays on screen, with its callbacks, until it's hidden or destroyed,
-even if you don't keep a reference to it. Clicking the macOS close button only **hides** the
-window (firing the `onHide()` callback, if you have one configured) — it does not destroy the
-window while you hold a reference to it in JavaScript, so you can show it again. Call
-`destroy()` explicitly (for example from within an `onHide()` handler) if you want to release
-it sooner. See `onShow()`, `onHide()`, and `onDestroy()` below for the full set of lifecycle
-callbacks.
-## Building UI Elements
-## Modifying Elements
-## Examples
-**Simple window with text and shapes:**
-```javascript
-hs.ui.window({x: 100, y: 100, w: 300, h: 200})
-    .vstack()
-        .spacing(10)
-        .padding(20)
-        .text("Dashboard")
-            .font(HSFont.largeTitle())
-            .foregroundColor("#FFFFFF")
-        .rectangle()
-            .fill("#4A90E2")
-            .cornerRadius(10)
-            .frame({w: "90%", h: 80})
-    .end()
-    .backgroundColor("#2C3E50")
-    .show();
-```
-**Window with image:**
-```javascript
-const img = HSImage.fromPath("~/Pictures/photo.jpg")
-hs.ui.window({x: 100, y: 100, w: 400, h: 300})
-    .vstack()
-        .padding(20)
-        .image(img)
-            .resizable()
-            .aspectRatio("fit")
-            .frame({w: 360, h: 240})
-    .end()
-    .show();
-```
+ *
+ * **A custom window with declarative UI building**
+ *
+ * `HSUIWindow` allows you to create custom windows with a SwiftUI-like
+ * declarative syntax. Build interfaces using shapes, text, images, and layout containers.
+ *
+ * ** Note: ** A shown window stays on screen, with its callbacks, until it's hidden or destroyed,
+ * even if you don't keep a reference to it. Clicking the macOS close button only **hides** the
+ * window (firing the `onHide()` callback, if you have one configured) — it does not destroy the
+ * window while you hold a reference to it in JavaScript, so you can show it again. Call
+ * `destroy()` explicitly (for example from within an `onHide()` handler) if you want to release
+ * it sooner. See `onShow()`, `onHide()`, and `onDestroy()` below for the full set of lifecycle
+ * callbacks.
+ *
+ * ## Building UI Elements
+ *
+ * - **Shapes**: `rectangle()`, `circle()`
+ * - **Text**: `text(content)`
+ * - **Buttons**: `button(label)` — uses SwiftUI's native Button for press-state feedback
+ * - **Images**: `image(imageValue)`
+ * - **Video**: `video(videoValue)`
+ * - **Layout**: `vstack()`, `hstack()`, `zstack()`, `spacer()`
+ *
+ * ## Modifying Elements
+ *
+ * - **Shape modifiers**: `fill()`, `stroke()`, `strokeWidth()`, `cornerRadius()`
+ * - **Text modifiers**: `font()`, `foregroundColor()`
+ * - **Image modifiers**: `resizable()`, `aspectRatio(mode)`
+ * - **Layout modifiers**: `frame()`, `opacity()`, `padding()`, `spacing()`
+ *
+ * ## Examples
+ *
+ * **Simple window with text and shapes:**
+ * ```javascript
+ * hs.ui.window({x: 100, y: 100, w: 300, h: 200})
+ *     .vstack()
+ *         .spacing(10)
+ *         .padding(20)
+ *         .text("Dashboard")
+ *             .font(HSFont.largeTitle())
+ *             .foregroundColor("#FFFFFF")
+ *         .rectangle()
+ *             .fill("#4A90E2")
+ *             .cornerRadius(10)
+ *             .frame({w: "90%", h: 80})
+ *     .end()
+ *     .backgroundColor("#2C3E50")
+ *     .show();
+ * ```
+ *
+ * **Window with image:**
+ * ```javascript
+ * const img = HSImage.fromPath("~/Pictures/photo.jpg")
+ * hs.ui.window({x: 100, y: 100, w: 400, h: 300})
+ *     .vstack()
+ *         .padding(20)
+ *         .image(img)
+ *             .resizable()
+ *             .aspectRatio("fit")
+ *             .frame({w: 360, h: 240})
+ *     .end()
+ *     .show();
+ * ```
  */
 declare class HSUIWindow {
     /**
@@ -10676,11 +12162,12 @@ declare class HSUIWindow {
 
     /**
      * Set a callback to fire when the window is hidden
-Fires when `hide()` is called, **and** when the user clicks the macOS close
-button — clicking that button only hides the window from Hammerspoon's
-perspective (see the class-level note above), so this is the callback that reacts
-to it. Does not fire when the window is destroyed via `destroy()` — use
-`onDestroy()` for that.
+     *
+     * Fires when `hide()` is called, **and** when the user clicks the macOS close
+     * button — clicking that button only hides the window from Hammerspoon's
+     * perspective (see the class-level note above), so this is the callback that reacts
+     * to it. Does not fire when the window is destroyed via `destroy()` — use
+     * `onDestroy()` for that.
      * @param callback A JavaScript function called after the window is hidden
      * @returns Self for chaining
      */
@@ -10688,11 +12175,12 @@ to it. Does not fire when the window is destroyed via `destroy()` — use
 
     /**
      * Set a callback to fire after the window is destroyed via `destroy()`
-Only fires when `destroy()` is called explicitly — whether directly, or from
-within an `onHide()` handler. It does **not** fire when the user clicks the macOS
-close button by itself; that only hides the window, so use `onHide()` to react to
-the button click, and call `destroy()` from that handler if you also want to
-release the window.
+     *
+     * Only fires when `destroy()` is called explicitly — whether directly, or from
+     * within an `onHide()` handler. It does **not** fire when the user clicks the macOS
+     * close button by itself; that only hides the window, so use `onHide()` to react to
+     * the button click, and call `destroy()` from that handler if you also want to
+     * release the window.
      * @param callback A JavaScript function called after the window is destroyed
      * @returns Self for chaining
      */
@@ -10700,9 +12188,10 @@ release the window.
 
     /**
      * Show or hide the window's title bar
-By default windows have a title bar. Pass `false` to create a borderless window.
-`.closable()`, `.miniaturizable()`, and `.allowResize()` only take visual effect
-when the window is titled.
+     *
+     * By default windows have a title bar. Pass `false` to create a borderless window.
+     * `.closable()`, `.miniaturizable()`, and `.allowResize()` only take visual effect
+     * when the window is titled.
      * @param show Pass `false` to make the window borderless
      * @returns Self for chaining
      */
@@ -10710,7 +12199,8 @@ when the window is titled.
 
     /**
      * Show or hide the close button on the window
-Requires `.titled(true)` to be visible. Enabled by default.
+     *
+     * Requires `.titled(true)` to be visible. Enabled by default.
      * @param show Pass `false` to hide the close button
      * @returns Self for chaining
      */
@@ -10718,7 +12208,8 @@ Requires `.titled(true)` to be visible. Enabled by default.
 
     /**
      * Show or hide the miniaturize (yellow) button on the window
-Requires `.titled(true)` to be visible. Enabled by default.
+     *
+     * Requires `.titled(true)` to be visible. Enabled by default.
      * @param show Pass `false` to hide the miniaturize button
      * @returns Self for chaining
      */
@@ -10726,7 +12217,8 @@ Requires `.titled(true)` to be visible. Enabled by default.
 
     /**
      * Allow or prevent the user from resizing the window
-Enabled by default. Only has a visual effect when `.titled(true)` is also set.
+     *
+     * Enabled by default. Only has a visual effect when `.titled(true)` is also set.
      * @param enable Pass `false` to prevent the user from resizing the window
      * @returns Self for chaining
      */
@@ -10734,7 +12226,8 @@ Enabled by default. Only has a visual effect when `.titled(true)` is also set.
 
     /**
      * Set the text shown in the window's title bar
-Only visible when `.titled(true)` is set (the default). Can be called before or after `show()`.
+     *
+     * Only visible when `.titled(true)` is set (the default). Can be called before or after `show()`.
      * @param text The title bar text
      * @returns Self for chaining
      */
@@ -10742,8 +12235,17 @@ Only visible when `.titled(true)` is set (the default). Can be called before or 
 
     /**
      * Set the window stacking level
-Controls where this window sits in the macOS window hierarchy.
-Can be called before or after `show()`.
+     *
+     * Controls where this window sits in the macOS window hierarchy.
+     * Supported values:
+     * - `"normal"` — regular app window, sits with other app windows (default)
+     * - `"floating"` — floats above all normal windows
+     * - `"screenSaver"` — above the screen saver layer
+     * - `"dock"` — same level as the Dock
+     * - `"status"` — status bar level
+     * - `"popUpMenu"` — pop-up menu level
+     *
+     * Can be called before or after `show()`.
      * @param name The level name
      * @returns Self for chaining
      */
@@ -10751,9 +12253,21 @@ Can be called before or after `show()`.
 
     /**
      * Set how the window behaves with Spaces, fullscreen apps and window cycling, from a single behavior name
-`"fullScreenAuxiliary"` lets it appear over another app's fullscreen Space
-Use `behaviorList()` to combine several. An unknown name is logged and leaves the behavior unchanged.
-Can be called before or after `show()`.
+     *
+     * The names (which map to `NSWindow.CollectionBehavior`) are:
+     * - `"default"` — the system default
+     * - `"canJoinAllSpaces"` — appears on every Space
+     * - `"moveToActiveSpace"` — moves to the active Space when shown
+     * - `"managed"` — participates in Spaces and Exposé (the default for normal windows)
+     * - `"transient"` — floats in Spaces and is hidden by Exposé
+     * - `"stationary"` — unaffected by Exposé
+     * - `"participatesInCycle"` / `"ignoresCycle"` — whether ⌘` cycles to the window
+     * - `"fullScreenPrimary"` / `"fullScreenAuxiliary"` / `"fullScreenNone"` — how the window relates to fullscreen apps;
+     *   `"fullScreenAuxiliary"` lets it appear over another app's fullscreen Space
+     * - `"fullScreenAllowsTiling"` / `"fullScreenDisallowsTiling"` — whether it can be tiled in fullscreen
+     *
+     * Use `behaviorList()` to combine several. An unknown name is logged and leaves the behavior unchanged.
+     * Can be called before or after `show()`.
      * @param name The behavior name
      * @returns Self for chaining
      */
@@ -10761,10 +12275,12 @@ Can be called before or after `show()`.
 
     /**
      * Set how the window behaves with Spaces, fullscreen apps and window cycling, from a combination of behavior names
-`"canJoinAllSpaces"` with `"moveToActiveSpace"`; any two of `"managed"`, `"transient"` and `"stationary"`;
-`"participatesInCycle"` with `"ignoresCycle"`; any two of the `"fullScreen…"` Primary/Auxiliary/None names;
-and `"fullScreenAllowsTiling"` with `"fullScreenDisallowsTiling"`. Combining them throws, leaving the
-behavior unchanged. Unknown names are logged and ignored. Can be called before or after `show()`.
+     *
+     * See `behavior()` for the names. Some can't be combined, because AppKit treats them as mutually exclusive:
+     * `"canJoinAllSpaces"` with `"moveToActiveSpace"`; any two of `"managed"`, `"transient"` and `"stationary"`;
+     * `"participatesInCycle"` with `"ignoresCycle"`; any two of the `"fullScreen…"` Primary/Auxiliary/None names;
+     * and `"fullScreenAllowsTiling"` with `"fullScreenDisallowsTiling"`. Combining them throws, leaving the
+     * behavior unchanged. Unknown names are logged and ignored. Can be called before or after `show()`.
      * @param names The behavior names to combine, or an empty array for the system default
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -10792,7 +12308,6 @@ behavior unchanged. Unknown names are logged and ignored. Can be called before o
 
     /**
      * Add a text element
-or an `HSString` object (from `hs.ui.string()`) for reactive text
      * @param content The text to display — a plain JS string for static text,
      * @returns Self for chaining (apply modifiers like `font()`, `foregroundColor()`)
      */
@@ -10807,9 +12322,10 @@ or an `HSString` object (from `hs.ui.string()`) for reactive text
 
     /**
      * Add a video element
-Renders a SwiftUI `VideoPlayer` for the given `HSVideo`. Keep a reference to the
-`HSVideo` object to control playback (`play()`, `pause()`, `seek()`, `volume`) after
-the window is shown.
+     *
+     * Renders a SwiftUI `VideoPlayer` for the given `HSVideo`. Keep a reference to the
+     * `HSVideo` object to control playback (`play()`, `pause()`, `seek()`, `volume`) after
+     * the window is shown.
      * @param videoValue Video as an HSVideo object
      * @returns Self for chaining (apply modifiers like `frame()`, `opacity()`)
      */
@@ -10817,7 +12333,6 @@ the window is shown.
 
     /**
      * Add a button element
-or an `HSString` object (from `hs.ui.string()`) for reactive text
      * @param label The button label — a plain JS string for static text,
      * @returns Self for chaining (apply `.fill()`, `.cornerRadius()`, `.font()`,
      */
@@ -10849,8 +12364,9 @@ or an `HSString` object (from `hs.ui.string()`) for reactive text
 
     /**
      * Embed a web browser element created with `hs.ui.webview()` (macOS 26+)
-The element fills the available space in the window layout.
-Keep a reference to the element to call navigation methods after the window is shown.
+     *
+     * The element fills the available space in the window layout.
+     * Keep a reference to the element to call navigation methods after the window is shown.
      * @param element A `UIWebView` created via `hs.ui.webview()`
      * @returns Self for chaining
      */
@@ -10963,19 +12479,23 @@ Keep a reference to the element to call navigation methods after the window is s
 
 /**
  * # HSUIAlert
-**A temporary on-screen notification**
-Displays a message that automatically fades out after a specified duration.
-Without an explicit `.position()`, multiple alerts stack vertically and
-stay centered as they appear and disappear. With `.position()`, the alert
-appears at the given coordinates regardless of other alerts.
-## Example
-```javascript
-hs.ui.alert("Task completed!")
-    .font(HSFont.headline())
-    .duration(5)
-    .padding(30)
-    .show();
-```
+ *
+ * **A temporary on-screen notification**
+ *
+ * Displays a message that automatically fades out after a specified duration.
+ * Without an explicit `.position()`, multiple alerts stack vertically and
+ * stay centered as they appear and disappear. With `.position()`, the alert
+ * appears at the given coordinates regardless of other alerts.
+ *
+ * ## Example
+ *
+ * ```javascript
+ * hs.ui.alert("Task completed!")
+ *     .font(HSFont.headline())
+ *     .duration(5)
+ *     .padding(30)
+ *     .show();
+ * ```
  */
 declare class HSUIAlert {
     /**
@@ -11001,9 +12521,10 @@ declare class HSUIAlert {
 
     /**
      * Set a custom position for the alert
-When a position is set, the alert is shown at those coordinates and will not
-be stacked with other alerts. Coordinates are in points from the top-left of
-the visible screen area (below the menu bar), with y increasing downward.
+     *
+     * When a position is set, the alert is shown at those coordinates and will not
+     * be stacked with other alerts. Coordinates are in points from the top-left of
+     * the visible screen area (below the menu bar), with y increasing downward.
      * @param dict Dictionary with `x` and `y` coordinates
      * @returns Self for chaining
      */
@@ -11024,23 +12545,27 @@ the visible screen area (below the menu bar), with y increasing downward.
 
 /**
  * # HSUIDialog
-**A modal dialog with customizable buttons**
-Shows a blocking dialog with a message, optional informative text, and custom buttons.
-Use the callback to respond to button presses.
-## Example
-```javascript
-hs.ui.dialog("Save changes?")
-    .informativeText("Your document has unsaved changes.")
-    .buttons(["Save", "Don't Save", "Cancel"])
-    .onButton((index) => {
-        if (index === 0) {
-            console.log("Saving...");
-        } else if (index === 1) {
-            console.log("Discarding changes...");
-        }
-    })
-    .show();
-```
+ *
+ * **A modal dialog with customizable buttons**
+ *
+ * Shows a blocking dialog with a message, optional informative text, and custom buttons.
+ * Use the callback to respond to button presses.
+ *
+ * ## Example
+ *
+ * ```javascript
+ * hs.ui.dialog("Save changes?")
+ *     .informativeText("Your document has unsaved changes.")
+ *     .buttons(["Save", "Don't Save", "Cancel"])
+ *     .onButton((index) => {
+ *         if (index === 0) {
+ *             console.log("Saving...");
+ *         } else if (index === 1) {
+ *             console.log("Discarding changes...");
+ *         }
+ *     })
+ *     .show();
+ * ```
  */
 declare class HSUIDialog {
     /**
@@ -11087,38 +12612,43 @@ declare class HSUIDialog {
 
 /**
  * # HSUIFilePicker
-**A file or directory selection dialog**
-Shows a standard macOS open panel for selecting files or directories. Supports
-multiple selection, file type filtering, and more.
-## Examples
-### File Picker
-```javascript
-hs.ui.filePicker()
-    .message("Choose a file to open")
-    .allowedFileTypes(["txt", "md", "js"])
-    .onSelection((path) => {
-        if (path) {
-            console.log("Selected: " + path);
-        } else {
-            console.log("User cancelled");
-        }
-    })
-    .show();
-```
-### Directory Picker with Multiple Selection
-```javascript
-hs.ui.filePicker()
-    .message("Choose directories to backup")
-    .canChooseFiles(false)
-    .canChooseDirectories(true)
-    .allowsMultipleSelection(true)
-    .onSelection((paths) => {
-        if (paths) {
-            paths.forEach(p => console.log("Dir: " + p));
-        }
-    })
-    .show();
-```
+ *
+ * **A file or directory selection dialog**
+ *
+ * Shows a standard macOS open panel for selecting files or directories. Supports
+ * multiple selection, file type filtering, and more.
+ *
+ * ## Examples
+ *
+ * ### File Picker
+ * ```javascript
+ * hs.ui.filePicker()
+ *     .message("Choose a file to open")
+ *     .allowedFileTypes(["txt", "md", "js"])
+ *     .onSelection((path) => {
+ *         if (path) {
+ *             console.log("Selected: " + path);
+ *         } else {
+ *             console.log("User cancelled");
+ *         }
+ *     })
+ *     .show();
+ * ```
+ *
+ * ### Directory Picker with Multiple Selection
+ * ```javascript
+ * hs.ui.filePicker()
+ *     .message("Choose directories to backup")
+ *     .canChooseFiles(false)
+ *     .canChooseDirectories(true)
+ *     .allowsMultipleSelection(true)
+ *     .onSelection((paths) => {
+ *         if (paths) {
+ *             paths.forEach(p => console.log("Dir: " + p));
+ *         }
+ *     })
+ *     .show();
+ * ```
  */
 declare class HSUIFilePicker {
     /**
@@ -11186,22 +12716,26 @@ declare class HSUIFilePicker {
 
 /**
  * # HSUITextPrompt
-**A modal dialog with text input**
-Shows a blocking dialog with a text input field. The callback receives both the
-button index and the entered text.
-## Example
-```javascript
-hs.ui.textPrompt("Enter your name")
-    .informativeText("Please provide your full name")
-    .defaultText("John Doe")
-    .buttons(["OK", "Cancel"])
-    .onButton((buttonIndex, text) => {
-        if (buttonIndex === 0) {
-            console.log("User entered: " + text);
-        }
-    })
-    .show();
-```
+ *
+ * **A modal dialog with text input**
+ *
+ * Shows a blocking dialog with a text input field. The callback receives both the
+ * button index and the entered text.
+ *
+ * ## Example
+ *
+ * ```javascript
+ * hs.ui.textPrompt("Enter your name")
+ *     .informativeText("Please provide your full name")
+ *     .defaultText("John Doe")
+ *     .buttons(["OK", "Cancel"])
+ *     .onButton((buttonIndex, text) => {
+ *         if (buttonIndex === 0) {
+ *             console.log("User entered: " + text);
+ *         }
+ *     })
+ *     .show();
+ * ```
  */
 declare class HSUITextPrompt {
     /**
@@ -11241,104 +12775,124 @@ declare class HSUITextPrompt {
 
 /**
  * # hs.ui.webview
-**A web browser element for embedding in `hs.ui.window` layouts**
-Available on macOS 26.0 or later, `hs.ui.webview()` creates a web browser element backed
-by a SwiftUI `WebView` and `WebPage`. Embed it in any `hs.ui.window` using
-`.webview(element)` — it fills the available space and can sit alongside other elements in
-stacks.
-```javascript
-const wv = hs.ui.webview()
-    .toolbar(["back", "forward", "reload", "url"])
-    .loadURL("https://apple.com")
-
-hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
-    .titled(true)
-    .closable(true)
-    .allowResize(true)
-    .level("normal")
-    .webview(wv)
-    .show()
-```
-Because `wv` is a regular JavaScript object you can keep a reference and call navigation
-```javascript
-wv.loadURL("https://google.com")
-wv.goBack()
-```
-## Custom Toolbar Example
-```javascript
-const wv = hs.ui.webview()
-    .toolbar([
-        "back", "forward", "reload", "url",
-        {title: "Home", systemImage: "house", callback: () => wv.loadURL("https://apple.com")},
-        {title: "Reload HS", callback: () => hs.reload()}
-    ])
-    .loadURL("https://apple.com")
-
-hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
-    .webview(wv)
-    .show()
-```
-## Full Example with Callbacks
-```javascript
-const wv = hs.ui.webview()
-    .toolbar(["back", "forward", "reload", "url"])
-    .inspectable(true)
-    .onNavigate((url) => console.log("Navigated to: " + url))
-    .onTitleChange((title) => console.log("Title: " + title))
-    .onLoadChange((loading, url, title, progress) => {
-        if (!loading) console.log("Page ready: " + url)
-    })
-    .loadURL("https://apple.com")
-
-hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
-    .webview(wv)
-    .show()
-```
-## Navigation Policy Example
-```javascript
-const wv = hs.ui.webview()
-    .toolbar(["back", "forward", "reload", "url"])
-    .onNavigationDecision((url) => {
-        return !url.includes("evil.com")
-    })
-    .loadURL("https://apple.com")
-
-hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
-    .webview(wv)
-    .show()
-```
-## Page Messages Example
-The page can call back into your config with
-`webkit.messageHandlers.<name>.postMessage(body)`, which returns a Promise that settles
-```javascript
-const wv = hs.ui.webview()
-    .onMessage("hs", (body) => {
-        console.log("Page says: " + body.text)
-        return "Thanks!"
-    })
-    .loadHTML(`<button onclick="send()">Send</button><script>
-        async function send() {
-            const reply = await webkit.messageHandlers.hs.postMessage({text: "hello"})
-            document.body.append(reply)
-        }
-    </script>`)
-
-hs.ui.window({x: 100, y: 100, w: 400, h: 300}).webview(wv).show()
-```
-## JavaScript Evaluation Example
-```javascript
-const wv = hs.ui.webview().loadURL("https://apple.com")
-hs.ui.window({x: 100, y: 100, w: 1024, h: 768}).webview(wv).show()
-
-// Fire and forget
-wv.execJS("document.body.style.backgroundColor = 'lightyellow'")
-
-// With result (the script must `return` its value)
-wv.evalJSResult("return document.title", (result, error) => {
-    if (error) { console.log("Error: " + error) }
-    else { console.log("Title: " + result) }
-})
-```
+ *
+ * **A web browser element for embedding in `hs.ui.window` layouts**
+ *
+ * Available on macOS 26.0 or later, `hs.ui.webview()` creates a web browser element backed
+ * by a SwiftUI `WebView` and `WebPage`. Embed it in any `hs.ui.window` using
+ * `.webview(element)` — it fills the available space and can sit alongside other elements in
+ * stacks.
+ *
+ * Create the element first, configure it, then embed it into a window:
+ *
+ * ```javascript
+ * const wv = hs.ui.webview()
+ *     .toolbar(["back", "forward", "reload", "url"])
+ *     .loadURL("https://apple.com")
+ *
+ * hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
+ *     .titled(true)
+ *     .closable(true)
+ *     .allowResize(true)
+ *     .level("normal")
+ *     .webview(wv)
+ *     .show()
+ * ```
+ *
+ * Because `wv` is a regular JavaScript object you can keep a reference and call navigation
+ * methods on it at any time after the window is shown:
+ *
+ * ```javascript
+ * wv.loadURL("https://google.com")
+ * wv.goBack()
+ * ```
+ *
+ * ## Custom Toolbar Example
+ *
+ * ```javascript
+ * const wv = hs.ui.webview()
+ *     .toolbar([
+ *         "back", "forward", "reload", "url",
+ *         {title: "Home", systemImage: "house", callback: () => wv.loadURL("https://apple.com")},
+ *         {title: "Reload HS", callback: () => hs.reload()}
+ *     ])
+ *     .loadURL("https://apple.com")
+ *
+ * hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
+ *     .webview(wv)
+ *     .show()
+ * ```
+ *
+ * ## Full Example with Callbacks
+ *
+ * ```javascript
+ * const wv = hs.ui.webview()
+ *     .toolbar(["back", "forward", "reload", "url"])
+ *     .inspectable(true)
+ *     .onNavigate((url) => console.log("Navigated to: " + url))
+ *     .onTitleChange((title) => console.log("Title: " + title))
+ *     .onLoadChange((loading, url, title, progress) => {
+ *         if (!loading) console.log("Page ready: " + url)
+ *     })
+ *     .loadURL("https://apple.com")
+ *
+ * hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
+ *     .webview(wv)
+ *     .show()
+ * ```
+ *
+ * ## Navigation Policy Example
+ *
+ * ```javascript
+ * const wv = hs.ui.webview()
+ *     .toolbar(["back", "forward", "reload", "url"])
+ *     .onNavigationDecision((url) => {
+ *         return !url.includes("evil.com")
+ *     })
+ *     .loadURL("https://apple.com")
+ *
+ * hs.ui.window({x: 100, y: 100, w: 1024, h: 768})
+ *     .webview(wv)
+ *     .show()
+ * ```
+ *
+ * ## Page Messages Example
+ *
+ * The page can call back into your config with
+ * `webkit.messageHandlers.<name>.postMessage(body)`, which returns a Promise that settles
+ * with whatever your callback returns:
+ *
+ * ```javascript
+ * const wv = hs.ui.webview()
+ *     .onMessage("hs", (body) => {
+ *         console.log("Page says: " + body.text)
+ *         return "Thanks!"
+ *     })
+ *     .loadHTML(`<button onclick="send()">Send</button><script>
+ *         async function send() {
+ *             const reply = await webkit.messageHandlers.hs.postMessage({text: "hello"})
+ *             document.body.append(reply)
+ *         }
+ *     </script>`)
+ *
+ * hs.ui.window({x: 100, y: 100, w: 400, h: 300}).webview(wv).show()
+ * ```
+ *
+ * ## JavaScript Evaluation Example
+ *
+ * ```javascript
+ * const wv = hs.ui.webview().loadURL("https://apple.com")
+ * hs.ui.window({x: 100, y: 100, w: 1024, h: 768}).webview(wv).show()
+ *
+ * // Fire and forget
+ * wv.execJS("document.body.style.backgroundColor = 'lightyellow'")
+ *
+ * // With result (the script must `return` its value)
+ * wv.evalJSResult("return document.title", (result, error) => {
+ *     if (error) { console.log("Error: " + error) }
+ *     else { console.log("Title: " + result) }
+ * })
+ * ```
  */
 declare class UIWebView {
     /**
@@ -11388,7 +12942,8 @@ declare class UIWebView {
 
     /**
      * Enable or disable the Safari Web Inspector for this web view
-When enabled, the web view appears in Safari → Develop menu.
+     *
+     * When enabled, the web view appears in Safari → Develop menu.
      * @param value Pass `true` to enable the Web Inspector
      * @returns Self for chaining
      */
@@ -11396,10 +12951,17 @@ When enabled, the web view appears in Safari → Develop menu.
 
     /**
      * Configure the toolbar with a list of standard and custom items
-The toolbar renders above the web view. Each element of the array is either a string
-naming a standard control or a dictionary describing a custom button.
-An empty array (or omitting this call) hides the toolbar.
-Standard string items: `"back"`, `"forward"`, `"reload"`, `"url"`, `"spacer"`.
+     *
+     * The toolbar renders above the web view. Each element of the array is either a string
+     * naming a standard control or a dictionary describing a custom button.
+     * An empty array (or omitting this call) hides the toolbar.
+     *
+     * Standard string items: `"back"`, `"forward"`, `"reload"`, `"url"`, `"spacer"`.
+     *
+     * Custom button dictionaries accept:
+     * - `title` (string, optional) — button label
+     * - `systemImage` (string, optional) — SF Symbol name (e.g. `"house"`)
+     * - `callback` (function, required) — called when the button is clicked
      * @remarks The toolbar will not be shown if the web view is in a borderless window
      * @param items Toolbar items in display order
      * @returns Self for chaining
@@ -11408,7 +12970,8 @@ Standard string items: `"back"`, `"forward"`, `"reload"`, `"url"`, `"spacer"`.
 
     /**
      * Enable or disable the macOS back/forward trackpad swipe gestures
-Gestures are enabled by default. Pass `false` to disable them.
+     *
+     * Gestures are enabled by default. Pass `false` to disable them.
      * @param enabled Pass `false` to disable back/forward swipe gestures
      * @returns Self for chaining
      */
@@ -11416,7 +12979,8 @@ Gestures are enabled by default. Pass `false` to disable them.
 
     /**
      * Enable or disable the trackpad pinch-to-zoom magnification gesture
-The gesture is enabled by default. Pass `false` to disable it.
+     *
+     * The gesture is enabled by default. Pass `false` to disable it.
      * @param enabled Pass `false` to disable pinch-to-zoom
      * @returns Self for chaining
      */
@@ -11424,7 +12988,8 @@ The gesture is enabled by default. Pass `false` to disable it.
 
     /**
      * Enable or disable link preview popovers shown on force-click
-Link previews are enabled by default. Pass `false` to disable them.
+     *
+     * Link previews are enabled by default. Pass `false` to disable them.
      * @param enabled Pass `false` to disable link previews
      * @returns Self for chaining
      */
@@ -11432,7 +12997,8 @@ Link previews are enabled by default. Pass `false` to disable them.
 
     /**
      * Control whether the web page background is visible
-Pass `false` to make the web view background transparent. Enabled (visible) by default.
+     *
+     * Pass `false` to make the web view background transparent. Enabled (visible) by default.
      * @param visible Pass `false` to hide the web content background
      * @returns Self for chaining
      */
@@ -11440,7 +13006,8 @@ Pass `false` to make the web view background transparent. Enabled (visible) by d
 
     /**
      * Register a callback that fires when loading state or progress changes
-Called whenever `isLoading`, `url`, `title`, or `estimatedProgress` changes.
+     *
+     * Called whenever `isLoading`, `url`, `title`, or `estimatedProgress` changes.
      * @remarks If you register a callback here, it is no longer possible to automatically release the webview via JS garbage collection. You will need to manually call `.destroy()` and also cause this callback to trigger
      * @param callback Called with current loading state
      * @returns Self for chaining
@@ -11465,7 +13032,8 @@ Called whenever `isLoading`, `url`, `title`, or `estimatedProgress` changes.
 
     /**
      * Register a callback that controls whether navigation is allowed
-Called before each navigation. Return `true` to allow or `false` to block.
+     *
+     * Called before each navigation. Return `true` to allow or `false` to block.
      * @param callback Return `true` to allow, `false` to block
      * @returns Self for chaining
      */
@@ -11473,11 +13041,17 @@ Called before each navigation. Return `true` to allow or `false` to block.
 
     /**
      * Let the page send messages to a callback
-Adds `webkit.messageHandlers.<name>` to the page, for this and every later page the web
-view loads. When the page calls `webkit.messageHandlers.<name>.postMessage(body)`, the
-callback is called with `body`, and the Promise `postMessage()` returns settles with the
-The body and the result can be strings, numbers, booleans, `null`, dates, and arrays and
-plain objects of those. Calling this again with the same name replaces the callback.
+     *
+     * Adds `webkit.messageHandlers.<name>` to the page, for this and every later page the web
+     * view loads. When the page calls `webkit.messageHandlers.<name>.postMessage(body)`, the
+     * callback is called with `body`, and the Promise `postMessage()` returns settles with the
+     * callback's result:
+     * - a plain value resolves it with that value
+     * - a Promise resolves or rejects it once that Promise settles
+     * - a thrown error rejects it with the error's message
+     *
+     * The body and the result can be strings, numbers, booleans, `null`, dates, and arrays and
+     * plain objects of those. Calling this again with the same name replaces the callback.
      * @remarks Any page loaded in the web view can send these messages, so treat them as untrusted input
      * @param name The handler name the page uses, as in `webkit.messageHandlers.<name>`
      * @param callback Called with each message the page sends. Its result is the reply
@@ -11487,7 +13061,8 @@ plain objects of those. Calling this again with the same name replaces the callb
 
     /**
      * Stop the page from sending messages with a name registered by `onMessage()`
-Removes `webkit.messageHandlers.<name>` from the page.
+     *
+     * Removes `webkit.messageHandlers.<name>` from the page.
      * @param name The handler name passed to `onMessage()`
      * @returns Self for chaining
      */
@@ -11495,7 +13070,8 @@ Removes `webkit.messageHandlers.<name>` from the page.
 
     /**
      * Execute JavaScript in the web page without capturing the result
-The script runs as the body of an async function, so it can use `await`.
+     *
+     * The script runs as the body of an async function, so it can use `await`.
      * @param script The JavaScript function body to execute
      * @returns Self for chaining
      */
@@ -11503,16 +13079,19 @@ The script runs as the body of an async function, so it can use `await`.
 
     /**
      * Execute JavaScript in the web page and deliver the result to a callback
-The script is not evaluated as an expression: it runs as the body of an async
-function, and the result is the value it returns. Use `return` to send a value
-back — a script without one, such as `"document.title"`, gives a result of `null`.
-Because the function is async, the script can use `await`, and if it returns a
-Promise the callback gets the value the Promise resolves to.
-The result is copied out of the page, so it must be a number, string, boolean,
-array, plain object, `null` or `undefined` (which arrives as `null`). Anything else,
-such as a DOM element or a function, is delivered as an error.
-If the script throws, or returns a Promise that rejects, the error is the page's own
-message for it, such as `"Error: boom"` or `"SyntaxError: Unexpected token '}'"`.
+     *
+     * The script is not evaluated as an expression: it runs as the body of an async
+     * function, and the result is the value it returns. Use `return` to send a value
+     * back — a script without one, such as `"document.title"`, gives a result of `null`.
+     * Because the function is async, the script can use `await`, and if it returns a
+     * Promise the callback gets the value the Promise resolves to.
+     *
+     * The result is copied out of the page, so it must be a number, string, boolean,
+     * array, plain object, `null` or `undefined` (which arrives as `null`). Anything else,
+     * such as a DOM element or a function, is delivered as an error.
+     *
+     * If the script throws, or returns a Promise that rejects, the error is the page's own
+     * message for it, such as `"Error: boom"` or `"SyntaxError: Unexpected token '}'"`.
      * @param script The JavaScript function body to run, which should `return` the result
      * @param callback Called with the result or an error message
      * @returns Self for chaining
@@ -11553,46 +13132,56 @@ message for it, such as `"Error: boom"` or `"SyntaxError: Unexpected token '}'"`
 
 /**
  * Handle URL events received by Hammerspoon 2.
-The module responds to `hammerspoon2://` URLs and, when Hammerspoon 2 is
-configured as the system default handler, also to `http://`, `https://`,
-and `mailto:` URLs.
-## Responding to custom hammerspoon2:// events
-URLs take the form `hammerspoon2://eventName?key=value&key2=value2`.
-The host component (`eventName`) selects the registered callback.
-```js
-hs.urlevent.bind("myEvent", (eventName, params, pid, url) => {
-    console.log("param foo = " + params["foo"])
-})
-
-// Remove a binding
-hs.urlevent.bind("myEvent", null)
-```
-## Intercepting http / https / mailto URLs
-Set `hs.urlevent.httpCallback` (or `mailtoCallback`) to a function.
-You must also set Hammerspoon 2 as the system default handler for the
-relevant scheme — see `setDefaultHandler(_:_:)`.
-```js
-hs.urlevent.httpCallback = (scheme, host, params, fullURL, pid) => {
-    // Forward to a real browser rather than swallowing the link
-    hs.urlevent.openURLWithBundle(fullURL, "com.apple.safari")
-}
-```
-## Querying and changing default handlers
-```js
-const current = hs.urlevent.getDefaultHandler("https")
-console.log("Current HTTPS handler: " + current)
-
-const all = hs.urlevent.getAllHandlersForScheme("https")
-console.log("Available: " + all.join(", "))
-
-hs.urlevent.setDefaultHandler("https", "com.apple.safari")
-```
+ *
+ * The module responds to `hammerspoon2://` URLs and, when Hammerspoon 2 is
+ * configured as the system default handler, also to `http://`, `https://`,
+ * and `mailto:` URLs.
+ *
+ * ## Responding to custom hammerspoon2:// events
+ *
+ * URLs take the form `hammerspoon2://eventName?key=value&key2=value2`.
+ * The host component (`eventName`) selects the registered callback.
+ *
+ * ```js
+ * hs.urlevent.bind("myEvent", (eventName, params, pid, url) => {
+ *     console.log("param foo = " + params["foo"])
+ * })
+ *
+ * // Remove a binding
+ * hs.urlevent.bind("myEvent", null)
+ * ```
+ *
+ * ## Intercepting http / https / mailto URLs
+ *
+ * Set `hs.urlevent.httpCallback` (or `mailtoCallback`) to a function.
+ * You must also set Hammerspoon 2 as the system default handler for the
+ * relevant scheme — see `setDefaultHandler(_:_:)`.
+ *
+ * ```js
+ * hs.urlevent.httpCallback = (scheme, host, params, fullURL, pid) => {
+ *     // Forward to a real browser rather than swallowing the link
+ *     hs.urlevent.openURLWithBundle(fullURL, "com.apple.safari")
+ * }
+ * ```
+ *
+ * ## Querying and changing default handlers
+ *
+ * ```js
+ * const current = hs.urlevent.getDefaultHandler("https")
+ * console.log("Current HTTPS handler: " + current)
+ *
+ * const all = hs.urlevent.getAllHandlersForScheme("https")
+ * console.log("Available: " + all.join(", "))
+ *
+ * hs.urlevent.setDefaultHandler("https", "com.apple.safari")
+ * ```
  */
 declare namespace hs.urlevent {
     /**
      * Register or remove a callback for a named `hammerspoon2://` URL event.
-The URL format is `hammerspoon2://eventName?key=value`. The host
-component (`eventName`) selects the callback to invoke.
+     *
+     * The URL format is `hammerspoon2://eventName?key=value`. The host
+     * component (`eventName`) selects the callback to invoke.
      * @param eventName The URL host component identifying the event.
      * @param callback A function receiving `(eventName, params, senderPID, fullURL)`, or `null` to remove any existing binding.
      */
@@ -11629,8 +13218,9 @@ component (`eventName`) selects the callback to invoke.
 
     /**
      * Set the default application for a URL scheme.
-macOS may display a confirmation dialog for sensitive schemes such as
-`http` and `https`. For custom schemes (`hammerspoon2`) no dialog is shown.
+     *
+     * macOS may display a confirmation dialog for sensitive schemes such as
+     * `http` and `https`. For custom schemes (`hammerspoon2`) no dialog is shown.
      * @param scheme The scheme to configure, without `://` (e.g. `"https"`, `"mailto"`).
      * @param bundleID Bundle identifier of the application to set as default.
      * @returns `true` if the change was accepted by the system.
@@ -11639,15 +13229,17 @@ macOS may display a confirmation dialog for sensitive schemes such as
 
     /**
      * Callback invoked when Hammerspoon 2 receives an `http://` or `https://` URL.
-Fires only when Hammerspoon 2 is the system default handler for `http`/`https`.
-Assign `null` to remove the callback.
+     *
+     * Fires only when Hammerspoon 2 is the system default handler for `http`/`https`.
+     * Assign `null` to remove the callback.
      */
     let httpCallback: ((scheme: string, host: string, params: Record<string, string>, fullURL: string, senderPID: number) => void) | null;
 
     /**
      * Callback invoked when Hammerspoon 2 receives a `mailto:` URL.
-Fires only when Hammerspoon 2 is the system default handler for `mailto`.
-Assign `null` to remove the callback.
+     *
+     * Fires only when Hammerspoon 2 is the system default handler for `mailto`.
+     * Assign `null` to remove the callback.
      */
     let mailtoCallback: ((scheme: string, host: string, params: Record<string, string>, fullURL: string, senderPID: number) => void) | null;
 
@@ -11690,33 +13282,38 @@ declare namespace hs.usb {
 
 /**
  * Module for storing small amounts of data that persists across Hammerspoon restarts.
-Values are stored in a dedicated `UserDefaults` suite named "hs.userdefaults", kept
-separate from the app's own preferences so it doesn't get confused with Hammerspoon's
-own configuration when inspected with tools like the `defaults` command line utility.
-Because the suite is just a standard macOS preferences domain, it can also be inspected
-```sh
-# Read every value stored by hs.userdefaults
-defaults read hs.userdefaults
-
-# Read a single key
-defaults read hs.userdefaults someKey
-
-# Write a value from the command line
-defaults write hs.userdefaults someKey "some value"
-
-# Delete a key
-defaults delete hs.userdefaults someKey
-```
-information such as passwords, API keys, or tokens.
+ *
+ * Values are stored in a dedicated `UserDefaults` suite named "hs.userdefaults", kept
+ * separate from the app's own preferences so it doesn't get confused with Hammerspoon's
+ * own configuration when inspected with tools like the `defaults` command line utility.
+ *
+ * JavaScript ↔ storage type mapping:
+ * - JavaScript strings, numbers, booleans, arrays and objects round-trip directly
+ * - JavaScript `Date` objects round-trip directly (no special API required)
+ * - JavaScript `null`/`undefined` are not storable values; use `clear()` to remove a key
+ *
+ * Because the suite is just a standard macOS preferences domain, it can also be inspected
+ * and manipulated from the command line with the `defaults` tool:
+ * ```sh
+ * # Read every value stored by hs.userdefaults
+ * defaults read hs.userdefaults
+ *
+ * # Read a single key
+ * defaults read hs.userdefaults someKey
+ *
+ * # Write a value from the command line
+ * defaults write hs.userdefaults someKey "some value"
+ *
+ * # Delete a key
+ * defaults delete hs.userdefaults someKey
+ * ```
  */
 declare namespace hs.userdefaults {
     /**
      * Store a value under the given key. The value persists across Hammerspoon restarts.
-Values must be storable as a property list: strings, numbers, booleans, Dates,
-arrays, or objects (which may themselves nest any of those types).
-is rejected with a logged error and nothing is stored. JavaScript functions have
-no property-list representation; if passed directly, or nested inside an array or
-object, they are silently stored as an empty object.
+     *
+     * Values must be storable as a property list: strings, numbers, booleans, Dates,
+     * arrays, or objects (which may themselves nest any of those types).
      * @remarks Passing a native object from another `hs.*` module (e.g. a timer or hotkey)
      * @param key The name of the setting
      * @param value A string, number, boolean, Date, array, or object to store
@@ -11770,14 +13367,17 @@ object, they are silently stored as an empty object.
 
 /**
  * Control and query Wi-Fi interfaces, scan for networks, and watch for Wi-Fi events.
-Built on CoreWLAN. Fields that reveal network identity — `ssid`, `bssid`, `countryCode`,
-and BSSIDs inside scan results — are only populated once Location Services is enabled and
-the user has authorized this app; call `hs.permissions.requestLocation()` first (the same
-gate `hs.location` uses). Without authorization these fields are `null`/omitted, not errors.
-## Watching for Wi-Fi events
-```js
-hs.wifi.on('ssidChange', info => console.log("SSID changed on " + info.interface))
-```
+ *
+ * Built on CoreWLAN. Fields that reveal network identity — `ssid`, `bssid`, `countryCode`,
+ * and BSSIDs inside scan results — are only populated once Location Services is enabled and
+ * the user has authorized this app; call `hs.permissions.requestLocation()` first (the same
+ * gate `hs.location` uses). Without authorization these fields are `null`/omitted, not errors.
+ *
+ * ## Watching for Wi-Fi events
+ *
+ * ```js
+ * hs.wifi.on('ssidChange', info => console.log("SSID changed on " + info.interface))
+ * ```
  */
 declare namespace hs.wifi {
     /**
@@ -11788,11 +13388,13 @@ declare namespace hs.wifi {
 
     /**
      * Returns detailed information about a Wi-Fi interface.
-This is safe to call frequently. The interface's cached scan results and its configuration are
-available from `cachedScanResults()` and `configuration()`, which are kept separate because
-fetching them can leak memory inside macOS.
-`active` reports whether the interface is in use, and does not need Location Services
-authorization, so it's a way to check that Wi-Fi is connected without that permission.
+     *
+     * This is safe to call frequently. The interface's cached scan results and its configuration are
+     * available from `cachedScanResults()` and `configuration()`, which are kept separate because
+     * fetching them can leak memory inside macOS.
+     *
+     * `active` reports whether the interface is in use, and does not need Location Services
+     * authorization, so it's a way to check that Wi-Fi is connected without that permission.
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
      * @returns a table with keys `interface, active, power, ssid, bssid, security, interfaceMode, activePHYMode, rssi, noise, transmitRate, transmitPower, countryCode, hardwareAddress, wlanChannel, supportedChannels`; or null if the interface doesn't exist. `ssid`/`bssid`/`countryCode`/`wlanChannel` may be absent without Location Services authorization.
      */
@@ -11800,9 +13402,10 @@ authorization, so it's a way to check that Wi-Fi is connected without that permi
 
     /**
      * Returns the networks an interface found in its most recent scan, without starting a new scan.
-Avoid calling this frequently: it has been seen to leak memory each time macOS refreshes the
-scan cache, so polling it in a long-running configuration can grow Hammerspoon's memory use. Use
-`scanNetworks()` for a fresh scan, or `on('scanCacheUpdated', ...)` to learn when the cache changes.
+     *
+     * Avoid calling this frequently: it has been seen to leak memory each time macOS refreshes the
+     * scan cache, so polling it in a long-running configuration can grow Hammerspoon's memory use. Use
+     * `scanNetworks()` for a fresh scan, or `on('scanCacheUpdated', ...)` to learn when the cache changes.
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
      * @returns an array of network tables, with the same keys as `scanNetworks()`; or null if the interface doesn't exist
      */
@@ -11810,8 +13413,9 @@ scan cache, so polling it in a long-running configuration can grow Hammerspoon's
 
     /**
      * Returns an interface's configuration: its remembered network profiles and administrator settings.
-Avoid calling this frequently: macOS leaks memory on every call, so polling this function in a
-long-running configuration grows Hammerspoon's memory use.
+     *
+     * Avoid calling this frequently: macOS leaks memory on every call, so polling this function in a
+     * long-running configuration grows Hammerspoon's memory use.
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
      * @returns a table with keys `rememberJoinedNetworks, requireAdministratorForAssociation, requireAdministratorForIBSSMode, requireAdministratorForPower, networkProfiles`, where `networkProfiles` is an array of tables with keys `ssid, security`; or null if the interface doesn't exist. Profile `ssid`s may be absent without Location Services authorization.
      */
@@ -11840,7 +13444,8 @@ long-running configuration grows Hammerspoon's memory use.
 
     /**
      * Scans for a network by SSID and joins it. Enterprise networks are not supported.
-This can take several seconds; it runs off the main thread so it does not block the app.
+     *
+     * This can take several seconds; it runs off the main thread so it does not block the app.
      * @param ssid the SSID of the network to join
      * @param passphrase the network passphrase; required for WEP/WPA/WPA2/WPA3 Personal networks
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
@@ -11850,7 +13455,8 @@ This can take several seconds; it runs off the main thread so it does not block 
 
     /**
      * Scans for visible Wi-Fi networks.
-This can take a few seconds; it runs off the main thread so it does not block the app.
+     *
+     * This can take a few seconds; it runs off the main thread so it does not block the app.
      * @param interface the interface name as returned by `interfaces()`; omit for the system's default Wi-Fi interface
      * @returns A Promise that resolves to an array of network tables, each with keys `ssid, bssid, rssi, noise, ibss, countryCode, beaconInterval, security, phyModes, wlanChannel, informationElementData`; or rejects if the interface doesn't exist or the scan fails. `bssid`/`countryCode` may be absent without Location Services authorization. `informationElementData` is raw beacon/probe-response data returned as an array of byte values (0-255) rather than a string, since it can contain sequences that are unsafe to render as text.
      */
@@ -11858,6 +13464,9 @@ This can take a few seconds; it runs off the main thread so it does not block th
 
     /**
      * Register a listener for a Wi-Fi interface event.
+     * Info keys by event:
+     *  - `"ssidChange"`, `"bssidChange"`, `"countryCodeChange"`, `"linkChange"`, `"modeChange"`, `"powerChange"`, `"scanCacheUpdated"`: `interface: string`
+     *  - `"linkQualityChange"`: `interface: string`, `rssi: number`, `transmitRate: number`
      * @param event The event to listen for
      * @param listener Called with an info dictionary describing the event; see the keys listed above
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -11893,12 +13502,13 @@ declare namespace hs.window {
 
     /**
      * Get all windows from all applications
-This includes windows in native fullscreen and on other Spaces, with one limitation: macOS
-only reveals a window on a Space that isn't visible if its app has already handed that
-window to an accessibility client, e.g. because Hammerspoon listed it while its Space was
-visible. A window that no accessibility client has looked at since it was created is
-missing until its Space is next visible, unless it's its app's main or focused window,
-which are always included.
+     *
+     * This includes windows in native fullscreen and on other Spaces, with one limitation: macOS
+     * only reveals a window on a Space that isn't visible if its app has already handed that
+     * window to an accessibility client, e.g. because Hammerspoon listed it while its Space was
+     * visible. A window that no accessibility client has looked at since it was created is
+     * missing until its Space is next visible, unless it's its app's main or focused window,
+     * which are always included.
      * @returns An array of all windows
      */
     function allWindows(): HSWindow[];
@@ -11911,8 +13521,9 @@ which are always included.
 
     /**
      * Get windows for a specific application
-Like `allWindows()`, this includes windows in native fullscreen and on other Spaces, with the
-same limitation.
+     *
+     * Like `allWindows()`, this includes windows in native fullscreen and on other Spaces, with the
+     * same limitation.
      * @param app An HSApplication object
      * @returns An array of windows for that application, or an empty array if `app` is null
      */
@@ -11940,7 +13551,8 @@ same limitation.
 
     /**
      * Capture the current on-screen contents of the window with the given ID.
-Requires **Screen Recording** permission.
+     *
+     * Requires **Screen Recording** permission.
      * @param id The window's underlying ID (see the `id` property on `hs.window` objects).
      * @param keepTransparency Whether to preserve the window's alpha channel. If `false` (the default), transparent regions are filled with an opaque black background.
      * @returns Resolves with the captured image, or rejects if no window with that ID can be found, or the capture fails.
@@ -11948,8 +13560,27 @@ Requires **Screen Recording** permission.
     function snapshotForID(id: number, keepTransparency?: boolean): Promise<HSImage>;
 
     /**
+     * The spaces the window with the given ID is on. This is the same as an `HSWindow`'s
+     * `spaces`, for windows you only have the ID of, such as those from `HSSpace.windowIDs()`
+     * (Hammerspoon can't make `HSWindow` objects for windows on other spaces).
+     * @param id The window's ID
+     * @returns An array of HSSpace objects, empty if there's no such window
+     */
+    function spacesForID(id: number): HSSpace[];
+
+    /**
+     * Moves the window with the given ID to another space, without switching to it. This is the
+     * same as an `HSWindow`'s `moveToSpace()`, for windows you only have the ID of, such as
+     * those from `HSSpace.windowIDs()`.
+     * @param id The window's ID
+     * @param space The desktop to move the window to
+     * @returns A Promise that resolves once the window is on that space, or
+     */
+    function moveToSpaceForID(id: number, space: HSSpace): Promise<void>;
+
+    /**
      * Find windows by title
-Parameter title: The window title to search for. All windows with titles that include this string, will be matched
+     * Parameter title: The window title to search for. All windows with titles that include this string, will be matched
      * @param title The window title to search for. All windows with titles that include this string, will be matched
      * @returns An array of HSWindow objects with matching titles
      */
@@ -11963,7 +13594,7 @@ Parameter title: The window title to search for. All windows with titles that in
 
     /**
      * Move a window to left half of screen
-Parameter win: An HSWindow object
+     * Parameter win: An HSWindow object
      * @param win An HSWindow object
      * @returns True if the operation was successful, otherwise False
      */
@@ -11971,7 +13602,7 @@ Parameter win: An HSWindow object
 
     /**
      * Move a window to right half of screen
-Parameter win: An HSWindow object
+     * Parameter win: An HSWindow object
      * @param win An HSWindow object
      * @returns True if the operation was successful, otherwise False
      */
@@ -11979,7 +13610,7 @@ Parameter win: An HSWindow object
 
     /**
      * Maximize a window
-Parameter win: An HSWindow object
+     * Parameter win: An HSWindow object
      * @param win An HSWindow object
      * @returns True if the operation was successful, otherwise false
      */
@@ -11994,32 +13625,47 @@ Parameter win: An HSWindow object
 
 /**
  * Object representing a window. You should not instantiate these directly, but rather, use the methods in hs.window to create them for you.
-Note that this type uses private macOS APIs
+ * Note that this type uses private macOS APIs
  */
 declare class HSWindow {
     /**
      * Move and resize the window, reporting whether it succeeded
-The same as setting `frame`, except that the result tells you whether the window accepted
-the change.
+     *
+     * The same as setting `frame`, except that the result tells you whether the window accepted
+     * the change.
      * @param frame The window's new frame
      * @returns true if the window was moved and resized, otherwise false
      */
     moveAndResize(frame: HSRect): boolean;
 
     /**
+     * Moves this window to another space, without switching to it. This works for any app's
+     * windows, and doesn't use Mission Control.
+     *
+     * Only windows on a desktop can be moved, and only to a desktop - not to or from a
+     * fullscreen space. Windows set to appear on every space can't be moved either.
+     * @param space The desktop to move the window to
+     * @returns A Promise that resolves once the window is on that space, or
+     */
+    moveToSpace(space: HSSpace): Promise<void>;
+
+    /**
      * Focus this window
-The window becomes its application's main window, and the application is brought to the front
-with only this window raised. The application's other windows keep their place in the stacking order.
-The application finishes coming to the front after this returns, and some applications then bring
-a different window forward, so this makes the window main again 0.3 seconds later. That is skipped
-if another of the application's windows has been chosen in the meantime, or if `focus()` is called again.
+     *
+     * The window becomes its application's main window, and the application is brought to the front
+     * with only this window raised. The application's other windows keep their place in the stacking order.
+     *
+     * The application finishes coming to the front after this returns, and some applications then bring
+     * a different window forward, so this makes the window main again 0.3 seconds later. That is skipped
+     * if another of the application's windows has been chosen in the meantime, or if `focus()` is called again.
      * @returns true if the window was made main and its application was brought to the front. The window
      */
     focus(): boolean;
 
     /**
      * Make this window its application's main window
-This does not activate the application. If the application is already frontmost, the window comes to the front.
+     *
+     * This does not activate the application. If the application is already frontmost, the window comes to the front.
      * @returns true if successful
      */
     becomeMain(): boolean;
@@ -12061,7 +13707,8 @@ This does not activate the application. If the application is already frontmost,
 
     /**
      * Capture the current on-screen contents of this window as an image.
-Requires **Screen Recording** permission.
+     *
+     * Requires **Screen Recording** permission.
      * @param keepTransparency Whether to preserve the window's alpha channel. If `false` (the default), transparent regions are filled with an opaque black background.
      * @returns Resolves with the captured image, or rejects if the capture fails (e.g. permission denied, or the window could no longer be located).
      */
@@ -12075,7 +13722,8 @@ Requires **Screen Recording** permission.
 
     /**
      * Returns a plain object describing this window, for JSON serialisation
-`JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
+     *
+     * `JSON.stringify()` calls this automatically, so you rarely need to call it yourself.
      * @returns An object with the window's `id`, `pid`, `title`, `application` (the owning app's title), `frame`, `isMinimized`, `isFullscreen` and `isStandard`. Values that can't be read are `null`
      */
     toJSON(): Record<string, any>;
@@ -12097,7 +13745,7 @@ Requires **Screen Recording** permission.
 
     /**
      * The window's underlying ID.
-A value of 0 or -1 likely means no window ID could be determined.
+     * A value of 0 or -1 likely means no window ID could be determined.
      */
     readonly id: number;
 
@@ -12138,9 +13786,10 @@ A value of 0 or -1 likely means no window ID could be determined.
 
     /**
      * The window's frame, as an HSRect
-Setting `frame`, `position` or `size` briefly turns off the owning application's
-`AXEnhancedUserInterface`, and restores it afterwards. Some applications (Chromium and Electron
-ones in particular) otherwise animate the change, or end up at the wrong size.
+     *
+     * Setting `frame`, `position` or `size` briefly turns off the owning application's
+     * `AXEnhancedUserInterface`, and restores it afterwards. Some applications (Chromium and Electron
+     * ones in particular) otherwise animate the change, or end up at the wrong size.
      */
     frame: HSRect | null;
 
@@ -12149,32 +13798,55 @@ ones in particular) otherwise animate the change, or end up at the wrong size.
      */
     readonly screen: HSScreen | null;
 
+    /**
+     * The spaces this window is on. That's usually one, but windows set to appear on every
+     * space are on all of them. Empty if Spaces are unavailable (see
+     * `hs.screen.spacesAvailable()`).
+     */
+    readonly spaces: HSSpace[];
+
 }
 
 /**
  * A connection to a SQLite database, as Node's `DatabaseSync` from `require('node:sqlite')`.
-Every method runs synchronously. Databases are opened with foreign key constraints enforced and
-double-quoted string literals disabled, as in Node.
-Not implemented from Node: `function()`, `aggregate()`, `loadExtension()`,
-`enableLoadExtension()`, `createSession()`, `applyChangeset()`, `backup()`,
-`createTagStore()` and `Symbol.dispose`.
+ *
+ * Every method runs synchronously. Databases are opened with foreign key constraints enforced and
+ * double-quoted string literals disabled, as in Node.
+ *
+ * Not implemented from Node: `function()`, `aggregate()`, `loadExtension()`,
+ * `enableLoadExtension()`, `createSession()`, `applyChangeset()`, `backup()`,
+ * `createTagStore()` and `Symbol.dispose`.
  */
 declare namespace node {
 }
 
 /**
  * A connection to a SQLite database, as Node's `DatabaseSync` from `require('node:sqlite')`.
-Every method runs synchronously. Databases are opened with foreign key constraints enforced and
-double-quoted string literals disabled, as in Node.
-Not implemented from Node: `function()`, `aggregate()`, `loadExtension()`,
-`enableLoadExtension()`, `createSession()`, `applyChangeset()`, `backup()`,
-`createTagStore()` and `Symbol.dispose`.
+ *
+ * Every method runs synchronously. Databases are opened with foreign key constraints enforced and
+ * double-quoted string literals disabled, as in Node.
+ *
+ * Not implemented from Node: `function()`, `aggregate()`, `loadExtension()`,
+ * `enableLoadExtension()`, `createSession()`, `applyChangeset()`, `backup()`,
+ * `createTagStore()` and `Symbol.dispose`.
  */
 declare class DatabaseSync {
     /**
      * Opens a SQLite database.
-Statements prepared on this database start with its `readBigInts`, `returnArrays`,
-`allowBareNamedParameters` and `allowUnknownNamedParameters` settings.
+     *
+     * Supported options, all optional:
+     * - `open` (boolean, default `true`): open the database now. If `false`, call `open()` later.
+     * - `readOnly` (boolean, default `false`): open the database read-only.
+     * - `enableForeignKeyConstraints` (boolean, default `true`): enforce foreign key constraints.
+     * - `enableDoubleQuotedStringLiterals` (boolean, default `false`): accept double-quoted string literals.
+     * - `timeout` (integer, default `0`): milliseconds to wait for a locked database before failing.
+     * - `readBigInts` (boolean, default `false`): read INTEGER values as `BigInt`s.
+     * - `returnArrays` (boolean, default `false`): return rows as arrays instead of objects.
+     * - `allowBareNamedParameters` (boolean, default `true`): allow named parameters without their prefix character.
+     * - `allowUnknownNamedParameters` (boolean, default `false`): ignore named parameters that the statement doesn't use.
+     *
+     * Statements prepared on this database start with its `readBigInts`, `returnArrays`,
+     * `allowBareNamedParameters` and `allowUnknownNamedParameters` settings.
      * @param path The path of the database file, or `":memory:"` for an in-memory database. A leading `~` is expanded to the home directory. Relative paths are relative to Hammerspoon's working directory, so use absolute paths.
      * @param options The options described above
      */
@@ -12182,26 +13854,26 @@ Statements prepared on this database start with its `readBigInts`, `returnArrays
 
     /**
      * Opens the database. Only needed if it was constructed with `open: false`, or after
-`close()`. Throws if the database is already open.
+     * `close()`. Throws if the database is already open.
      */
     open(): void;
 
     /**
      * Closes the database, finalizing every statement prepared on it. Throws if the database
-isn't open.
+     * isn't open.
      */
     close(): void;
 
     /**
      * Runs one or more SQL statements, without returning any results. Statements run in order
-until one fails, which throws.
+     * until one fails, which throws.
      * @param sql The SQL to run
      */
     exec(sql: string): void;
 
     /**
      * Compiles a SQL statement so it can be run, any number of times, with different parameters.
-Only the first statement in `sql` is compiled.
+     * Only the first statement in `sql` is compiled.
      * @param sql The SQL to compile
      * @returns The prepared statement
      */
@@ -12228,25 +13900,29 @@ Only the first statement in `sql` is compiled.
 
 /**
  * A prepared statement, as Node's `StatementSync`. Made by `DatabaseSync.prepare()`; it can't be
-constructed directly.
-Parameters are bound the same way for `run()`, `get()`, `all()` and `iterate()`: if the first
-argument is an object (other than a typed array), its properties are bound to named
-parameters (`:name`, `@name` or `$name`), and any remaining arguments are bound, in order, to
-| JavaScript | SQLite |
-|---|---|
-| `null`, `undefined` | NULL |
-| number | REAL (stored as INTEGER in columns with INTEGER affinity) |
-| boolean | INTEGER 1 or 0 |
-| bigint | INTEGER |
-| string | TEXT |
-| typed array (e.g. `Uint8Array`) | BLOB |
-Results come back as `null`, numbers (or `BigInt`s, see `setReadBigInts()`), strings and
-`Uint8Array`s. An INTEGER too large to be a JS number throws, unless `readBigInts` is set.
+ * constructed directly.
+ *
+ * Parameters are bound the same way for `run()`, `get()`, `all()` and `iterate()`: if the first
+ * argument is an object (other than a typed array), its properties are bound to named
+ * parameters (`:name`, `@name` or `$name`), and any remaining arguments are bound, in order, to
+ * anonymous (`?`) parameters. Values convert as in Node:
+ *
+ * | JavaScript | SQLite |
+ * |---|---|
+ * | `null`, `undefined` | NULL |
+ * | number | REAL (stored as INTEGER in columns with INTEGER affinity) |
+ * | boolean | INTEGER 1 or 0 |
+ * | bigint | INTEGER |
+ * | string | TEXT |
+ * | typed array (e.g. `Uint8Array`) | BLOB |
+ *
+ * Results come back as `null`, numbers (or `BigInt`s, see `setReadBigInts()`), strings and
+ * `Uint8Array`s. An INTEGER too large to be a JS number throws, unless `readBigInts` is set.
  */
 declare class StatementSync {
     /**
      * Runs the statement, and returns the number of rows it changed and the ID of the last row
-inserted.
+     * inserted.
      * @param params Named parameters (an object) and/or anonymous parameters
      * @returns The rows changed and the last inserted row ID. These are `BigInt`s if `readBigInts` is set.
      */
@@ -12268,7 +13944,7 @@ inserted.
 
     /**
      * Runs the statement and returns an iterator over its rows, which are read as the iterator
-is advanced. Running the statement again invalidates the iterator.
+     * is advanced. Running the statement again invalidates the iterator.
      * @param params Named parameters (an object) and/or anonymous parameters
      * @returns An iterator over the rows
      */
@@ -12282,7 +13958,7 @@ is advanced. Running the statement again invalidates the iterator.
 
     /**
      * Sets whether INTEGER values are read as `BigInt`s, including `run()`'s `changes` and
-`lastInsertRowid`.
+     * `lastInsertRowid`.
      * @param enabled Whether to read `BigInt`s
      */
     setReadBigInts(enabled: boolean): void;
@@ -12295,7 +13971,7 @@ is advanced. Running the statement again invalidates the iterator.
 
     /**
      * Sets whether named parameters may be given without their prefix character (`{ id: 1 }`
-for `:id`).
+     * for `:id`).
      * @param enabled Whether to allow bare names
      */
     setAllowBareNamedParameters(enabled: boolean): void;
@@ -12320,7 +13996,7 @@ for `:id`).
 
 /**
  * Iterates over the rows of a statement, as returned by `StatementSync.iterate()`. It's a
-standard JS iterator, so it works with `for...of`, spread syntax and iterator helpers.
+ * standard JS iterator, so it works with `for...of`, spread syntax and iterator helpers.
  */
 declare class StatementSyncIterator {
     /**
@@ -12343,8 +14019,9 @@ declare class StatementSyncIterator {
 declare namespace util {
     /**
      * Returns a string representation of a value, intended for debugging.
-Objects, arrays, `Map`/`Set`, functions, dates, and errors are formatted the way
-Node/browser consoles render them; a top-level string is returned as-is.
+     *
+     * Objects, arrays, `Map`/`Set`, functions, dates, and errors are formatted the way
+     * Node/browser consoles render them; a top-level string is returned as-is.
      * @param value The value to format.
      * @returns A formatted string.
      */

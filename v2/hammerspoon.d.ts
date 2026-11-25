@@ -247,7 +247,10 @@ declare class HSImage {
 
     /**
      * Create a cropped copy of the image
-     * @param rect HSRect defining the crop area (x, y, w, h)
+     *
+     * The crop area is measured from the top left corner of the image, like the frames of screens and windows,
+     * so a screen snapshot can be cropped to a window's frame (after subtracting the screen's origin).
+     * @param rect HSRect defining the crop area (x, y, w, h), with `y` measured down from the top of the image
      * @returns A new cropped HSImage, or null if the rect falls outside the image bounds
      */
     croppedCopy(rect: HSRect): HSImage | null;
@@ -2809,20 +2812,16 @@ declare class HSCamera {
  * builder for app-like interfaces -- reach for `hs.canvas` when you need absolute
  * positioning, clipped/composited shapes, or direct window-level/Spaces control.
  *
- * ## Coordinate systems -- read this before positioning elements
+ * ## Coordinates
  *
- * A canvas's **window position** (`create({x, y, w, h})`, and any later `x`/`y` you
- * compare it against, e.g. from `hs.screen`) uses unflipped AppKit screen coordinates:
- * `y = 0` is the *bottom* of the screen, and `y` increases upward. This matches
- * `hs.ui.window`.
+ * A canvas's **window position** (`create({x, y, w, h})`, `frame()`, `setFrame()`,
+ * `topLeft()`) uses the same screen coordinates as `hs.screen`, `hs.window` and
+ * `hs.ui.window`: `y = 0` is the *top* of the primary screen, and `y` increases downward.
+ * You can pass a window's or screen's `frame` straight to `create()` or `setFrame()`.
  *
- * But **element content** positioned *inside* a canvas -- every `frame`, `center`, and
- * `coordinates` value you pass to `appendElements()` and friends -- is drawn top-down:
- * `y = 0` is the *top* of the canvas, and `y` increases downward. These two coordinate
- * senses are independent of each other and easy to conflate, especially when a script
- * computes an element's position from the same screen geometry it used for the
- * window's own placement. If a shape appears vertically mirrored from where you
- * expect, this mismatch is the first thing to check.
+ * **Element content** positioned *inside* a canvas -- every `frame`, `center`, and
+ * `coordinates` value you pass to `appendElements()` and friends -- is relative to the
+ * canvas: `{x: 0, y: 0}` is the canvas's top-left corner, and `y` increases downward.
  *
  * ## Example: a rounded screen corner overlay
  * ```javascript
@@ -2847,10 +2846,10 @@ declare namespace hs.canvas {
      * JavaScriptCore-exported method name (it collides with the JS `new` operator
      * keyword at the bridging layer), and this codebase's conventions additionally
      * forbid method names starting with `new`/`alloc`/`copy` (an ARC/ObjC hazard).
-     * @param rect A `{x, y, w, h}` dictionary describing the canvas window's frame
+     * @param rect The canvas window's frame: an HSRect (e.g. a window's or screen's `frame`) or a `{x, y, w, h}` dictionary, with `y = 0` at the top of the primary screen
      * @returns A new HSCanvas, not yet shown
      */
-    function create(rect: object): HSCanvas;
+    function create(rect: HSRect | object): HSCanvas;
 
     /**
      * Named window levels, exposed as raw numeric values (not opaque strings) so
@@ -2968,32 +2967,31 @@ declare class HSCanvas {
 
     /**
      * The canvas window's current position and size
-     * @returns A `{x, y, w, h}` dictionary, in the same unflipped AppKit screen coordinates as `create()`
+     * @returns A `{x, y, w, h}` dictionary, in the same screen coordinates as `create()` and `hs.screen` (`y = 0` at the top of the primary screen)
      */
     frame(): object;
 
     /**
      * Move and/or resize the canvas window
-     * @param rect A `{x, y, w, h}` dictionary. Any keys left out keep their current value
+     * @param rect An HSRect (e.g. a window's or screen's `frame`) or a `{x, y, w, h}` dictionary, in the same screen coordinates as `hs.screen` and `hs.window`. Any keys left out of a dictionary keep their current value
      * @returns Self for chaining
      */
-    setFrame(rect: object): HSCanvas;
+    setFrame(rect: HSRect | object): HSCanvas;
 
     /**
      * The canvas window's current top-left corner
      *
-     * "Top-left" here means the same unflipped AppKit sense `create()`/`frame()` use:
-     * the point at the window's highest `y` (its screen-visual top), not `y = 0`.
+     * This is the same point as `frame()`'s `x`/`y`.
      * @returns An `{x, y}` dictionary
      */
     topLeft(): object;
 
     /**
      * Move the canvas window without changing its size
-     * @param point An `{x, y}` dictionary giving the new top-left corner. Any keys left out keep their current value
+     * @param point An HSPoint or an `{x, y}` dictionary giving the new top-left corner. Any keys left out of a dictionary keep their current value
      * @returns Self for chaining
      */
-    setTopLeft(point: object): HSCanvas;
+    setTopLeft(point: HSPoint | object): HSCanvas;
 
     /**
      * The canvas window's current size
@@ -3077,10 +3075,8 @@ declare class HSCanvas {
     /**
      * Append one or more elements to the end of the canvas
      *
-     * Element `frame`/`center`/`coordinates` values are y-down (`y = 0` at the top of
-     * the canvas) -- a different sense from the canvas *window's* own `x`/`y` position,
-     * which is unflipped AppKit screen coordinates. See `hs.canvas`'s module-level docs
-     * for the full explanation.
+     * Element `frame`/`center`/`coordinates` values are relative to the canvas itself:
+     * `{x: 0, y: 0}` is the canvas's top-left corner, and `y` increases downward.
      * @param elements Array of element dictionaries (each needs at least a `type`)
      * @returns Self for chaining
      * @throws {Error} Throws an Error on failure; wrap calls in try/catch to handle it.
@@ -3225,8 +3221,8 @@ declare class HSCanvas {
      * @param up Track mouse-up events
      * @param enterExit Track mouse enter/exit events
      * @param move Track mouse-move events
-     * @param rightDown Track right mouse-down events (defaults to `false`). Every call sets
-     * @param rightUp Track right mouse-up events (defaults to `false`). Every call sets all
+     * @param rightDown Track right mouse-down events (defaults to `false`). Every call sets all six flags, so omitting this turns right mouse-down tracking off
+     * @param rightUp Track right mouse-up events (defaults to `false`). Every call sets all six flags, so omitting this turns right mouse-up tracking off
      * @returns Self for chaining
      */
     canvasMouseEvents(down: boolean, up: boolean, enterExit: boolean, move: boolean, rightDown?: boolean, rightUp?: boolean): HSCanvas;
@@ -3655,6 +3651,15 @@ declare class HSChooser {
      * separator. Any other fields on an entry (e.g. an `id`) are passed back to
      * `onContextMenuSelect` unchanged, so one handler can tell the entries apart.
      *
+     * A menu item can show a keyboard shortcut with a `shortcut` field: a string of modifier symbols
+     * (`⌘` `⇧` `⌥` `⌃`) followed by one key, as the menu shows it (`"⇧⌘C"`, or just `"O"` for no
+     * modifiers), or an object with the modifiers and key spelled out
+     * (`{ mods: ["cmd", "shift"], key: "c" }`). Modifier and key names are the same as for
+     * `hs.hotkey.bind()`.
+     *
+     * **A menu shortcut is not a system-wide hotkey**, nor a shortcut for the chooser: pressing it
+     * chooses the item only while the context menu is open, and does nothing while it's closed.
+     *
      * Rows whose choice has `contextMenu: false` show no menu, e.g. for a "Clear history" row.
      */
     contextMenu: Array<Record<string, any>>;
@@ -3703,6 +3708,9 @@ declare namespace hs.dockicon {
      * - `color` (HSColor or hex string): The colour of the item's title text.
      * - `icon` (HSImage): Icon shown to the left of the title.
      * - `menu` (array): Nested array of menu item objects to create a submenu.
+     * - `shortcut` (string or object): Accepted so that the same items can be shared with `HSMenuBarItem.setMenu()`,
+     *   but **the Dock ignores it**: it draws the menu itself, shows no shortcuts, and pressing one does nothing.
+     *   Menu shortcuts are never system-wide hotkeys anyway; use `hs.hotkey.bind()` for those.
      *
      * The menu is removed when the config is reloaded.
      * @param menuOrFn Array of menu item objects, a function returning such an array, or null to remove the extra items
@@ -3829,9 +3837,9 @@ declare namespace hs.eventtap {
      * held when it's created. It is a single key event: to send a whole keystroke with modifiers to an
      * application, including the modifier key presses some applications need to see, use
      * `hs.eventtap.keyStroke(mods, key, app)`.
-     * @param key A key name or character (e.g. "a", "space", "return", "f1"), resolved
+     * @param key A key name or character (e.g. "a", "space", "return", "f1"), resolved through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code
      * @param isDown true for key down, false for key up
-     * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`.
+     * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`. Omit to keep the modifiers that are currently held.
      * @returns An HSEventTapEvent, or null if the key name is unknown
      */
     function makeKeyEvent(key: string | number, isDown: boolean, mods?: string[] | null): HSEventTapEvent | null;
@@ -3843,7 +3851,7 @@ declare namespace hs.eventtap {
      * held when it's created.
      * @param keyCode A numeric virtual key code
      * @param isDown true for key down, false for key up
-     * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`.
+     * @param mods An array of modifier names (e.g. ["cmd", "shift"]), as accepted by `hs.eventtap.keyStroke()`. Omit to keep the modifiers that are currently held.
      * @returns An HSEventTapEvent
      */
     function makeKeyEventWithCode(keyCode: number, isDown: boolean, mods?: string[] | null): HSEventTapEvent | null;
@@ -3899,8 +3907,8 @@ declare namespace hs.eventtap {
      * released around the key, as a real keyboard does, so applications that track modifier
      * key presses themselves see them held.
      * @param mods An array of modifier names (e.g. ["cmd", "shift"])
-     * @param key A key name or character (e.g. "a", "space", "return"), resolved
-     * @param app The application to send the keystroke to. Omit, or pass null, to
+     * @param key A key name or character (e.g. "a", "space", "return"), resolved through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which always presses the same physical key
+     * @param app The application to send the keystroke to. Omit, or pass null, to send it to the frontmost application.
      */
     function keyStroke(mods: string[], key: string | number, app?: HSApplication | null): void;
 
@@ -4052,10 +4060,10 @@ declare namespace hs.eventtap {
      *
      * Requires Accessibility permission.
      * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
-     * @param mods An array of modifier key strings. Supports generic names (`cmd`, `shift`, `alt`,
-     * @param key A key name or character (e.g., "a", "space", "f1"), resolved through the
-     * @param onPressed Called when the key combination is pressed, and again for
-     * @param onReleased Called when the key is released, or as soon as a key
+     * @param mods An array of modifier key strings. Supports generic names (`cmd`, `shift`, `alt`, `ctrl`, `fn`) and side-specific names (`leftCmd`, `rightCmd`, `leftAlt`, `rightAlt`, `leftCtrl`, `rightCtrl`, `leftShift`, `rightShift`). macOS reports `fn` as held on every press of the arrow keys, F-keys, help, home, end, page up/down, forward delete and keypad clear, so on those keys a hotkey with `fn` also fires without it (one without `fn` still works).
+     * @param key A key name or character (e.g., "a", "space", "f1"), resolved through the current keyboard layout (see `hs.eventtap.followsKeyboardLayout`), or a numeric virtual key code, which always means the same physical key
+     * @param onPressed Called when the key combination is pressed, and again for each key repeat while the whole combination stays held, or null
+     * @param onReleased Called when the key is released, or as soon as a key repeat shows the combination is no longer held (e.g. a modifier was let go first), or null. After that, the key's remaining repeats and its release pass through as normal.
      * @returns An `HSEventTapHotkey` object, or null if binding failed
      */
     function bindHotkey(mods: string[], key: string | number, onPressed: (() => void) | null, onReleased: (() => void) | null): HSEventTapHotkey | null;
@@ -5363,8 +5371,8 @@ declare namespace hs.hotkey {
     /**
      * Bind a hotkey
      * @remarks The hotkey stays bound until you disable it, even if you don't keep a reference to it.
-     * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
-     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
+     * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names: `cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
+     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which always means the same physical key
      * @param onPressed A JavaScript function to call when the hotkey is pressed, or null for no callback
      * @param onReleased A JavaScript function to call when the hotkey is released, or null/omitted for no callback
      * @param onRepeat A JavaScript function to call repeatedly while the hotkey is held down, or null/omitted for no repeat
@@ -5386,8 +5394,8 @@ declare namespace hs.hotkey {
 
     /**
      * Create a hotkey without enabling it
-     * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names:
-     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved
+     * @param mods An array of modifier key strings (e.g., `["cmd", "shift"]`). Supported names: `cmd` / `command` / `⌘`, `shift` / `⇧`, `alt` / `option` / `⌥`, `ctrl` / `control` / `⌃`.
+     * @param key The key: a name or character (e.g. "a", "space", "return", "f1"), resolved through the current keyboard layout (see `hs.keycodes.map`), or a numeric virtual key code, which always means the same physical key
      * @param onPressed A JavaScript function to call when the hotkey is pressed, or null for no callback
      * @param onReleased A JavaScript function to call when the hotkey is released, or null/omitted for no callback
      * @param onRepeat A JavaScript function to call repeatedly while the hotkey is held down, or null/omitted for no repeat
@@ -5439,7 +5447,20 @@ declare namespace hs.hotkey {
      * @param spec An object with the following fields:
      * @returns A hotkey object, or null if binding failed
      */
-    function bindSpec(spec: any): any;
+    function bindSpec(spec: {
+        /** Modifier keys (e.g. ["cmd", "shift"]) */
+        mods: string[];
+        /** Key name or character (e.g. "h"), or a numeric key code */
+        key: string | number;
+        /** [optional] A description shown as a toast when the hotkey fires */
+        message: string;
+        /** [optional] Called when the hotkey is pressed */
+        pressed: (() => void) | null;
+        /** [optional] Called when the hotkey is released */
+        released: (() => void) | null;
+        /** [optional] Called repeatedly while the hotkey is held down */
+        repeat: (() => void) | null;
+    }): any;
 
     /**
      * Create a new modal hotkey group, optionally entered via a trigger key combination
@@ -6334,21 +6355,21 @@ declare namespace hs.keycodes {
 
     /**
      * Switches the active keyboard layout to the one with the given localized name.
-     * @param layoutName The localized name of the layout to activate (e.g. `"U.S."`).
+     * @param layoutName The localized name of the layout to activate (e.g. `"U.S."`). Use `layouts()` to enumerate valid names.
      * @returns `true` if the layout was found and selected, `false` otherwise.
      */
     function setLayout(layoutName: string): boolean;
 
     /**
      * Switches the active input method to the one with the given localized name.
-     * @param methodName The localized name of the input method to activate.
+     * @param methodName The localized name of the input method to activate. Use `methods()` to enumerate valid names.
      * @returns `true` if the method was found and selected, `false` otherwise.
      */
     function setMethod(methodName: string): boolean;
 
     /**
      * Switches the active input source to the one with the given reverse-DNS identifier.
-     * @param sourceID The input source ID to activate (e.g. `"com.apple.keylayout.British"`).
+     * @param sourceID The input source ID to activate (e.g. `"com.apple.keylayout.British"`). Use `currentSourceID()` to see the current value.
      * @returns `true` if the source was found and selected, `false` otherwise.
      */
     function setSourceID(sourceID: string): boolean;
@@ -6455,16 +6476,16 @@ declare namespace hs.locale {
 
     /**
      * Returns detailed information about the current or a specified locale.
-     * @param identifier A locale identifier from `availableLocales()`. If omitted, the
-     * @returns A dictionary describing the locale, including (where available):
+     * @param identifier A locale identifier from `availableLocales()`. If omitted, the user's currently selected locale is used.
+     * @returns A dictionary describing the locale, including (where available): `identifier`, `languageCode`, `countryCode`, `scriptCode`, `variantCode`, `currencyCode`, `currencySymbol`, `decimalSeparator`, `groupingSeparator`, `collationIdentifier`, `measurementSystem` (`"metric"`, `"us"`, or `"uk"`), `usesMetricSystem`, `temperatureUnit`, `timeFormatIs24Hour`, `quotationBeginDelimiter`, `quotationEndDelimiter`, `alternateQuotationBeginDelimiter`, `alternateQuotationEndDelimiter`, and `calendar` — a nested object describing the locale's calendar (`identifier`, `firstWeekday`, `minimumDaysInFirstWeek`, `amSymbol`, `pmSymbol`, and arrays of era/month/quarter/weekday symbols in their standard, short, standalone, and very-short forms).
      */
     function details(identifier?: string | null): Record<string, any>;
 
     /**
      * Returns the localized display name for a locale identifier.
-     * @param localeCode The locale identifier to look up (e.g. `"de_CH"`). Must be one
-     * @param baseLocaleCode The locale to display the name in. If omitted, the user's
-     * @returns A dictionary with `name` (e.g. `"German"`) and `nameWithDialect`
+     * @param localeCode The locale identifier to look up (e.g. `"de_CH"`). Must be one of the strings returned by `availableLocales()`.
+     * @param baseLocaleCode The locale to display the name in. If omitted, the user's currently selected locale is used. Must be one of the strings returned by `availableLocales()`.
+     * @returns A dictionary with `name` (e.g. `"German"`) and `nameWithDialect` (e.g. `"German (Switzerland)"`), or `null` if either locale code is invalid.
      */
     function localizedName(localeCode: string, baseLocaleCode?: string | null): Record<string, string> | null;
 
@@ -6758,6 +6779,16 @@ declare class HSMenuBarItem {
      * - `color` (HSColor or hex string): The colour of the item's title text.
      * - `icon` (HSImage): Icon shown to the left of the title.
      * - `menu` (array): Nested array of menu item objects to create a submenu.
+     * - `shortcut` (string or object): A keyboard shortcut to show at the right-hand side of the item. Either a
+     *   string of modifier symbols (`⌘` `⇧` `⌥` `⌃`) followed by one key, as the menu shows it (`"⌘T"`, `"⇧⌘N"`,
+     *   or just `"F"` for no modifiers), or an object with the modifiers and key spelled out
+     *   (`{ mods: ["cmd", "shift"], key: "n" }`; leave out `mods` for no modifiers). The key can be a character,
+     *   a key name such as `"return"`, `"delete"`, `"left"` or `"f5"`, or the symbol a menu draws for it such as
+     *   `↩`, `⌫`, `⎋` or `←` (`"⌘⌫"`). Modifier and key names are the same as for `hs.hotkey.bind()`.
+     *
+     * **A menu shortcut is not a system-wide hotkey.** Pressing it chooses the item only while the menu is
+     * open; while the menu is closed it does nothing. To run something from anywhere with a key combination,
+     * also bind it with `hs.hotkey.bind()`.
      * @param menuOrFn Array of menu item objects, a function returning such an array, or null to remove the menu
      */
     setMenu(menuOrFn: Array<Record<string, any>> | ((modifiers: string[]) => Array<Record<string, any>>) | null): void;
@@ -6906,7 +6937,7 @@ declare class HSMIDIDevice {
      * - `pitchWheelChange`: `pitchChange` (0-16383, center `8192`), `channel` (0-15)
      * @param commandType The command type string
      * @param metadata A table of command-specific fields
-     * @returns `true` if the command was sent, `false` if the device has no
+     * @returns `true` if the command was sent, `false` if the device has no destination (e.g. a source with no destination of the same name) or `commandType`/`metadata` was invalid
      */
     sendCommand(commandType: string, metadata: object): boolean;
 
@@ -7085,7 +7116,7 @@ declare namespace hs.mouse {
     /**
      * Returns the name of the cursor type currently set by this application.
      * @remarks This reflects the cursor set by the Hammerspoon process. If another application
-     * @returns A string such as `"arrow"`, `"iBeam"`, `"crosshair"`, `"pointingHand"`,
+     * @returns A string such as `"arrow"`, `"iBeam"`, `"crosshair"`, `"pointingHand"`, `"openHand"`, `"closedHand"`, `"resizeLeft"`, `"resizeRight"`, `"resizeLeftRight"`, `"resizeUp"`, `"resizeDown"`, `"resizeUpDown"`, `"operationNotAllowed"`, `"dragLink"`, `"dragCopy"`, `"contextualMenu"`, `"iBeamCursorForVerticalLayout"`, or `"unknown"`.
      */
     function currentCursorType(): string;
 
@@ -7358,8 +7389,8 @@ declare namespace hs.network {
      * The store holds live network configuration for the running system — interface addresses,
      * routing, DNS servers, proxy settings, VPN state, and more. Keys follow a hierarchical
      * path convention (e.g. `"State:/Network/Global/IPv4"`).
-     * @param pattern An optional regular expression that filters which keys are included.
-     * @returns A dictionary mapping key strings to their current values. Values may be
+     * @param pattern An optional regular expression that filters which keys are included. Omit or pass `null` to return all keys (equivalent to `".*"`).
+     * @returns A dictionary mapping key strings to their current values. Values may be dictionaries, arrays, strings, or numbers depending on the key.
      */
     function configurationStore(pattern: string | null): Record<string, any>;
 
@@ -8620,7 +8651,7 @@ declare namespace hs.power {
      *
      * Creates an IOKit power assertion that stops macOS from allowing the specified
      * type of sleep. Call `allowSleep` with the same type to release the assertion.
-     * @param type The sleep type to prevent. One of: `"display"` (prevent display
+     * @param type The sleep type to prevent. One of: `"display"` (prevent display idle sleep), `"systemIdle"` (prevent system idle sleep), `"system"` (prevent all system sleep, including from power button or lid close).
      * @returns `true` if the assertion was created successfully.
      */
     function preventSleep(type: string): boolean;
@@ -8915,20 +8946,20 @@ declare namespace hs.screen {
      * The names Mission Control shows for each space, such as "Desktop 2" or "Safari". This
      * opens Mission Control briefly to read them, and needs Accessibility permission. For a
      * desktop's number without opening Mission Control, use `HSSpace.desktopNumber`.
-     * @returns A Promise that resolves to an object mapping
+     * @returns A Promise that resolves to an object mapping each space's ID to its name, or rejects with the reason they couldn't be read
      */
     function missionControlNames(): Promise<Record<string, string>>;
 
     /**
      * Opens Mission Control, and keeps it open until `closeMissionControl()`, even across other
      * Spaces operations that use it. Needs Accessibility permission.
-     * @returns A Promise that resolves once Mission Control is fully open, or
+     * @returns A Promise that resolves once Mission Control is fully open, or rejects with the reason it couldn't be opened
      */
     function openMissionControl(): Promise<void>;
 
     /**
      * Closes Mission Control, if it's open. Needs Accessibility permission.
-     * @returns A Promise that resolves once Mission Control has fully closed,
+     * @returns A Promise that resolves once Mission Control has fully closed, or rejects with the reason it couldn't be closed
      */
     function closeMissionControl(): Promise<void>;
 
@@ -9123,7 +9154,7 @@ declare class HSScreen {
     /**
      * Adds a desktop to the end of this screen's spaces, by opening Mission Control and
      * clicking its add button. Needs Accessibility permission.
-     * @returns A Promise that resolves to the new desktop, or rejects with
+     * @returns A Promise that resolves to the new desktop, or rejects with the reason it couldn't be added
      */
     addSpace(): Promise<HSSpace>;
 
@@ -9244,7 +9275,7 @@ declare class HSSpace {
     /**
      * Switches this space's screen to this space, by opening Mission Control and clicking it.
      * Needs Accessibility permission.
-     * @returns A Promise that resolves once the screen is showing this space
+     * @returns A Promise that resolves once the screen is showing this space and Mission Control has closed, or rejects with the reason it couldn't switch
      */
     goto(): Promise<void>;
 
@@ -9254,13 +9285,13 @@ declare class HSSpace {
      *
      * Only desktops can be removed - not fullscreen spaces - and macOS won't remove a screen's
      * only desktop, or the desktop the screen is currently showing.
-     * @returns A Promise that resolves once the desktop has gone, or rejects
+     * @returns A Promise that resolves once the desktop has gone, or rejects with the reason it couldn't be removed
      */
     remove(): Promise<void>;
 
     /**
      * A summary of the space, for `JSON.stringify()` and the Console
-     * @returns An object with the space's `id`, `uuid`, `type`, `screen` (its UUID),
+     * @returns An object with the space's `id`, `uuid`, `type`, `screen` (its UUID), `desktopNumber`, `isCurrent` and `isFocused`
      */
     toJSON(): Record<string, any>;
 
@@ -10574,9 +10605,10 @@ declare namespace hs.spoons {
      *
      * If the object has a `bindings` object (its actions, keyed by name), it's given a generic
      * `bindHotkeys(mapping)` before `init()` runs, which binds the hotkeys in `mapping` (e.g.
-     * `{ show: [["cmd", "alt"], "g"] }`) to those actions. This replaces any `bindHotkeys()` the
-     * Spoon exports itself. A Spoon without `bindings` keeps its own `bindHotkeys()`, if it has
-     * one. See the Spoons guide for the details.
+     * `{ show: [["cmd", "alt"], "g"] }`) to those actions, and an `unbindHotkeys(actions)` that
+     * unbinds them again. These replace any `bindHotkeys()` and `unbindHotkeys()` the Spoon
+     * exports itself. A Spoon without `bindings` keeps its own, if it has them. See the Spoons
+     * guide for the details.
      *
      * `path` is for developing a Spoon: it loads the Spoon straight from that directory (such as
      * a `.spoon2` bundle in your own checkout of its repository), instead of from `Spoons/`, so
@@ -11294,7 +11326,7 @@ declare namespace hs.task {
      * @param args - Array of arguments
      * @param options - Options object or legacy callback
      * @param legacyStreamCallback - Legacy streaming callback (optional)
-     * @returns The task's result
+     * @returns The task's result. If the task exits with a non-zero status or is killed by a signal, the promise rejects with an Error that also has the result's exitCode, stdout, stderr and reason
      */
     function runAsync(launchPath: string, args: string[], options: Object|Function, legacyStreamCallback: Function): Promise<{exitCode: number, stdout: string, stderr: string}>;
 
@@ -11724,7 +11756,7 @@ declare class HSTranslationSession {
     /**
      * Translate a string from the session's source language to its target language.
      * @param text The text to translate.
-     * @returns A Promise resolving to the translated string,
+     * @returns A Promise resolving to the translated string, or rejecting with an error message if translation fails.
      */
     translate(text: string): Promise<string>;
 
@@ -12002,10 +12034,14 @@ declare namespace hs.ui {
      *
      * Creates a borderless window that can contain custom UI elements built using a declarative,
      * SwiftUI-like syntax with shapes, text, and layout containers.
-     * @param dict Dictionary with keys: `x`, `y`, `w`, `h` (all numbers)
+     *
+     * The window is placed in the same screen coordinates as `hs.screen` and `hs.window`:
+     * `y = 0` is the top of the primary screen, and `y` increases downward. Like `hs.window`'s
+     * `frame`, the rect is the whole window, including its title bar if it has one.
+     * @param rect The window's frame: an HSRect (e.g. a screen's `frame`) or a dictionary with keys `x`, `y`, `w`, `h` (all numbers)
      * @returns An `HSUIWindow` object for chaining
      */
-    function window(dict: Record<string, any>): HSUIWindow;
+    function window(rect: HSRect | object): HSUIWindow;
 
     /**
      * Create a temporary on-screen alert
@@ -12308,7 +12344,7 @@ declare class HSUIWindow {
 
     /**
      * Add a text element
-     * @param content The text to display — a plain JS string for static text,
+     * @param content The text to display — a plain JS string for static text, or an `HSString` object (from `hs.ui.string()`) for reactive text
      * @returns Self for chaining (apply modifiers like `font()`, `foregroundColor()`)
      */
     text(content: string | HSString): HSUIWindow;
@@ -12333,8 +12369,8 @@ declare class HSUIWindow {
 
     /**
      * Add a button element
-     * @param label The button label — a plain JS string for static text,
-     * @returns Self for chaining (apply `.fill()`, `.cornerRadius()`, `.font()`,
+     * @param label The button label — a plain JS string for static text, or an `HSString` object (from `hs.ui.string()`) for reactive text
+     * @returns Self for chaining (apply `.fill()`, `.cornerRadius()`, `.font()`, `.foregroundColor()`, `.frame()`, `.onClick()` etc.)
      */
     button(label: string | HSString): HSUIWindow;
 
@@ -13501,6 +13537,17 @@ declare namespace hs.window {
     function focusedWindow(): HSWindow | null;
 
     /**
+     * Get the window with the given ID
+     *
+     * This is much faster than searching `allWindows()` for the ID, because it only asks the
+     * application that owns the window for its windows. Like `allWindows()`, this can find windows
+     * in native fullscreen and on other Spaces, with the same limitation.
+     * @param id The window's ID (see the `id` property on `hs.window` objects)
+     * @returns The window, or null if there is no window with that ID
+     */
+    function forID(id: number): HSWindow | null;
+
+    /**
      * Get all windows from all applications
      *
      * This includes windows in native fullscreen and on other Spaces, with one limitation: macOS
@@ -13574,7 +13621,7 @@ declare namespace hs.window {
      * those from `HSSpace.windowIDs()`.
      * @param id The window's ID
      * @param space The desktop to move the window to
-     * @returns A Promise that resolves once the window is on that space, or
+     * @returns A Promise that resolves once the window is on that space, or rejects with the reason it couldn't be moved
      */
     function moveToSpaceForID(id: number, space: HSSpace): Promise<void>;
 
@@ -13645,7 +13692,7 @@ declare class HSWindow {
      * Only windows on a desktop can be moved, and only to a desktop - not to or from a
      * fullscreen space. Windows set to appear on every space can't be moved either.
      * @param space The desktop to move the window to
-     * @returns A Promise that resolves once the window is on that space, or
+     * @returns A Promise that resolves once the window is on that space, or rejects with the reason it couldn't be moved
      */
     moveToSpace(space: HSSpace): Promise<void>;
 
@@ -13658,7 +13705,7 @@ declare class HSWindow {
      * The application finishes coming to the front after this returns, and some applications then bring
      * a different window forward, so this makes the window main again 0.3 seconds later. That is skipped
      * if another of the application's windows has been chosen in the meantime, or if `focus()` is called again.
-     * @returns true if the window was made main and its application was brought to the front. The window
+     * @returns true if the window was made main and its application was brought to the front. The window may not be the focused window yet; check `hs.window.focusedWindow()` after a short delay if it matters.
      */
     focus(): boolean;
 
